@@ -30,10 +30,10 @@ const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo }) => {
   // Contributors data
   const contributorsData: ContributorData[] = [
     { 
-      name: "John Doe", 
-      role: "Lead Developer", 
-      bio: "Implemented core functionality and architecture.",
-      linkedin: "https://www.linkedin.com/in/jhu-acm-dev",
+      name: "Alan Li", 
+      role: "About Us", 
+      bio: "2026",
+      linkedin: "https://www.linkedin.com/in/alanli6/",
       imagePath: "/images/contributors/john.jpg"
     },
     { 
@@ -60,14 +60,15 @@ const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo }) => {
   ];
 
   return (
-    <div className="about-container">
-      <h1 className="about-title" style={{ color: 'white' }}>Credits</h1>
+    <div className="about-container" style={{ position: 'relative', zIndex: 1 }}>
+      <div className="about-background" style={{ zIndex: -1 }}></div>
+      <h1 className="about-title" style={{ color: 'white', position: 'relative', zIndex: 2 }}>Credits</h1>
       
-      <div className="about-content">
+      <div className="about-content" style={{ position: 'relative', zIndex: 2 }}>
         <div style={{ marginBottom: '30px' }}>
           <h2 style={{ color: 'white', marginBottom: '10px' }}>Website Development</h2>
           <ul style={{ listStyleType: 'none', color: 'white' }}>
-            <li>Design & Implementation: JHU ACM Web Team</li>
+            <li>Brought to you by: Spring 2025 JHU ACM Coding Circle</li>
             <li>Framework: React with TypeScript</li>
           </ul>
         </div>
@@ -100,7 +101,7 @@ const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo }) => {
                 <div className="flip-card-back">
                   <h3 style={{ margin: '0 0 5px 0', fontSize: '1rem' }}>{contributor.name}</h3>
                   <h4 style={{ margin: '0 0 5px 0', fontWeight: 'normal', fontSize: '0.9rem' }}>{contributor.role}</h4>
-                  <p style={{ fontSize: '0.8rem', margin: '0 0 8px 0' }}>{contributor.bio}</p>
+                  <p style={{ fontSize: '0.8rem', margin: '0 0 8px 0', color: 'inherit' }}>{contributor.bio}</p>
                   <a 
                     href={contributor.linkedin} 
                     target="_blank" 
@@ -150,7 +151,9 @@ const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo }) => {
           border: 'none',
           borderRadius: '4px',
           cursor: 'pointer',
-          marginTop: '20px'
+          marginTop: '20px',
+          position: 'relative',
+          zIndex: 2
         }}
       >
         Back to Home
@@ -170,7 +173,8 @@ const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo }) => {
           cursor: 'pointer',
           backgroundColor: 'rgba(50, 50, 50, 0.5)',
           padding: '8px 0',
-          backdropFilter: 'blur(2px)'
+          backdropFilter: 'blur(2px)',
+          zIndex: 2
         }}
       >
         made with lots of ❤️ @JHU ACM

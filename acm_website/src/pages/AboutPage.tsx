@@ -127,10 +127,11 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo }) => {
   ];
 
   return (
-    <div className="about-container">
-      <h1 className="about-title" style={{ color: 'white' }}>About Us</h1>
+    <div className="about-container" style={{ position: 'relative', zIndex: 1 }}>
+      <div className="about-background" style={{ zIndex: -1 }}></div>
+      <h1 className="about-title" style={{ color: 'white', position: 'relative', zIndex: 2 }}>About Us</h1>
       
-      <div className="about-content">
+      <div className="about-content" style={{ position: 'relative', zIndex: 2 }}>
         <p style={{ color: 'white' }}>
           We are a student organization of the Johns Hopkins University dedicated to furthering the knowledge and advancement of computers and 
           information technology through the free exchange of ideas and information. As a chapter of the oldest computing society in the world, the JHU ACM 
@@ -139,7 +140,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo }) => {
         </p>
       </div>
       
-      <h2 className="leadership-title" style={{ color: 'white' }}>Officers</h2>
+      <h2 className="leadership-title" style={{ color: 'white', position: 'relative', zIndex: 2 }}>Officers</h2>
       
       <div style={{ 
         display: 'grid', 

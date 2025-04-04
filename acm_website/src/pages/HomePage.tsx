@@ -24,16 +24,23 @@ const HomePage: React.FC<HomePageProps> = ({ navigateTo }) => {
         </button>
       </div>
       
-      <div style={{ 
-        fontSize: '0.8rem', 
-        textAlign: 'center', 
-        position: 'fixed',
-        bottom: '10px',
-        left: '0',
-        right: '0',
-        color: 'gray',
-        opacity: 0.8
-      }}>
+      <div 
+        onClick={() => navigateTo('credits')}
+        style={{ 
+          fontSize: '0.8rem', 
+          textAlign: 'center', 
+          position: 'fixed',
+          bottom: '0',
+          left: '0',
+          right: '0',
+          color: 'white',
+          opacity: 0.8,
+          cursor: 'pointer',
+          backgroundColor: 'rgba(50, 50, 50, 0.5)',
+          padding: '8px 0',
+          backdropFilter: 'blur(2px)'
+        }}
+      >
         made with lots of ❤️ @JHU ACM
       </div>
     </div>

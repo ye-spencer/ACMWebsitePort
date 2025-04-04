@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import './App.css'
 import HomePage from './pages/HomePage'
 import AboutPage from './pages/AboutPage'
 import EventsPage from './pages/EventsPage'
+import CreditsPage from './pages/CreditsPage'
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home')
@@ -11,11 +12,24 @@ function App() {
     setCurrentPage(page)
   }
 
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'home':
+        return <HomePage navigateTo={navigateTo} />
+      case 'about':
+        return <AboutPage navigateTo={navigateTo} />
+      case 'events':
+        return <EventsPage navigateTo={navigateTo} />
+      case 'credits':
+        return <CreditsPage navigateTo={navigateTo} />
+      default:
+        return <HomePage navigateTo={navigateTo} />
+    }
+  }
+
   return (
     <div className="App">
-      {currentPage === 'home' && <HomePage navigateTo={navigateTo} />}
-      {currentPage === 'about' && <AboutPage navigateTo={navigateTo} />}
-      {currentPage === 'events' && <EventsPage navigateTo={navigateTo} />}
+      {renderPage()}
     </div>
   )
 }

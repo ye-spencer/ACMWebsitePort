@@ -7,7 +7,7 @@ interface HomePageProps {
 const HomePage: React.FC<HomePageProps> = ({ navigateTo }) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] p-8">
-      <h1 className="text-4xl font-bold mb-4 text-gray-800">Welcome to ACM</h1>
+      <h1 className="text-4xl font-bold mb-4 text-gray-800">Welcome to JHU ACM</h1>
       <p className="text-xl mb-8 text-gray-600">Association for Computing Machinery</p>
       <div className="flex gap-4">
         <button 
@@ -41,7 +41,7 @@ const HomePage: React.FC<HomePageProps> = ({ navigateTo }) => {
           backdropFilter: 'blur(2px)'
         }}
       >
-        made with lots of ❤️ @JHU ACM
+        Made with lots of ❤️ by JHU ACM
       </div>
     </div>
   );

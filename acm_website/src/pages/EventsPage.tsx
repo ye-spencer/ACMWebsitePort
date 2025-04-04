@@ -69,7 +69,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo }) => {
           backdropFilter: 'blur(2px)'
         }}
       >
-        made with lots of ❤️ @JHU ACM
+        Made with lots of ❤️ by JHU ACM
       </div>
     </div>
   );

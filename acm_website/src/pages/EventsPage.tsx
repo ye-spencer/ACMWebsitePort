@@ -34,11 +34,12 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo }) => {
   ];
 
   return (
-    <div className="events-container">
-      <h1 className="events-title">Upcoming Events</h1>
-      <div className="events-list">
+    <div className="events-container" style={{ position: 'relative', zIndex: 1 }}>
+      <div className="about-background" style={{ zIndex: -1 }}></div>
+      <h1 className="events-title" style={{ position: 'relative', zIndex: 2 }}>Upcoming Events</h1>
+      <div className="events-list" style={{ position: 'relative', zIndex: 2 }}>
         {events.map(event => (
-          <div key={event.id} className="event-card">
+          <div key={event.id} className="event-card" style={{ position: 'relative', zIndex: 2 }}>
             <h2 className="event-title">{event.title}</h2>
             <div className="event-details">
               <p><strong>Date:</strong> {event.date}</p>
@@ -50,7 +51,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo }) => {
           </div>
         ))}
       </div>
-      <button className="home-button" onClick={() => navigateTo('home')}>Back to Home</button>
+      <button className="home-button" onClick={() => navigateTo('home')} style={{ position: 'relative', zIndex: 2 }}>Back to Home</button>
       
       <div 
         onClick={() => navigateTo('credits')}
@@ -66,7 +67,8 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo }) => {
           cursor: 'pointer',
           backgroundColor: 'rgba(50, 50, 50, 0.5)',
           padding: '8px 0',
-          backdropFilter: 'blur(2px)'
+          backdropFilter: 'blur(2px)',
+          zIndex: 2
         }}
       >
         Made with lots of ❤️ by JHU ACM

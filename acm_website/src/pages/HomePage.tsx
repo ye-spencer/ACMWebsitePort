@@ -23,6 +23,19 @@ const HomePage: React.FC<HomePageProps> = ({ navigateTo }) => {
           Events
         </button>
       </div>
+      
+      <div style={{ 
+        fontSize: '0.8rem', 
+        textAlign: 'center', 
+        position: 'fixed',
+        bottom: '10px',
+        left: '0',
+        right: '0',
+        color: 'gray',
+        opacity: 0.8
+      }}>
+        made with lots of ❤️ @JHU ACM
+      </div>
     </div>
   );
 };

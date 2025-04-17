@@ -27,6 +27,18 @@ const Navbar: React.FC<NavbarProps> = ({ navigateTo }) => {
           >
             About Us
           </span>
+          <span 
+            onClick={() => navigateTo('credits')}
+            className="font-['Mulish'] text-white hover:text-indigo-200 transition-colors cursor-pointer px-12 py-4"
+          >
+            Credits
+          </span>
+          <span 
+            onClick={() => navigateTo('login')}
+            className="font-['Mulish'] text-white hover:text-indigo-200 transition-colors cursor-pointer px-12 py-4"
+          >
+            Login
+          </span>
         </div>
       </div>
     </nav>

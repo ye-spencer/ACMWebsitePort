@@ -77,4 +77,4 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo }) => {
   );
 };
 
-export default EventsPage; 
+export default EventsPage;

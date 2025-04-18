@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './LoginPage.css'; // Import the CSS file for styling
 import { auth } from '../firebase/config';
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 
 
 interface LoginPageProps {
@@ -36,6 +36,19 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    signInWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
+      .then((userCredential) => {
+        // Signed in 
+        const user = userCredential.user;
+        console.log(user);
+        // ...
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode, errorMessage);
+      });
+
     console.log(userCredentials);
   };
 

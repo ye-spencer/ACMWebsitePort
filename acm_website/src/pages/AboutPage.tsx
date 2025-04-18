@@ -4,6 +4,7 @@ import miseokImage from '../assets/alumni/miseok kim.jpg';
 import juliaImage from '../assets/alumni/julia bian.jpeg';
 import nishImage from '../assets/alumni/nish.jpeg';
 import chaseImage from '../assets/alumni/chase feng.jpeg';
+import backgroundImage from '../assets/aboutus_background.webp';
 import '../styles/FlipCard.css';
 
 interface AboutPageProps {
@@ -127,8 +128,27 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo }) => {
   ];
 
   return (
-    <div className="about-container" style={{ position: 'relative', zIndex: 1 }}>
-      <div className="about-background" style={{ zIndex: -1 }}></div>
+    <div className="about-container" style={{ 
+      position: 'relative',
+      minHeight: '100vh',
+      width: '100vw',
+      padding: '40px 20px',
+      zIndex: 1
+    }}>
+      <div className="about-background" style={{ 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#001531',
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundBlendMode: 'overlay',
+        zIndex: -1
+      }}></div>
       <h1 className="about-title" style={{ color: 'white', position: 'relative', zIndex: 2 }}>About Us</h1>
       
       <div className="about-content" style={{ position: 'relative', zIndex: 2 }}>

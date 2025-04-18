@@ -1,18 +1,42 @@
 import React, { useState } from 'react';
 import './LoginPage.css'; // Import the CSS file for styling
+import { auth } from '../firebase/config';
+import { createUserWithEmailAndPassword } from "firebase/auth";
+
 
 interface LoginPageProps {
   navigateTo: (page: string) => void;
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [userCredentials, setUserCredentials] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [loginType, setLoginType] = useState('login');
+  
+  const handleCredentials = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserCredentials({...userCredentials, [e.target.name]: e.target.value});
+    console.log(userCredentials);
+  };
+
+  function handleSignup(e: React.FormEvent) {
+    e.preventDefault();
+    createUserWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
+      .then((userCredential) => {
+        // Signed up 
+        const user = userCredential.user;
+        console.log(user);
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode, errorMessage);
+    });
+
+  }
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Email:', email, 'Password:', password); // send this to your backend for authentication
-    // Here you would typically send a request to your backend to authenticate the user
+    console.log(userCredentials);
   };
 
   return (
@@ -26,8 +50,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
                 type="email"
                 id="email"
                 placeholder="EMAIL"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                name="email"
+                onChange={(e) => handleCredentials(e)}
                 required
               />
             </div>
@@ -37,17 +61,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
                 type="password"
                 id="password"
                 placeholder="PASSWORD"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                name="password"
+                onChange={(e) => handleCredentials(e)}
                 required
               />
             </div>
-            <button type="submit" className="login-button">LOGIN</button>
-            <button
-              type="button"
-              className="signup-button"
-              onClick={() => navigateTo('signup')}
-            >
+            <button className="login-button" onClick={(e) => handleLogin(e)}>LOGIN</button>
+            <button className="signup-button" onClick={(e) => handleSignup(e)}>
               SIGN-UP
             </button>
             <p className="forgot-password">Forgot password?</p>

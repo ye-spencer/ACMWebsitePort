@@ -9,10 +9,10 @@ interface LoginPageProps {
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
-  const [userCredentials, setUserCredentials] = useState({});
+  const [userCredentials, setUserCredentials] = useState({email: '', password: ''});
   const [isLoading, setIsLoading] = useState(false);
   const [loginType, setLoginType] = useState('login');
-  
+  const [error, setError] = useState('');
   const handleCredentials = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserCredentials({...userCredentials, [e.target.name]: e.target.value});
     console.log(userCredentials);
@@ -20,33 +20,37 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
 
   function handleSignup(e: React.FormEvent) {
     e.preventDefault();
+    setError('');
+    // validate jhu email
+    const domain = userCredentials.email.split('@')[1];
+    const validDomains = ['jh.edu', 'jhu.edu', 'cs.jhu.com'];
+    if (!validDomains.includes(domain)) {
+      setError('Error: Invalid email domain. Please use a valid JHU email.');
+      return;
+    }
+    // signup with email and password
     createUserWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
       .then((userCredential) => {
-        // Signed up 
         const user = userCredential.user;
         console.log(user);
       })
+      // handle errors
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
+        setError(error.message);
     });
 
   }
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     signInWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
       .then((userCredential) => {
-        // Signed in 
         const user = userCredential.user;
         console.log(user);
-        // ...
       })
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
+        setError(error.message);
       });
 
     console.log(userCredentials);
@@ -83,6 +87,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
             <button className="signup-button" onClick={(e) => handleSignup(e)}>
               SIGN-UP
             </button>
+            {
+              error && (
+                <div className="error-message">
+                  {error}
+                </div>
+              )
+            }
             <p className="forgot-password">Forgot password?</p>
           </form>
         </div>

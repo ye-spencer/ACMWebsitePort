@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import './LoginPage.css'; // Import the CSS file for styling
 import { auth } from '../firebase/config';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword,
+         onAuthStateChanged,
+         sendPasswordResetEmail,
+         signInWithEmailAndPassword } from "firebase/auth";
 
 
 interface LoginPageProps {
@@ -9,6 +12,7 @@ interface LoginPageProps {
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
+
   const [userCredentials, setUserCredentials] = useState({email: '', password: ''});
   const [isLoading, setIsLoading] = useState(false);
   const [loginType, setLoginType] = useState('login');
@@ -17,6 +21,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
     setUserCredentials({...userCredentials, [e.target.name]: e.target.value});
     console.log(userCredentials);
   };
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      navigateTo('home');
+    }
+  });
 
   function handleSignup(e: React.FormEvent) {
     e.preventDefault();
@@ -41,7 +51,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
 
   }
 
-  const handleLogin = (e: React.FormEvent) => {
+  function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setError('');
     signInWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
@@ -56,8 +66,30 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
     console.log(userCredentials);
   };
 
+  function handlePasswordReset(e: React.FormEvent) {
+    e.preventDefault();
+    const email = prompt("Please enter your JHU email address to reset your password:");
+    if (!email) {
+      setError("Error: No email provided.");
+      return;
+    }
+
+    setIsLoading(true);
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        alert("Password reset email sent! Please check your inbox for instructions.");
+      })
+      .catch((error) => {
+        setError(error.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }
+
   return (
     <div className="login-page">
+      <div className="about-background" style={{ zIndex: -1 }}></div>
       <div className="login-container">
         <div className="login-box">
           <form onSubmit={handleLogin}>
@@ -94,7 +126,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
                 </div>
               )
             }
-            <p className="forgot-password">Forgot password?</p>
+            <p onClick={handlePasswordReset} className="forgot-password">Forgot password?</p>
           </form>
         </div>
       </div>

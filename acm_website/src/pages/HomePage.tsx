@@ -1,10 +1,21 @@
 import React from 'react';
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebase/config';
 
 interface HomePageProps {
   navigateTo: (page: string) => void;
 }
 
 const HomePage: React.FC<HomePageProps> = ({ navigateTo }) => {
+  function handleLogout() {
+    try {
+      signOut(auth);
+      navigateTo('login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] p-8" style={{ position: 'relative', zIndex: 1 }}>
       <div className="about-background" style={{ zIndex: -1 }}></div>
@@ -29,6 +40,12 @@ const HomePage: React.FC<HomePageProps> = ({ navigateTo }) => {
           onClick={() => navigateTo('login')}
         >
           Login
+        </button>
+        <button 
+          className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+          onClick={handleLogout}
+        >
+          Logout
         </button>
       </div>
       

@@ -19,7 +19,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
   const [error, setError] = useState('');
   const handleCredentials = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserCredentials({...userCredentials, [e.target.name]: e.target.value});
-    console.log(userCredentials);
   };
 
   onAuthStateChanged(auth, (user) => {
@@ -42,7 +41,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
     createUserWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
       .then((userCredential) => {
         const user = userCredential.user;
-        console.log(user);
       })
       // handle errors
       .catch((error) => {
@@ -57,13 +55,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
     signInWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
       .then((userCredential) => {
         const user = userCredential.user;
-        console.log(user);
       })
       .catch((error) => {
         setError(error.message);
       });
-
-    console.log(userCredentials);
   };
 
   function handlePasswordReset(e: React.FormEvent) {

@@ -8,33 +8,38 @@ import { createUserWithEmailAndPassword,
 
 
 interface LoginPageProps {
-  navigateTo: (page: string) => void;
+  navigateTo: (page: string, errorMessage?: string) => void;
+  error?: string;
 }
 
-const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
+const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
 
   const [userCredentials, setUserCredentials] = useState({email: '', password: ''});
   const [isLoading, setIsLoading] = useState(false);
   const [loginType, setLoginType] = useState('login');
-  const [error, setError] = useState('');
+  const [localError, setLocalError] = useState('');
   const handleCredentials = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserCredentials({...userCredentials, [e.target.name]: e.target.value});
   };
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      navigateTo('home');
+      if (error?.includes('booking')) {
+        navigateTo('booking');
+      } else {
+        navigateTo('home');
+      }
     }
   });
 
   function handleSignup(e: React.FormEvent) {
     e.preventDefault();
-    setError('');
+    setLocalError('');
     // validate jhu email
     const domain = userCredentials.email.split('@')[1];
     const validDomains = ['jh.edu', 'jhu.edu', 'cs.jhu.com'];
     if (!validDomains.includes(domain)) {
-      setError('Error: Invalid email domain. Please use a valid JHU email.');
+      setLocalError('Error: Invalid email domain. Please use a valid JHU email.');
       return;
     }
     // signup with email and password
@@ -44,20 +49,20 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
       })
       // handle errors
       .catch((error) => {
-        setError(error.message);
+        setLocalError(error.message);
     });
 
   }
 
   function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    setError('');
+    setLocalError('');
     signInWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
       .then((userCredential) => {
         const user = userCredential.user;
       })
       .catch((error) => {
-        setError(error.message);
+        setLocalError(error.message);
       });
   };
 
@@ -65,7 +70,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
     e.preventDefault();
     const email = prompt("Please enter your JHU email address to reset your password:");
     if (!email) {
-      setError("Error: No email provided.");
+      setLocalError("Error: No email provided.");
       return;
     }
 
@@ -75,7 +80,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
         alert("Password reset email sent! Please check your inbox for instructions.");
       })
       .catch((error) => {
-        setError(error.message);
+        setLocalError(error.message);
       })
       .finally(() => {
         setIsLoading(false);
@@ -88,6 +93,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
       <div className="login-container">
         <div className="login-box">
           <form onSubmit={handleLogin}>
+            {(error || localError) && (
+              <div className="error-message">
+                {error || localError}
+              </div>
+            )}
             <div className="input-group">
               <label htmlFor="email" className="sr-only">Email</label>
               <input
@@ -114,13 +124,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo }) => {
             <button className="signup-button" onClick={(e) => handleSignup(e)}>
               SIGN-UP
             </button>
-            {
-              error && (
-                <div className="error-message">
-                  {error}
-                </div>
-              )
-            }
             <p onClick={handlePasswordReset} className="forgot-password">Forgot password?</p>
           </form>
         </div>

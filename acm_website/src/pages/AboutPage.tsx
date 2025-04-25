@@ -8,7 +8,8 @@ import backgroundImage from '../assets/aboutus_background.webp';
 import '../styles/FlipCard.css';
 
 interface AboutPageProps {
-  navigateTo: (page: string) => void;
+  navigateTo: (page: string, errorMessage?: string) => void;
+  error?: string;
 }
 
 interface PersonData {
@@ -19,7 +20,7 @@ interface PersonData {
   imagePath?: string;
 }
 
-const AboutPage: React.FC<AboutPageProps> = ({ navigateTo }) => {
+const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
   // State to track which cards are flipped
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
   const [flippedAlumniCards, setFlippedAlumniCards] = useState<number[]>([]);
@@ -149,6 +150,11 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo }) => {
         backgroundBlendMode: 'overlay',
         zIndex: -1
       }}></div>
+      {error && (
+        <div className="error-message" style={{ position: 'relative', zIndex: 2 }}>
+          {error}
+        </div>
+      )}
       <h1 className="about-title" style={{ color: 'white', position: 'relative', zIndex: 2 }}>About Us</h1>
       
       <div className="about-content" style={{ position: 'relative', zIndex: 2 }}>

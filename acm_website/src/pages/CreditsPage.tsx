@@ -3,7 +3,8 @@ import placeholderImage from '../assets/depositphotos_104564156-stock-illustrati
 import '../styles/FlipCard.css';
 
 interface CreditsPageProps {
-  navigateTo: (page: string) => void;
+  navigateTo: (page: string, errorMessage?: string) => void;
+  error?: string;
 }
 
 interface ContributorData {
@@ -14,7 +15,7 @@ interface ContributorData {
   imagePath?: string;
 }
 
-const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo }) => {
+const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo, error }) => {
   // State to track which cards are flipped
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
 
@@ -62,6 +63,11 @@ const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo }) => {
   return (
     <div className="about-container" style={{ position: 'relative', zIndex: 1 }}>
       <div className="about-background" style={{ zIndex: -1 }}></div>
+      {error && (
+        <div className="error-message" style={{ position: 'relative', zIndex: 2 }}>
+          {error}
+        </div>
+      )}
       <h1 className="about-title" style={{ color: 'white', position: 'relative', zIndex: 2 }}>Credits</h1>
       
       <div className="about-content" style={{ position: 'relative', zIndex: 2 }}>

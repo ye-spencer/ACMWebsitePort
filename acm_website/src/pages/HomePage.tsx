@@ -3,10 +3,11 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../firebase/config';
 
 interface HomePageProps {
-  navigateTo: (page: string) => void;
+  navigateTo: (page: string, errorMessage?: string) => void;
+  error?: string;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ navigateTo }) => {
+const HomePage: React.FC<HomePageProps> = ({ navigateTo, error }) => {
   function handleLogout() {
     try {
       signOut(auth);
@@ -19,6 +20,12 @@ const HomePage: React.FC<HomePageProps> = ({ navigateTo }) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] p-8" style={{ position: 'relative', zIndex: 1 }}>
       <div className="about-background" style={{ zIndex: -1 }}></div>
+      
+      {error && (
+        <div className="error-message" style={{ position: 'relative', zIndex: 2 }}>
+          {error}
+        </div>
+      )}
       
       <h1 className="text-4xl font-bold mb-4 text-gray-800" style={{ position: 'relative', zIndex: 2 }}>Welcome to JHU ACM</h1>
       <p className="text-xl mb-8 text-gray-600" style={{ position: 'relative', zIndex: 2 }}>Association for Computing Machinery</p>
@@ -34,6 +41,12 @@ const HomePage: React.FC<HomePageProps> = ({ navigateTo }) => {
           onClick={() => navigateTo('events')}
         >
           Events
+        </button>
+        <button 
+          className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+          onClick={() => navigateTo('booking')}
+        >
+          Book a Meeting
         </button>
         <button 
           className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"

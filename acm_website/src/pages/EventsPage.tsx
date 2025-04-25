@@ -1,10 +1,11 @@
 import React from 'react';
 
 interface EventsPageProps {
-  navigateTo: (page: string) => void;
+  navigateTo: (page: string, errorMessage?: string) => void;
+  error?: string;
 }
 
-const EventsPage: React.FC<EventsPageProps> = ({ navigateTo }) => {
+const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
   // Sample events data - in a real app, this would come from an API or database
   const events = [
     {
@@ -36,6 +37,11 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo }) => {
   return (
     <div className="events-container" style={{ position: 'relative', zIndex: 1 }}>
       <div className="about-background" style={{ zIndex: -1 }}></div>
+      {error && (
+        <div className="error-message" style={{ position: 'relative', zIndex: 2 }}>
+          {error}
+        </div>
+      )}
       <h1 className="events-title" style={{ position: 'relative', zIndex: 2 }}>Upcoming Events</h1>
       <div className="events-list" style={{ position: 'relative', zIndex: 2 }}>
         {events.map(event => (

@@ -111,3 +111,8 @@
 .home-button:hover {
   background-color: #002244;
 }
+
+.calendly-inline-widget {
+  min-width:320px;
+  height:700px;
+}

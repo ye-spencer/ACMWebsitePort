@@ -5,28 +5,37 @@ import AboutPage from './pages/AboutPage';
 import EventsPage from './pages/EventsPage';
 import CreditsPage from './pages/CreditsPage';
 import LoginPage from './pages/LoginPage';
+import BookingPage from './pages/BookingPage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
+  const [error, setError] = useState('');
 
-  const navigateTo = (page: string) => {
+  const navigateTo = (page: string, errorMessage?: string) => {
+    if (errorMessage) {
+      setError(errorMessage);
+    } else {
+      setError('');
+    }
     setCurrentPage(page);
   };
 
   const renderPage = () => {
     switch (currentPage) {
       case 'home':
-        return <HomePage navigateTo={navigateTo} />;
+        return <HomePage navigateTo={navigateTo} error={error} />;
       case 'about':
-        return <AboutPage navigateTo={navigateTo} />;
+        return <AboutPage navigateTo={navigateTo} error={error} />;
       case 'events':
-        return <EventsPage navigateTo={navigateTo} />;
+        return <EventsPage navigateTo={navigateTo} error={error} />;
       case 'credits':
-        return <CreditsPage navigateTo={navigateTo} />;
+        return <CreditsPage navigateTo={navigateTo} error={error} />;
       case 'login':
-        return <LoginPage navigateTo={navigateTo} />;
+        return <LoginPage navigateTo={navigateTo} error={error} />;
+      case 'booking':
+        return <BookingPage navigateTo={navigateTo} error={error} />;
       default:
-        return <HomePage navigateTo={navigateTo} />;
+        return <HomePage navigateTo={navigateTo} error={error} />;
     }
   };
 

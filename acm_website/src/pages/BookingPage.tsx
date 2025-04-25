@@ -28,7 +28,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
               {error}
             </div>
           )}
-          <div className="calendly-inline-widget" data-url="https://calendly.com/jhuacmweb"></div>
+          <div className="calendly-inline-widget" data-url="https://calendly.com/jhuacmweb/30min"></div>
           <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
         </div>
       </div>

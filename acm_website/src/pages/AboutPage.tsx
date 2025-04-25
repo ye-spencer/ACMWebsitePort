@@ -129,34 +129,12 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
   ];
 
   return (
-    <div className="about-container" style={{ 
-      position: 'relative',
-      minHeight: '100vh',
-      width: '100vw',
-      padding: '40px 20px',
-      zIndex: 1
-    }}>
-      <div className="about-background" style={{ 
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        backgroundColor: '#001531',
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundBlendMode: 'overlay',
-        zIndex: -1
-      }}></div>
-      {error && (
-        <div className="error-message" style={{ position: 'relative', zIndex: 2 }}>
-          {error}
-        </div>
-      )}
-      <h1 className="about-title" style={{ color: 'white', position: 'relative', zIndex: 2 }}>About Us</h1>
     <div className="about-container" style={{ position: 'relative', zIndex: 1 }}>
+      {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
       <div className="about-background" style={{ zIndex: -1 }}></div>
       <h1 className="about-title" style={{ position: 'relative', zIndex: 2, color: 'white' }}>About Us</h1>
       

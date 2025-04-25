@@ -156,6 +156,9 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
         </div>
       )}
       <h1 className="about-title" style={{ color: 'white', position: 'relative', zIndex: 2 }}>About Us</h1>
+    <div className="about-container" style={{ position: 'relative', zIndex: 1 }}>
+      <div className="about-background" style={{ zIndex: -1 }}></div>
+      <h1 className="about-title" style={{ position: 'relative', zIndex: 2, color: 'white' }}>About Us</h1>
       
       <div className="about-content" style={{ position: 'relative', zIndex: 2 }}>
         <p style={{ color: 'white' }}>
@@ -166,7 +169,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
         </p>
       </div>
       
-      <h2 className="leadership-title" style={{ color: 'white', position: 'relative', zIndex: 2 }}>Officers</h2>
+      <h2 className="leadership-title" style={{ position: 'relative', zIndex: 2, color: 'white' }}>Officers</h2>
       
       <div style={{ 
         display: 'grid', 
@@ -191,10 +194,10 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
                   }}
                 />
               </div>
-              <div className="flip-card-back">
-                <h3 style={{ margin: '0 0 5px 0', fontSize: '1rem' }}>{leader.name}</h3>
-                <h4 style={{ margin: '0 0 5px 0', fontWeight: 'normal', fontSize: '0.9rem' }}>{leader.role}</h4>
-                <p style={{ fontSize: '0.8rem', margin: '0 0 8px 0' }}>{leader.bio}</p>
+              <div className="flip-card-back" style={{ color: 'white' }}>
+                <h3 style={{ margin: '0 0 5px 0', fontSize: '1rem', color: 'white' }}>{leader.name}</h3>
+                <h4 style={{ margin: '0 0 5px 0', fontWeight: 'normal', fontSize: '0.9rem', color: 'white' }}>{leader.role}</h4>
+                <p style={{ fontSize: '0.8rem', margin: '0 0 8px 0', color: 'white' }}>{leader.bio}</p>
                 <a 
                   href={leader.linkedin} 
                   target="_blank" 
@@ -243,10 +246,10 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
                   }}
                 />
               </div>
-              <div className="flip-card-back">
-                <h3 style={{ margin: '0 0 5px 0', fontSize: '1rem' }}>{alumni.name}</h3>
-                <h4 style={{ margin: '0 0 5px 0', fontWeight: 'normal', fontSize: '0.9rem' }}>{alumni.role}</h4>
-                <p style={{ fontSize: '0.8rem', margin: '0 0 8px 0' }}>{alumni.bio}</p>
+              <div className="flip-card-back" style={{ color: 'white' }}>
+                <h3 style={{ margin: '0 0 5px 0', fontSize: '1rem', color: 'white' }}>{alumni.name}</h3>
+                <h4 style={{ margin: '0 0 5px 0', fontWeight: 'normal', fontSize: '0.9rem', color: 'white' }}>{alumni.role}</h4>
+                <p style={{ fontSize: '0.8rem', margin: '0 0 8px 0', color: 'white' }}>{alumni.bio}</p>
                 <a 
                   href={alumni.linkedin} 
                   target="_blank" 

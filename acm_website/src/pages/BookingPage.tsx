@@ -41,6 +41,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
   });
   const [dates, setDates] = useState<Date[]>([]);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  const [bookingError, setBookingError] = useState<string>('');
 
   // Initial auth check
   onAuthStateChanged(auth, (user) => {
@@ -100,9 +101,11 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
     // Update both start and end times with the new date
     const newStartTime = new Date(startTime);
     newStartTime.setFullYear(newDate.getFullYear(), newDate.getMonth(), newDate.getDate());
+    setStartTime(newStartTime);
 
     const newEndTime = new Date(endTime);
     newEndTime.setFullYear(newDate.getFullYear(), newDate.getMonth(), newDate.getDate());
+    setEndTime(newEndTime);
   };
 
   const handleStartTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -119,10 +122,35 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
     setEndTime(newEndTime);
   };
 
+  const validateBookingTimes = (): boolean => {
+    // Reset error message
+    setBookingError('');
+
+    // Check if start time is after end time
+    if (startTime >= endTime) {
+      setBookingError('End time must be after start time');
+      return false;
+    }
+
+    // Check if booking duration is more than 2 hours
+    const durationInHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+    if (durationInHours > 2) {
+      setBookingError('Booking duration cannot exceed 2 hours');
+      return false;
+    }
+
+    return true;
+  };
+
   const handleBooking = async () => {
     try {
       if (!auth.currentUser) {
         throw new Error('User not authenticated');
+      }
+
+      // Validate booking times before proceeding
+      if (!validateBookingTimes()) {
+        return;
       }
 
       await setDoc(doc(db, "bookings", auth.currentUser.uid + startTime.toDateString()), {
@@ -137,6 +165,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
       });
     } catch (error) {
       console.error('Error booking:', error);
+      setBookingError('Failed to create booking. Please try again.');
     }
   };
 
@@ -227,6 +256,21 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
                     })}
                   </select>
                 </div>
+
+                {/* Error message display */}
+                {bookingError && (
+                  <div style={{
+                    color: '#dc3545',
+                    fontSize: '0.875rem',
+                    marginTop: '8px',
+                    padding: '8px',
+                    backgroundColor: '#f8d7da',
+                    border: '1px solid #f5c6cb',
+                    borderRadius: '4px'
+                  }}>
+                    {bookingError}
+                  </div>
+                )}
               </div>
             </div>
 

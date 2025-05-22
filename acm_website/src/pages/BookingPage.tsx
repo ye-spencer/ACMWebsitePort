@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './LoginPage.css'; // Reuse the login page styling
 import { auth } from '../firebase/config';
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getFirestore, setDoc, Timestamp } from "firebase/firestore";
+import { collection, doc, getFirestore, setDoc, Timestamp, query, where, getDocs } from "firebase/firestore";
 import { initializeApp } from 'firebase/app';
 
 const firebaseConfig = {
@@ -40,6 +40,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
     return date;
   });
   const [dates, setDates] = useState<Date[]>([]);
+  const [week, setWeek] = useState<Date[][]>([]);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [bookingError, setBookingError] = useState<string>('');
 
@@ -84,6 +85,18 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
       nextSevenDays.push(date);
     }
     setDates(nextSevenDays);
+  }, []);
+
+  useEffect(() => {
+    // get bookings for the current week
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const q = query(collection(db, "bookings"), 
+      where("start", ">=", Timestamp.fromDate(today)), 
+      where("start", "<=", Timestamp.fromDate(new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000))));
+    getDocs(q).then((querySnapshot) => {
+      setWeek(querySnapshot.docs.map((doc) => [doc.data().start.toDate(), doc.data().end.toDate()]));
+    });
   }, []);
 
   const formatDate = (date: Date): string => {
@@ -167,6 +180,25 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
       console.error('Error booking:', error);
       setBookingError('Failed to create booking. Please try again.');
     }
+  };
+
+  const isTimeSlotBooked = (date: Date, hour: number, minute: number): boolean => {
+    const slotTime = new Date(date);
+    slotTime.setHours(hour, minute, 0, 0);
+    
+    return week.some(([start, end]) => {
+      const slotStart = new Date(slotTime);
+      const slotEnd = new Date(slotTime);
+      slotEnd.setMinutes(slotEnd.getMinutes() + 30); // Each slot is 30 minutes
+      
+      return (
+        slotTime >= start && 
+        slotTime < end && // Check if slot starts during a booking
+        date.getDate() === start.getDate() && 
+        date.getMonth() === start.getMonth() && 
+        date.getFullYear() === start.getFullYear()
+      );
+    });
   };
 
   return (
@@ -361,16 +393,21 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
                         const hour = Math.floor(index / 2);
                         const minute = (index % 2) * 30;
                         const isFullHour = minute === 0;
+                        const isBooked = isTimeSlotBooked(date, hour, minute);
+                        
                         return (
                           <div 
                             key={index}
                             style={{
-                              backgroundColor: '#f8f9fa',
+                              backgroundColor: isBooked ? 'rgba(0, 51, 102, 1)' : '#f8f9fa',
                               border: '1px solid #dee2e6',
                               borderTop: isFullHour ? '2px solid #dee2e6' : '1px solid #dee2e6',
                               height: '15px',
-                              marginTop: isFullHour ? '-1px' : '0'
+                              marginTop: isFullHour ? '-1px' : '0',
+                              position: 'relative',
+                              cursor: isBooked ? 'not-allowed' : 'default'
                             }}
+                            title={isBooked ? 'booked' : 'open'}
                           />
                         );
                       })}

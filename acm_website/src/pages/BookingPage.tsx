@@ -2,6 +2,20 @@ import React, { useState, useEffect } from 'react';
 import './LoginPage.css'; // Reuse the login page styling
 import { auth } from '../firebase/config';
 import { onAuthStateChanged } from "firebase/auth";
+import { doc, getFirestore, setDoc, Timestamp } from "firebase/firestore";
+import { initializeApp } from 'firebase/app';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDSyFrdpgHmHKHCIgbdXJiOkX2TOvDlkKE",
+  authDomain: "acm-website-25a8a.firebaseapp.com",
+  projectId: "acm-website-25a8a",
+  storageBucket: "acm-website-25a8a.firebasestorage.app",
+  messagingSenderId: "231551202058",
+  appId: "1:231551202058:web:b3c0182f283fa6068280f3",
+  measurementId: "G-W01JXMQ1JK"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 interface BookingPageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
@@ -15,9 +29,16 @@ interface TimeSlot {
 }
 
 const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [startTime, setStartTime] = useState<string>('09:00');
-  const [endTime, setEndTime] = useState<string>('10:00');
+  const [startTime, setStartTime] = useState<Date>(() => {
+    const date = new Date();
+    date.setHours(9, 0, 0, 0);
+    return date;
+  });
+  const [endTime, setEndTime] = useState<Date>(() => {
+    const date = new Date();
+    date.setHours(10, 0, 0, 0);
+    return date;
+  });
   const [dates, setDates] = useState<Date[]>([]);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
 
@@ -74,15 +95,49 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
 
   const handleDateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedIndex = parseInt(e.target.value);
-    setSelectedDate(dates[selectedIndex]);
+    const newDate = dates[selectedIndex];
+    
+    // Update both start and end times with the new date
+    const newStartTime = new Date(startTime);
+    newStartTime.setFullYear(newDate.getFullYear(), newDate.getMonth(), newDate.getDate());
+
+    const newEndTime = new Date(endTime);
+    newEndTime.setFullYear(newDate.getFullYear(), newDate.getMonth(), newDate.getDate());
   };
 
   const handleStartTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStartTime(e.target.value);
+    const [hours, minutes] = e.target.value.split(':').map(Number);
+    const newStartTime = new Date(startTime);
+    newStartTime.setHours(hours, minutes, 0, 0);
+    setStartTime(newStartTime);
   };
 
   const handleEndTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setEndTime(e.target.value);
+    const [hours, minutes] = e.target.value.split(':').map(Number);
+    const newEndTime = new Date(endTime);
+    newEndTime.setHours(hours, minutes, 0, 0);
+    setEndTime(newEndTime);
+  };
+
+  const handleBooking = async () => {
+    try {
+      if (!auth.currentUser) {
+        throw new Error('User not authenticated');
+      }
+
+      await setDoc(doc(db, "bookings", auth.currentUser.uid + startTime.toDateString()), {
+        UID: auth.currentUser.uid,
+        start: Timestamp.fromDate(startTime),
+        end: Timestamp.fromDate(endTime)
+      });
+
+      console.log('Booking:', {
+        startTime,
+        endTime
+      });
+    } catch (error) {
+      console.error('Error booking:', error);
+    }
   };
 
   return (
@@ -102,7 +157,11 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
               {/* date selection */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <select 
-                  value={dates.indexOf(selectedDate)} 
+                  value={dates.findIndex(date => 
+                    date.getDate() === startTime.getDate() && 
+                    date.getMonth() === startTime.getMonth() && 
+                    date.getFullYear() === startTime.getFullYear()
+                  )} 
                   onChange={handleDateChange}
                   style={{
                     padding: '8px',
@@ -122,7 +181,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
                 {/* start time selection */}
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <select 
-                    value={startTime} 
+                    value={`${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`}
                     onChange={handleStartTimeChange}
                     style={{
                       flex: 1,
@@ -133,7 +192,10 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
                     }}
                   >
                     {timeSlots.map((slot, index) => (
-                      <option key={index} value={`${slot.hour.toString().padStart(2, '0')}:${slot.minute.toString().padStart(2, '0')}`}>
+                      <option 
+                        key={index} 
+                        value={`${slot.hour.toString().padStart(2, '0')}:${slot.minute.toString().padStart(2, '0')}`}
+                      >
                         {slot.label}
                       </option>
                     ))}
@@ -141,7 +203,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
 
                   {/* end time selection */}
                   <select 
-                    value={endTime} 
+                    value={`${endTime.getHours().toString().padStart(2, '0')}:${endTime.getMinutes().toString().padStart(2, '0')}`}
                     onChange={handleEndTimeChange}
                     style={{
                       flex: 1,
@@ -279,14 +341,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
           <button 
             className="login-button"
             style={{ marginTop: '20px' }}
-            onClick={() => {
-              // TODO:Handle booking submission
-              console.log('Booking:', {
-                date: selectedDate,
-                startTime,
-                endTime
-              });
-            }}
+            onClick={handleBooking}
           >
             Book Room
           </button>

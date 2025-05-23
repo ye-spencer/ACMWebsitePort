@@ -43,6 +43,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
   const [week, setWeek] = useState<Date[][]>([]);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [bookingError, setBookingError] = useState<string>('');
+  const [bookingSuccess, setBookingSuccess] = useState<string>('');
 
   // Initial auth check
   onAuthStateChanged(auth, (user) => {
@@ -161,6 +162,10 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
         throw new Error('User not authenticated');
       }
 
+      // Reset messages
+      setBookingError('');
+      setBookingSuccess('');
+
       // Validate booking times before proceeding
       if (!validateBookingTimes()) {
         return;
@@ -172,6 +177,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
         end: Timestamp.fromDate(endTime)
       });
 
+      setBookingSuccess('Room successfully booked!');
       console.log('Booking:', {
         startTime,
         endTime
@@ -289,18 +295,18 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
                   </select>
                 </div>
 
-                {/* Error message display */}
-                {bookingError && (
+                {/* Error and success message display */}
+                {(bookingError || bookingSuccess) && (
                   <div style={{
-                    color: '#dc3545',
+                    color: bookingError ? '#dc3545' : '#28a745',
                     fontSize: '0.875rem',
                     marginTop: '8px',
                     padding: '8px',
-                    backgroundColor: '#f8d7da',
-                    border: '1px solid #f5c6cb',
+                    backgroundColor: bookingError ? '#f8d7da' : '#d4edda',
+                    border: `1px solid ${bookingError ? '#f5c6cb' : '#c3e6cb'}`,
                     borderRadius: '4px'
                   }}>
-                    {bookingError}
+                    {bookingError || bookingSuccess}
                   </div>
                 )}
               </div>

@@ -19,7 +19,12 @@ interface Event {
   id: string;
   title: string;
   date: Date;
-  description: string;
+}
+
+interface FirestoreEvent {
+  eventID: string;
+  name: string;
+  date: { toDate: () => Date };
 }
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
@@ -64,21 +69,28 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
         setUpcomingBookings(bookings.filter(booking => booking.start > now));
         setPastBookings(bookings.filter(booking => booking.start <= now));
 
-        // TODO: Implement events fetching logic
-        // const eventsQuery = query(
-        //   collection(db, "events"),
-        //   where("attendees", "array-contains", user.uid)
-        // );
-        // const eventsSnapshot = await getDocs(eventsQuery);
-        // const events: Event[] = eventsSnapshot.docs.map(doc => ({
-        //   id: doc.id,
-        //   title: doc.data().title,
-        //   date: doc.data().date.toDate(),
-        //   description: doc.data().description
-        // }));
+        // Implement events fetching logic
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          // get events attended
+          const attended: Event[] = userData.eventsAttended.map((event: FirestoreEvent) => ({
+            id: event.eventID,
+            title: event.name,
+            date: event.date.toDate(),
+          }));
 
-        // setUpcomingEvents(events.filter(event => event.date > now));
-        // setPastEvents(events.filter(event => event.date <= now));
+          // get events registered
+          const registered: Event[] = userData.eventsRegistered.map((event: FirestoreEvent) => ({
+            id: event.eventID,
+            title: event.name,
+            date: event.date.toDate(),
+          }));
+
+          // determine upcoming and past events
+          setUpcomingEvents(registered.filter(event => event.date > now));
+          setPastEvents(attended.filter(event => event.date <= now));
+        }
+
       } else {
         navigateTo('login', 'Please log in to access your profile');
       }
@@ -313,8 +325,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
                     }}
                   >
                     <h4 style={{ margin: '0 0 5px 0', color: '#495057' }}>{event.title}</h4>
-                    <p style={{ margin: '0 0 5px 0', color: '#495057' }}>{formatDate(event.date)}</p>
-                    <p style={{ margin: '0', color: '#495057' }}>{event.description}</p>
+                    <p style={{ margin: '0 0 5px 0', color: '#495057' }}>{formatDate(event.date)} • {formatTime(event.date)}</p>
                   </div>
                 ))}
               </div>
@@ -339,8 +350,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
                     }}
                   >
                     <h4 style={{ margin: '0 0 5px 0', color: '#495057' }}>{event.title}</h4>
-                    <p style={{ margin: '0 0 5px 0', color: '#495057' }}>{formatDate(event.date)}</p>
-                    <p style={{ margin: '0', color: '#495057' }}>{event.description}</p>
+                    <p style={{ margin: '0 0 5px 0', color: '#495057' }}>{formatDate(event.date)} • {formatTime(event.date)}</p>
                   </div>
                 ))}
               </div>

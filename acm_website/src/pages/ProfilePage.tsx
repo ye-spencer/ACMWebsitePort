@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './LoginPage.css';
 import { auth } from '../firebase/config';
 import { onAuthStateChanged, updatePassword, deleteUser, signOut } from "firebase/auth";
-import { collection, doc, getFirestore, getDoc, getDocs, query, where, Timestamp } from "firebase/firestore";
+import { collection, doc, getFirestore, getDoc, getDocs, query, where, deleteDoc } from "firebase/firestore";
 
 interface ProfilePageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
@@ -162,6 +162,19 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
     });
   };
 
+  const handleDeleteBooking = async (bookingId: string) => {
+    if (window.confirm('Are you sure you want to cancel this booking?')) {
+      try {
+        const db = getFirestore();
+        await deleteDoc(doc(db, "bookings", bookingId));
+        // Update the bookings list by filtering out the deleted booking
+        setUpcomingBookings(prev => prev.filter(booking => booking.id !== bookingId));
+      } catch (error) {
+        console.error('Error deleting booking:', error);
+      }
+    }
+  };
+
   return (
     <div className="login-page">
       <div className="about-background" style={{ zIndex: -1 }}></div>
@@ -261,10 +274,35 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
                       backgroundColor: '#f8f9fa',
                       borderRadius: '4px',
                       border: '1px solid #dee2e6',
-                      color: '#495057'
+                      color: '#495057',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
                     }}
                   >
-                    {formatDate(booking.start)} • {formatTime(booking.start)} - {formatTime(booking.end)}
+                    <span>{formatDate(booking.start)} • {formatTime(booking.start)} - {formatTime(booking.end)}</span>
+                    <button
+                      onClick={() => handleDeleteBooking(booking.id)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#dc3545',
+                        fontSize: '1.2rem',
+                        cursor: 'pointer',
+                        padding: '0 5px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '50%',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#ffebee'}
+                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      ×
+                    </button>
                   </div>
                 ))}
               </div>

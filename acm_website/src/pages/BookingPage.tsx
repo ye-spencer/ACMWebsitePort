@@ -136,7 +136,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
     setEndTime(newEndTime);
   };
 
-  const validateBookingTimes = (): boolean => {
+  const validateBookingTimes = async (): Promise<boolean> => {
     // Reset error message
     setBookingError('');
 
@@ -151,6 +151,27 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
     if (durationInHours > 2) {
       setBookingError('Booking duration cannot exceed 2 hours');
       return false;
+    }
+
+    // Check if user already has a booking on this day
+    if (auth.currentUser) {
+      const startOfDay = new Date(startTime);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(startTime);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const q = query(
+        collection(db, "bookings"),
+        where("UID", "==", auth.currentUser.uid),
+        where("start", ">=", Timestamp.fromDate(startOfDay)),
+        where("start", "<=", Timestamp.fromDate(endOfDay))
+      );
+
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        setBookingError('You already have a booking on this day');
+        return false;
+      }
     }
 
     // Check if any part of the requested time slot is already booked
@@ -182,7 +203,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
       setBookingSuccess('');
 
       // Validate booking times before proceeding
-      if (!validateBookingTimes()) {
+      if (!(await validateBookingTimes())) {
         return;
       }
 

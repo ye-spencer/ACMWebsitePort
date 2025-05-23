@@ -137,6 +137,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
+      year: 'numeric',
+      hour12: true
+    });
+  };
+
+  const formatTime = (date: Date): string => {
+    return date.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true
@@ -169,8 +176,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
           padding: '20px',
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
         }}>
-          <h2 style={{ marginBottom: '5px', color: '#333', borderBottom: '2px solid #e9ecef', paddingBottom: '5px' }}>Profile Information</h2>
-          <div style={{ display: 'grid', gap: '5px' }}>
+          <h2 style={{ marginBottom: '5px', color: '#495057', borderBottom: '2px solid #e9ecef', paddingBottom: '5px' }}>Profile Information</h2>
+          <div style={{ display: 'grid', gap: '5px', color: '#495057' }}>
             <div>
               <strong>Email:</strong> {email}
             </div>
@@ -227,7 +234,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
           padding: '20px',
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
         }}>
-          <h2 style={{ marginBottom: '20px', color: '#333', borderBottom: '2px solid #e9ecef', paddingBottom: '10px' }}>Your Bookings</h2>
+          <h2 style={{ marginBottom: '20px', color: '#495057', borderBottom: '2px solid #e9ecef', paddingBottom: '10px' }}>Your Bookings</h2>
           
           {/* Upcoming Bookings */}
           <div style={{ marginBottom: '20px' }}>
@@ -241,15 +248,16 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
                       padding: '10px',
                       backgroundColor: '#f8f9fa',
                       borderRadius: '4px',
-                      border: '1px solid #dee2e6'
+                      border: '1px solid #dee2e6',
+                      color: '#495057'
                     }}
                   >
-                    {formatDate(booking.start)} - {formatDate(booking.end)}
+                    {formatDate(booking.start)} • {formatTime(booking.start)} - {formatTime(booking.end)}
                   </div>
                 ))}
               </div>
             ) : (
-              <p style={{ color: '#6c757d' }}>No upcoming bookings</p>
+              <p style={{ color: '#495057' }}>No upcoming bookings</p>
             )}
           </div>
 
@@ -265,15 +273,16 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
                       padding: '10px',
                       backgroundColor: '#f8f9fa',
                       borderRadius: '4px',
-                      border: '1px solid #dee2e6'
+                      border: '1px solid #dee2e6',
+                      color: '#495057'
                     }}
                   >
-                    {formatDate(booking.start)} - {formatDate(booking.end)}
+                    {formatDate(booking.start)} • {formatTime(booking.start)} - {formatTime(booking.end)}
                   </div>
                 ))}
               </div>
             ) : (
-              <p style={{ color: '#6c757d' }}>No past bookings</p>
+              <p style={{ color: '#495057' }}>No past bookings</p>
             )}
           </div>
         </div>
@@ -286,7 +295,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
           padding: '20px',
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
         }}>
-          <h2 style={{ marginBottom: '20px', color: '#333', borderBottom: '2px solid #e9ecef', paddingBottom: '10px' }}>Your Events</h2>
+          <h2 style={{ marginBottom: '20px', color: '#495057', borderBottom: '2px solid #e9ecef', paddingBottom: '10px' }}>Your Events</h2>
           
           {/* Upcoming Events */}
           <div style={{ marginBottom: '20px' }}>
@@ -303,14 +312,14 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
                       border: '1px solid #dee2e6'
                     }}
                   >
-                    <h4 style={{ margin: '0 0 5px 0', color: '#333' }}>{event.title}</h4>
+                    <h4 style={{ margin: '0 0 5px 0', color: '#495057' }}>{event.title}</h4>
                     <p style={{ margin: '0 0 5px 0', color: '#495057' }}>{formatDate(event.date)}</p>
-                    <p style={{ margin: '0', color: '#6c757d' }}>{event.description}</p>
+                    <p style={{ margin: '0', color: '#495057' }}>{event.description}</p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p style={{ color: '#6c757d' }}>No upcoming events</p>
+              <p style={{ color: '#495057' }}>No upcoming events</p>
             )}
           </div>
 
@@ -329,14 +338,14 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
                       border: '1px solid #dee2e6'
                     }}
                   >
-                    <h4 style={{ margin: '0 0 5px 0', color: '#333' }}>{event.title}</h4>
+                    <h4 style={{ margin: '0 0 5px 0', color: '#495057' }}>{event.title}</h4>
                     <p style={{ margin: '0 0 5px 0', color: '#495057' }}>{formatDate(event.date)}</p>
-                    <p style={{ margin: '0', color: '#6c757d' }}>{event.description}</p>
+                    <p style={{ margin: '0', color: '#495057' }}>{event.description}</p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p style={{ color: '#6c757d' }}>No past events</p>
+              <p style={{ color: '#495057' }}>No past events</p>
             )}
           </div>
         </div>

@@ -153,6 +153,21 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
       return false;
     }
 
+    // Check if any part of the requested time slot is already booked
+    const checkTime = new Date(startTime);
+    while (checkTime < endTime) {
+      if (isTimeSlotBooked(
+        checkTime,
+        checkTime.getHours(),
+        checkTime.getMinutes()
+      )) {
+        setBookingError('This time slot overlaps with an existing booking');
+        return false;
+      }
+      // Check every 30 minutes
+      checkTime.setMinutes(checkTime.getMinutes() + 30);
+    }
+
     return true;
   };
 
@@ -198,8 +213,10 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
       slotEnd.setMinutes(slotEnd.getMinutes() + 30); // Each slot is 30 minutes
       
       return (
-        slotTime >= start && 
-        slotTime < end && // Check if slot starts during a booking
+        ((slotStart >= start && 
+        slotStart < end) || // Check if slot starts during a booking
+        (slotEnd > start &&
+        slotEnd <= end)) && // Check if slot ends during a booking
         date.getDate() === start.getDate() && 
         date.getMonth() === start.getMonth() && 
         date.getFullYear() === start.getFullYear()

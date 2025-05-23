@@ -116,6 +116,15 @@ A page that allows members to book the ACM lounge for a period of time, and also
 - Availible and unavaile times with dates/times
 - Limit of registration time/occurences
 
+### Sponsor Page
+
+A page containing information about our sponsors
+
+**Possible Components:**
+
+- A reusable component to use for each of our sponsors
+- Two tiers, one for our partners and one for standard sponsors
+
 ### Whatever else you think
 
 I'm writing this document off 5 hours of sleep on a Delta Airlines flight, I've definitely missed stuff, and there's also probably a lot of stuff that none of us have thought about yet. Implement anything you think is going to be good.

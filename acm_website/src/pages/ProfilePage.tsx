@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './LoginPage.css';
 import { auth } from '../firebase/config';
 import { onAuthStateChanged, updatePassword, deleteUser, signOut } from "firebase/auth";
-import { collection, doc, getFirestore, getDoc, getDocs, query, where, deleteDoc } from "firebase/firestore";
+import { collection, doc, getFirestore, getDoc, getDocs, query, where, deleteDoc, updateDoc } from "firebase/firestore";
 
 interface ProfilePageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
@@ -126,6 +126,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
       try {
         const user = auth.currentUser;
         if (user) {
+          const db = getFirestore();
+          // Update user document to mark as deleted
+          await updateDoc(doc(db, "users", user.uid), {
+            deleted: true,
+            deletedAt: new Date()
+          });
+          // Delete the user account
           await deleteUser(user);
           navigateTo('home');
         }

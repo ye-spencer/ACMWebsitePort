@@ -7,6 +7,7 @@ import CreditsPage from './pages/CreditsPage';
 import LoginPage from './pages/LoginPage';
 import BookingPage from './pages/BookingPage';
 import ProfilePage from './pages/ProfilePage';
+import AdminPage from './pages/AdminPage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -37,6 +38,8 @@ function App() {
         return <BookingPage navigateTo={navigateTo} error={error} />;
       case 'profile':
         return <ProfilePage navigateTo={navigateTo} error={error} />;
+      case 'admin':
+        return <AdminPage navigateTo={navigateTo} error={error} />;
       default:
         return <HomePage navigateTo={navigateTo} error={error} />;
     }

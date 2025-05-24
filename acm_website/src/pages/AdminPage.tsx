@@ -250,7 +250,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
                   onChange={(e) => setEventStartDate(e.target.value)}
                   required
                   style={{
-                    padding: '8px',
+                    padding: '2px',
                     borderRadius: '4px',
                     border: '1px solid #ced4da',
                     fontSize: '1rem',
@@ -266,7 +266,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
                   onChange={(e) => setEventStartTime(e.target.value)}
                   required
                   style={{
-                    padding: '8px',
+                    padding: '2px',
                     borderRadius: '4px',
                     border: '1px solid #ced4da',
                     fontSize: '1rem',
@@ -284,7 +284,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
                   onChange={(e) => setEventEndDate(e.target.value)}
                   required
                   style={{
-                    padding: '8px',
+                    padding: '2px',
                     borderRadius: '4px',
                     border: '1px solid #ced4da',
                     fontSize: '1rem',
@@ -300,7 +300,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
                   onChange={(e) => setEventEndTime(e.target.value)}
                   required
                   style={{
-                    padding: '8px',
+                    padding: '2px',
                     borderRadius: '4px',
                     border: '1px solid #ced4da',
                     fontSize: '1rem',
@@ -336,7 +336,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
                 <tr style={{ borderBottom: '2px solid #dee2e6' }}>
                   <th style={{ padding: '12px', textAlign: 'left', color: '#495057' }}>Email</th>
                   <th style={{ padding: '12px', textAlign: 'left', color: '#495057' }}>Events Attended</th>
-                  <th style={{ padding: '12px', textAlign: 'center', color: '#495057' }}>Actions</th>
+                  <th style={{ padding: '12px', textAlign: 'center', color: '#495057' }}>Remove</th>
                 </tr>
               </thead>
               <tbody>
@@ -420,8 +420,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
                 required
                 style={{
                   padding: '8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ced4da',
                   fontSize: '1rem',
                   width: '100%'
                 }}

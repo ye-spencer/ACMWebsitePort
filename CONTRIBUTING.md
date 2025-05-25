@@ -98,23 +98,41 @@ Basic contact page with officer information
 
 Likely the most complex part of the website (but not that complex still). Students should be able to register to become a ACM member with an email/password, this allows them to join the new mailing list (just some database) and become part of our records (records includes events attended).
 
+**Existing Functionality:**
+
+- Sign up, sign in
+- Booking management on profile page
+- Event management on profile page
+
 **Possible Components:**
 
-- User registration and authentication
-- Profile management
 - Event attendance tracking
 - Mailing list integration
 - Membership status management
-- Admin dashboard for member management
+
+### Admin Dashboard
+
+**Existing Functionality:**
+
+- Event creation
+- Member management
+
+**Possible Components:**
+
+- Attendance upload
 
 ### Booking ACM Lounge
 
 A page that allows members to book the ACM lounge for a period of time, and also has a schedule of when it is already booked
 
-**Possible Components:**
+**Existing Functionality:**
 
 - Availible and unavaile times with dates/times
 - Limit of registration time/occurences
+
+**Possible Components:**
+
+- UI improvements
 
 ### Sponsor Page
 

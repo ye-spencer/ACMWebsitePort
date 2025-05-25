@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './LoginPage.css';
 import { auth } from '../firebase/config';
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { collection, doc, getFirestore, getDocs, query, where, updateDoc, addDoc, Timestamp, orderBy } from "firebase/firestore";
 
 interface AdminPageProps {
@@ -153,6 +153,16 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
     // 2. Parsing the attendance data
     // 3. Updating the eventsAttended field for each user
     alert('Attendance upload functionality to be implemented');
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigateTo('login', 'You have been logged out');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      alert('Failed to log out. Please try again.');
+    }
   };
 
   if (!isAdmin) {
@@ -328,7 +338,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
         }}>
           <h2 style={{ marginBottom: '20px', color: '#495057', borderBottom: '2px solid #e9ecef', paddingBottom: '10px' }}>
-            Members
+            Manage Members
           </h2>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -433,6 +443,38 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
               Upload Attendance
             </button>
           </form>
+        </div>
+
+        {/* Logout Container */}
+        <div className="login-box" style={{ 
+          width: '100%',
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          padding: '20px',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+        }}>
+          <h2 style={{ marginBottom: '20px', color: '#495057', borderBottom: '2px solid #e9ecef', paddingBottom: '10px' }}>
+            Account
+          </h2>
+          <button 
+            onClick={handleLogout}
+            className="login-button"
+            style={{ 
+              backgroundColor: '#003366',
+              color: 'white',
+              border: 'none',
+              padding: '10px 20px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '1rem',
+              width: '100%',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#c82333'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#dc3545'}
+          >
+            Logout
+          </button>
         </div>
       </div>
 

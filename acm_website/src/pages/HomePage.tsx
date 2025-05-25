@@ -9,10 +9,12 @@ interface HomePageProps {
 
 const HomePage: React.FC<HomePageProps> = ({ navigateTo, error }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       setIsLoggedIn(!!user);
+      setIsAdmin(user?.email === "jhuacmweb@gmail.com");
     });
   }, []);
 
@@ -49,9 +51,9 @@ const HomePage: React.FC<HomePageProps> = ({ navigateTo, error }) => {
         </button>
         <button 
           className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-          onClick={() => navigateTo(isLoggedIn ? 'profile' : 'login')}
+          onClick={() => navigateTo(isAdmin ? 'admin' : isLoggedIn ? 'profile' : 'login')}
         >
-          {isLoggedIn ? 'Profile' : 'Login'}
+          {isAdmin ? 'Admin' : isLoggedIn ? 'Profile' : 'Login'}
         </button>
       </div>
       

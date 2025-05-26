@@ -103,10 +103,10 @@ Likely the most complex part of the website (but not that complex still). Studen
 - Sign up, sign in
 - Booking management on profile page
 - Event management on profile page
+- Event attendance tracking
 
 **Possible Components:**
 
-- Event attendance tracking
 - Mailing list integration
 - Membership status management
 
@@ -116,10 +116,11 @@ Likely the most complex part of the website (but not that complex still). Studen
 
 - Event creation
 - Member management
+- Attendance upload
 
 **Possible Components:**
 
-- Attendance upload
+- UI improvements
 
 ### Booking ACM Lounge
 

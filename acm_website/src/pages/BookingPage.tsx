@@ -46,13 +46,16 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
   const [bookingSuccess, setBookingSuccess] = useState<string>('');
 
   // Initial auth check
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // User is signed in
-    } else {
-      navigateTo('login', 'Please log in to access the booking page');
-    }
-  });
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in
+      } else {
+        navigateTo('login', 'Please log in to access the booking page');
+      }
+    });
+    return unsubscribe;
+  }, []);
 
   // Generate time slots for dropdowns
   useEffect(() => {

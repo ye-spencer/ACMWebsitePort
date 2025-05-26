@@ -127,8 +127,8 @@ A page that allows members to book the ACM lounge for a period of time, and also
 
 **Existing Functionality:**
 
-- Availible and unavaile times with dates/times
-- Limit of registration time/occurences
+- Available and unavailable times with dates/times
+- Limit of registration time/occurrences
 
 **Possible Components:**
 

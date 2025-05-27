@@ -39,6 +39,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
   const [pastBookings, setPastBookings] = useState<Booking[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
+  const [eventsAttended, setEventsAttended] = useState<number>(0);
+  const [memberError, setMemberError] = useState<string>('');
+  const [memberSuccess, setMemberSuccess] = useState<string>('');
 
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
@@ -89,6 +92,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
           // determine upcoming and past events
           setUpcomingEvents(registered.filter(event => event.date > now));
           setPastEvents(attended.filter(event => event.date <= now));
+          setEventsAttended(attended.length);
         }
 
       } else {
@@ -167,17 +171,34 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
   };
 
   const handleUnsubscribeMailingList = async () => {
-    try {
-      const user = auth.currentUser;
-      if (user) {
-        const db = getFirestore();
-        await updateDoc(doc(db, "users", user.uid), {
+    await updateDoc(doc(db, "users", user.uid), {
           isOnMailingList: false,
         });
         setIsOnMailingList(false);
       }
     } catch (error) {
       console.error('Error unsubscribing from mailing list:', error);
+    }
+  };
+
+  const handleBecomeMember = async () => {
+    setMemberError('');
+    setMemberSuccess('');
+    if (eventsAttended < 3) {
+      setMemberError('You must have attended at least 3 events to become a member.');
+      return;
+    }
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const db = getFirestore();
+        await updateDoc(doc(db, 'users', user.uid), { isMember: true });
+        setIsMember(true);
+        setMemberSuccess('You are now a member!');
+      }
+    } catch (error) {
+      console.error('Error updating membership:', error);
+      setMemberError('Failed to update membership status. Please try again.');
     }
   };
 
@@ -245,12 +266,23 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
             </div>
             <div>
               <strong>ACM Member:</strong> {isMember ? 'Yes' : (
-                <button 
+                <button
                   className="login-button"
-                  onClick={() => {/* TODO: Implement membership signup */}}
+                  onClick={handleBecomeMember}
                 >
                   Become a Member
                 </button>
+              )}
+              {(memberError || memberSuccess) && (
+                <div
+                  style={{
+                    color: memberError ? '#dc3545' : '#28a745',
+                    fontSize: '0.875rem',
+                    marginTop: '5px'
+                  }}
+                >
+                  {memberError || memberSuccess}
+                </div>
               )}
             </div>
             <div>

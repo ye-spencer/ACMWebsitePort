@@ -3,6 +3,7 @@ import './LoginPage.css';
 import { auth } from '../firebase/config';
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { collection, doc, getFirestore, getDocs, query, where, updateDoc, addDoc, Timestamp, orderBy } from "firebase/firestore";
+import { deleteUser } from '../api';
 
 interface AdminPageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
@@ -130,8 +131,13 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
       try {
         const db = getFirestore();
         await updateDoc(doc(db, "users", uid), {
-          isMember: false
+          isMember: false,
+          deleted: true,
+          deletedAt: Timestamp.now()
         });
+
+        await deleteUser(uid);
+
         setMembers(prev => prev.filter(member => member.uid !== uid));
       } catch (error) {
         console.error('Error removing member:', error);

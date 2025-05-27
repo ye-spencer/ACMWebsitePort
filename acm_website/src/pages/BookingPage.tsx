@@ -69,7 +69,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
     const slots: TimeSlot[] = [];
     // Start time slots (12 AM to 11:30 PM)
     for (let hour = 0; hour < 24; hour++) {
-      for (let minute of [0, 30]) {
+      for (const minute of [0, 30]) {
         const time = new Date();
         time.setHours(hour, minute, 0, 0);
         slots.push({

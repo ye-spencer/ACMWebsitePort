@@ -15,8 +15,6 @@ interface LoginPageProps {
 const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
 
   const [userCredentials, setUserCredentials] = useState({email: '', password: ''});
-  const [isLoading, setIsLoading] = useState(false);
-  const [loginType, setLoginType] = useState('login');
   const [localError, setLocalError] = useState('');
   const handleCredentials = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserCredentials({...userCredentials, [e.target.name]: e.target.value});
@@ -35,6 +33,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
   function handleSignup(e: React.FormEvent) {
     e.preventDefault();
     setLocalError('');
+    userCredentials.email = userCredentials.email.toLowerCase();
+
     // validate jhu email
     const domain = userCredentials.email.split('@')[1];
     const validDomains = ['jh.edu', 'jhu.edu', 'cs.jhu.com'];
@@ -57,6 +57,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
   function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLocalError('');
+    userCredentials.email = userCredentials.email.toLowerCase();
+
     signInWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
       .then((userCredential) => {
         const user = userCredential.user;
@@ -68,22 +70,19 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
 
   function handlePasswordReset(e: React.FormEvent) {
     e.preventDefault();
-    const email = prompt("Please enter your JHU email address to reset your password:");
-    if (!email) {
+    const input = prompt("Please enter your JHU email address to reset your password:");
+    if (!input) {
       setLocalError("Error: No email provided.");
       return;
     }
+    const email = input.toLowerCase();
 
-    setIsLoading(true);
     sendPasswordResetEmail(auth, email)
       .then(() => {
         alert("Password reset email sent! Please check your inbox for instructions.");
       })
       .catch((error) => {
         setLocalError(error.message);
-      })
-      .finally(() => {
-        setIsLoading(false);
       });
   }
 

@@ -120,7 +120,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
         setConfirmPassword('');
         setPasswordError('');
       }
-    } catch (error) {
+    } catch (err) {
+      console.error(err);
       setPasswordError('Failed to update password. Please try again.');
     }
   };
@@ -434,9 +435,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
             <h3 style={{ color: '#495057', marginBottom: '10px' }}>Upcoming Events</h3>
             {upcomingEvents.length > 0 ? (
               <div style={{ display: 'grid', gap: '10px' }}>
-                {upcomingEvents.map(event => (
-                  <div 
-                    key={event.id}
+                {upcomingEvents.map((event, index) => (
+                  <div
+                    key={`${event.id}-${index}`}
                     style={{
                       padding: '15px',
                       backgroundColor: '#f8f9fa',
@@ -459,9 +460,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
             <h3 style={{ color: '#495057', marginBottom: '10px' }}>Past Events</h3>
             {pastEvents.length > 0 ? (
               <div style={{ display: 'grid', gap: '10px' }}>
-                {pastEvents.map(event => (
-                  <div 
-                    key={event.id}
+                {pastEvents.map((event, index) => (
+                  <div
+                    key={`${event.id}-${index}`}
                     style={{
                       padding: '15px',
                       backgroundColor: '#f8f9fa',

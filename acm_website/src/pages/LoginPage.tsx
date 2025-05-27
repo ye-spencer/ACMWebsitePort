@@ -44,8 +44,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
     }
     // signup with email and password
     createUserWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
-      .then((userCredential) => {
-        const user = userCredential.user;
+      .then(() => {
+        // Sign-up successful
       })
       // handle errors
       .catch((error) => {
@@ -60,8 +60,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
     userCredentials.email = userCredentials.email.toLowerCase();
 
     signInWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
-      .then((userCredential) => {
-        const user = userCredential.user;
+      .then(() => {
+        // Login successful
       })
       .catch((error) => {
         setLocalError(error.message);

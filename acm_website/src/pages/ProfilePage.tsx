@@ -292,11 +292,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
             <div>
               <strong>Mailing List:</strong> {isOnMailingList ? (
                 <>
-                  Yes
                   <button
                     className="login-button"
                     onClick={handleUnsubscribeMailingList}
-                    style={{ marginLeft: '10px' }}
                   >
                     Unsubscribe
                   </button>
@@ -306,7 +304,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
                   className="login-button"
                   onClick={handleJoinMailingList}
                 >
-                  Join Mailing List
+                  Subscribe
                 </button>
               )}
             </div>

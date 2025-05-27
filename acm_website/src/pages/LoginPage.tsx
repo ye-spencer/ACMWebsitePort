@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './LoginPage.css'; // Import the CSS file for styling
+import '../styles/LoginPage.css'; // Import the CSS file for styling
 import { auth } from '../firebase/config';
 import { createUserWithEmailAndPassword,
          onAuthStateChanged,

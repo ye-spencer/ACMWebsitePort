@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './LoginPage.css'; // Reuse the login page styling
+import '../styles/LoginPage.css'; // Reuse the login page styling
 import '../styles/BookingPage.css';
 import TimeSelection from '../components/booking/TimeSelection';
 import CalendarView from '../components/booking/CalendarView';

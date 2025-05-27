@@ -67,7 +67,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
             attendees.forEach((a) => {
               if (a.email && a.email.toLowerCase() === cred.user.email!.toLowerCase()) {
                 attended.push({ eventID: eventDoc.id, name: data.name, date: data.start });
-                if (!a.uid || a.uid === 'unknown') {
+                if (a.uid !== cred.user.uid) {
                   a.uid = cred.user.uid;
                   changed = true;
                 }
@@ -77,7 +77,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
             regs.forEach((r) => {
               if (r.email && r.email.toLowerCase() === cred.user.email!.toLowerCase()) {
                 registered.push({ eventID: eventDoc.id, name: data.name, date: data.start });
-                if (!r.uid || r.uid === 'unknown') {
+                if (r.uid !== cred.user.uid) {
                   r.uid = cred.user.uid;
                   changed = true;
                 }

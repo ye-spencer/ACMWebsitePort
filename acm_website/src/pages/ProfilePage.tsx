@@ -151,6 +151,36 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
     }
   };
 
+  const handleJoinMailingList = async () => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const db = getFirestore();
+        await updateDoc(doc(db, "users", user.uid), {
+          isOnMailingList: true,
+        });
+        setIsOnMailingList(true);
+      }
+    } catch (error) {
+      console.error('Error joining mailing list:', error);
+    }
+  };
+
+  const handleUnsubscribeMailingList = async () => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const db = getFirestore();
+        await updateDoc(doc(db, "users", user.uid), {
+          isOnMailingList: false,
+        });
+        setIsOnMailingList(false);
+      }
+    } catch (error) {
+      console.error('Error unsubscribing from mailing list:', error);
+    }
+  };
+
   const formatDate = (date: Date): string => {
     return date.toLocaleDateString('en-US', {
       weekday: 'short',
@@ -224,10 +254,21 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
               )}
             </div>
             <div>
-              <strong>Mailing List:</strong> {isOnMailingList ? 'Yes' : (
-                <button 
+              <strong>Mailing List:</strong> {isOnMailingList ? (
+                <>
+                  Yes
+                  <button
+                    className="login-button"
+                    onClick={handleUnsubscribeMailingList}
+                    style={{ marginLeft: '10px' }}
+                  >
+                    Unsubscribe
+                  </button>
+                </>
+              ) : (
+                <button
                   className="login-button"
-                  onClick={() => {/* TODO: Implement mailing list signup */}}
+                  onClick={handleJoinMailingList}
                 >
                   Join Mailing List
                 </button>

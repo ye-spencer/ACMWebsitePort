@@ -1,19 +1,13 @@
 import React, { useState } from 'react';
 import placeholderImage from '../assets/depositphotos_104564156-stock-illustration-male-user-icon.jpg';
 import '../styles/FlipCard.css';
+import { contributorsData } from '../data/contributors';
 
 interface CreditsPageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
   error?: string;
 }
 
-interface ContributorData {
-  name: string;
-  role: string;
-  bio: string;
-  linkedin: string;
-  imagePath?: string;
-}
 
 const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo, error }) => {
   // State to track which cards are flipped
@@ -28,37 +22,7 @@ const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo, error }) => {
     }
   };
 
-  // Contributors data
-  const contributorsData: ContributorData[] = [
-    { 
-      name: "Alan Li", 
-      role: "About Us", 
-      bio: "2026",
-      linkedin: "https://www.linkedin.com/in/alanli6/",
-      imagePath: "/images/contributors/john.jpg"
-    },
-    { 
-      name: "Jane Smith", 
-      role: "UI/UX Designer", 
-      bio: "Created the visual design and user experience.",
-      linkedin: "https://www.linkedin.com/in/jhu-acm-design",
-      imagePath: "/images/contributors/jane.jpg"
-    },
-    { 
-      name: "Alex Johnson", 
-      role: "Backend Developer", 
-      bio: "Built the server infrastructure and APIs.",
-      linkedin: "https://www.linkedin.com/in/jhu-acm-backend",
-      imagePath: "/images/contributors/alex.jpg"
-    },
-    { 
-      name: "Sam Wilson", 
-      role: "Content Manager", 
-      bio: "Developed and organized website content.",
-      linkedin: "https://www.linkedin.com/in/jhu-acm-content",
-      imagePath: "/images/contributors/sam.jpg"
-    }
-  ];
+  // Contributors data sourced from a separate file
 
   return (
     <div className="about-container" style={{ position: 'relative', zIndex: 1 }}>

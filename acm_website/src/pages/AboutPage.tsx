@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import placeholderImage from '../assets/depositphotos_104564156-stock-illustration-male-user-icon.jpg';
-import miseokImage from '../assets/alumni/miseok kim.jpg';
-import juliaImage from '../assets/alumni/julia bian.jpeg';
-import nishImage from '../assets/alumni/nish.jpeg';
-import chaseImage from '../assets/alumni/chase feng.jpeg';
+import { leadershipData } from '../data/leadership';
+import { alumniData } from '../data/alumni';
 import '../styles/FlipCard.css';
 
 interface AboutPageProps {
@@ -11,13 +9,6 @@ interface AboutPageProps {
   error?: string;
 }
 
-interface PersonData {
-  name: string;
-  role: string;
-  bio: string;
-  linkedin: string;
-  imagePath?: string;
-}
 
 const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
   // State to track which cards are flipped
@@ -42,111 +33,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
     }
   };
 
-  // Leadership data
-  const leadershipData: PersonData[] = [
-    { 
-      name: "Spencer Ye", 
-      role: "President", 
-      bio: "2027",
-      linkedin: "https://www.linkedin.com/in/spencerye/",
-      imagePath: "/images/team/spencer.jpg"
-    },
-    { 
-      name: "Elizabeth Fu", 
-      role: "Vice President", 
-      bio: "2027",
-      linkedin: "https://www.linkedin.com/in/elizabeth-f-773b78244/",
-      imagePath: "/images/team/elizabeth.jpg"
-    },
-    { 
-      name: "Ria Talwar", 
-      role: "Treasurer", 
-      bio: "2027",
-      linkedin: "https://www.linkedin.com/in/ria-talwar-cs2027/",
-      imagePath: "/images/team/ria.jpg"
-    },
-    { 
-      name: "Mischa Kumar", 
-      role: "Secretary", 
-      bio: "2028",
-      linkedin: "https://www.linkedin.com/in/mischa-kumar-274631298/",
-      imagePath: "/images/team/mischa.jpg"
-    },
-    { 
-      name: "Timothy Lin", 
-      role: "ICPC Head", 
-      bio: "2026",
-      linkedin: "https://www.linkedin.com/in/tlin2004/",
-      imagePath: "/images/team/timothy.jpg"
-    },
-    { 
-      name: "Liam Finn", 
-      role: "Outreach Chair", 
-      bio: "2027",
-      linkedin: "https://www.linkedin.com/in/liam-finn-11o37/",
-      imagePath: "/images/team/liam.jpg"
-    },
-    { 
-      name: "Tianai Yue", 
-      role: "Events Chair", 
-      bio: "2026",
-      linkedin: "https://www.linkedin.com/in/tianai-yue-70981523b/",
-      imagePath: "/images/team/tianai.jpg"
-    },
-    { 
-      name: "Alan Li", 
-      role: "General Officer", 
-      bio: "2026",
-      linkedin: "https://www.linkedin.com/in/alanli6/",
-      imagePath: "/images/team/alan.jpg"
-    },
-    { 
-      name: "Vrinda Sehgal", 
-      role: "General Officer", 
-      bio: "2028",
-      linkedin: "https://www.linkedin.com/in/vrinda-sehgal-0000000000/",
-      imagePath: "/images/team/vrinda.jpg"
-    },
-    { 
-      name: "Vicki Chen", 
-      role: "General Officer", 
-      bio: "2028",
-      linkedin: "https://www.linkedin.com/in/vickichenn/",
-      imagePath: "/images/team/vicki.jpg"
-    }
-  ];
-
-  // Alumni data
-  const alumniData: PersonData[] = [
-    { 
-      name: "Miseok Kim", 
-      role: "2025", 
-      bio: "Google",
-      linkedin: "https://www.linkedin.com/in/miseok-k-aa4202195/",
-      imagePath: miseokImage
-    },
-    { 
-      name: "Julia Bian", 
-      role: "2024", 
-      bio: "Meta",
-      linkedin: "https://www.linkedin.com/in/juliabian/",
-      imagePath: juliaImage
-    },
-    { 
-      name: "Nish Paruchuri", 
-      role: "2024", 
-      bio: "MS @ Stanford",
-      linkedin: "https://www.linkedin.com/in/nishikarp/",
-      imagePath: nishImage
-    },
-    { 
-      name: "Chase Feng", 
-      role: "2025", 
-      bio: "IMC Trading",
-      linkedin: "https://www.linkedin.com/in/chasejhu/",
-      imagePath: chaseImage
-    }
-  ];
+  // Leadership and alumni data now sourced from data files
 
   return (
     <div className="about-container" style={{ position: 'relative', zIndex: 1 }}>

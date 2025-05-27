@@ -216,6 +216,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
         return;
       }
 
+      // add booking to database
       await setDoc(doc(db, "bookings", auth.currentUser.uid + startTime.toDateString()), {
         UID: auth.currentUser.uid,
         start: Timestamp.fromDate(startTime),
@@ -223,10 +224,6 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
       });
 
       setBookingSuccess('Room successfully booked!');
-      console.log('Booking:', {
-        startTime,
-        endTime
-      });
     } catch (error) {
       console.error('Error booking:', error);
       setBookingError('Failed to create booking. Please try again.');

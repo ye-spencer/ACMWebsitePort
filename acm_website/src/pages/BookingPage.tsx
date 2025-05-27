@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './LoginPage.css'; // Reuse the login page styling
+import '../styles/BookingPage.css';
+import TimeSelection from '../components/booking/TimeSelection';
+import CalendarView from '../components/booking/CalendarView';
 import { app, auth } from '../firebase/config';
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, doc, getFirestore, setDoc, Timestamp, query, where, getDocs, getDoc } from "firebase/firestore";
@@ -213,6 +216,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
         return;
       }
 
+      // add booking to database
       await setDoc(doc(db, "bookings", auth.currentUser.uid + startTime.toDateString()), {
         UID: auth.currentUser.uid,
         start: Timestamp.fromDate(startTime),
@@ -220,10 +224,6 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
       });
 
       setBookingSuccess('Room successfully booked!');
-      console.log('Booking:', {
-        startTime,
-        endTime
-      });
     } catch (error) {
       console.error('Error booking:', error);
       setBookingError('Failed to create booking. Please try again.');
@@ -253,241 +253,34 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
 
   return (
     <div className="login-page">
-      <div className="about-background" style={{ zIndex: -1 }}></div>
+      <div className="about-background"></div>
       <div className="login-container">
-        <div className="login-box" style={{ width: '80vw', maxWidth: '1200px' }}>
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
-          
-          <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
-            <div style={{ flex: 0.8 }}>
-              <h2 style={{ marginBottom: '10px', color: '#333' }}>Select Date and Time</h2>
-              {/* date selection */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <select 
-                  value={dates.findIndex(date => 
-                    date.getDate() === startTime.getDate() && 
-                    date.getMonth() === startTime.getMonth() && 
-                    date.getFullYear() === startTime.getFullYear()
-                  )} 
-                  onChange={handleDateChange}
-                  style={{
-                    padding: '8px',
-                    borderRadius: '4px',
-                    border: '1px solid #ced4da',
-                    fontSize: '1rem',
-                    width: '100%'
-                  }}
-                >
-                  {dates.map((date, index) => (
-                    <option key={index} value={index}>
-                      {formatDate(date)}
-                    </option>
-                  ))}
-                </select>
+        <div className="login-box booking-box">
+          {error && <div className="error-message">{error}</div>}
 
-                {/* start time selection */}
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <select 
-                    value={`${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`}
-                    onChange={handleStartTimeChange}
-                    style={{
-                      flex: 1,
-                      padding: '8px',
-                      borderRadius: '4px',
-                      border: '1px solid #ced4da',
-                      fontSize: '1rem'
-                    }}
-                  >
-                    {timeSlots.map((slot, index) => (
-                      <option 
-                        key={index} 
-                        value={`${slot.hour.toString().padStart(2, '0')}:${slot.minute.toString().padStart(2, '0')}`}
-                      >
-                        {slot.label}
-                      </option>
-                    ))}
-                  </select>
-
-                  {/* end time selection */}
-                  <select 
-                    value={`${endTime.getHours().toString().padStart(2, '0')}:${endTime.getMinutes().toString().padStart(2, '0')}`}
-                    onChange={handleEndTimeChange}
-                    style={{
-                      flex: 1,
-                      padding: '8px',
-                      borderRadius: '4px',
-                      border: '1px solid #ced4da',
-                      fontSize: '1rem'
-                    }}
-                  >
-                    {timeSlots.map((slot, index) => {
-                      // For end time, we want to show times from 12:30 AM to 12:00 AM
-                      const nextSlot = timeSlots[(index + 1) % timeSlots.length];
-                      const displayTime = nextSlot ? 
-                        `${slot.hour.toString().padStart(2, '0')}:${slot.minute.toString().padStart(2, '0')}` :
-                        '24:00';
-                      return (
-                        <option key={index} value={displayTime}>
-                          {slot.label}
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
-
-                {/* Error and success message display */}
-                {(bookingError || bookingSuccess) && (
-                  <div
-                    style={{
-                      color: bookingError ? '#dc3545' : '#28a745',
-                      fontSize: '0.875rem',
-                      marginTop: '8px',
-                      padding: '8px',
-                      backgroundColor: bookingError ? '#f8d7da' : '#d4edda',
-                      border: `1px solid ${bookingError ? '#f5c6cb' : '#c3e6cb'}`,
-                      borderRadius: '4px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '8px'
-                    }}
-                  >
-                    <span>{bookingError || bookingSuccess}</span>
-                    {showMembershipPrompt && (
-                      <button
-                        className="login-button"
-                        onClick={() => navigateTo('profile')}
-                        style={{ alignSelf: 'flex-start' }}
-                      >
-                        Go to Profile
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* calendar view */}
-            <div style={{ flex: 2.2 }}>
-              <h2 style={{ marginBottom: '10px', color: '#333' }}>Calendar View</h2>
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'auto repeat(7, 1fr)', // Added auto column for time labels
-                gap: '2px',
-                backgroundColor: '#e9ecef',
-                padding: '2px',
-                borderRadius: '4px'
-              }}>
-                {/* Time labels column */}
-                <div style={{ 
-                  backgroundColor: '#fff',
-                  padding: '5px 2px 5px 2px',
-                  borderTopLeftRadius: '4px',
-                  borderBottomLeftRadius: '4px'
-                }}>
-                  <div style={{ 
-                    height: '30px',
-                    marginBottom: '5px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 'bold',
-                    color: '#333'
-                  }}>
-                    Time
-                  </div>
-                  <div style={{ 
-                    display: 'grid', 
-                    gridTemplateRows: 'repeat(24, 30px)',
-                    gap: '2px'
-                  }}>
-                    {Array.from({ length: 24 }, (_, hour) => {
-                      const time = new Date();
-                      time.setHours(hour, 0, 0, 0);
-                      return (
-                        <div 
-                          key={hour}
-                          style={{
-                            backgroundColor: '#f8f9fa',
-                            border: '1px solid #dee2e6',
-                            fontSize: '0.8rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'flex-end',
-                            paddingRight: '8px',
-                            color: '#495057',
-                            height: '30px',
-                            marginBottom: '1px'
-                          }}
-                        >
-                          {time.toLocaleTimeString('en-US', { 
-                            hour: 'numeric', 
-                            hour12: true 
-                          })}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Calendar columns */}
-                {dates.map((date, dayIndex) => (
-                  <div key={dayIndex} style={{ textAlign: 'center', padding: '5px', backgroundColor: '#fff' }}>
-                    <div style={{ 
-                      fontWeight: 'bold', 
-                      marginBottom: '5px',
-                      color: date.toDateString() === new Date().toDateString() ? '#007bff' : '#333',
-                      height: '30px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                      {formatDate(date)}
-                    </div>
-                    <div style={{ 
-                      display: 'grid', 
-                      gridTemplateRows: 'repeat(48, 15px)',
-                      gap: '1px',
-                      marginTop: '-1px'
-                    }}>
-                      {Array.from({ length: 48 }, (_, index) => {
-                        const hour = Math.floor(index / 2);
-                        const minute = (index % 2) * 30;
-                        const isFullHour = minute === 0;
-                        const isBooked = isTimeSlotBooked(date, hour, minute);
-                        
-                        return (
-                          <div 
-                            key={index}
-                            style={{
-                              backgroundColor: isBooked ? 'rgba(0, 51, 102, 1)' : '#f8f9fa',
-                              border: '1px solid #dee2e6',
-                              borderTop: isFullHour ? '2px solid #dee2e6' : '1px solid #dee2e6',
-                              height: '15px',
-                              marginTop: isFullHour ? '-1px' : '0',
-                              position: 'relative',
-                              cursor: isBooked ? 'not-allowed' : 'default'
-                            }}
-                            title={isBooked ? 'booked' : 'open'}
-                          />
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="booking-wrapper">
+            <TimeSelection
+              dates={dates}
+              startTime={startTime}
+              endTime={endTime}
+              timeSlots={timeSlots}
+              bookingError={bookingError}
+              bookingSuccess={bookingSuccess}
+              showMembershipPrompt={showMembershipPrompt}
+              onDateChange={handleDateChange}
+              onStartTimeChange={handleStartTimeChange}
+              onEndTimeChange={handleEndTimeChange}
+              navigateTo={navigateTo}
+              formatDate={formatDate}
+            />
+            <CalendarView
+              dates={dates}
+              isTimeSlotBooked={isTimeSlotBooked}
+              formatDate={formatDate}
+            />
           </div>
 
-          {/* booking button */}
-          <button 
-            className="login-button"
-            style={{ marginTop: '20px' }}
-            onClick={handleBooking}
-          >
+          <button className="login-button book-room-button" onClick={handleBooking}>
             Book Room
           </button>
         </div>

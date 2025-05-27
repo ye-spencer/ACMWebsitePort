@@ -77,7 +77,6 @@ A page containing upcoming events with a register link, along with relevant info
 - Event listing with dates, times, and locations
 - Registration system integration
 - Event details page
-- Admin interface for event management
 - Past events archive
 - Event categories/tags
 
@@ -104,11 +103,12 @@ Likely the most complex part of the website (but not that complex still). Studen
 - Booking management on profile page
 - Event management on profile page
 - Event attendance tracking
+- Membership request
+- Mailing list subscription management
 
 **Possible Components:**
 
-- Mailing list integration
-- Membership status management
+- UI improvements
 
 ### Admin Dashboard
 

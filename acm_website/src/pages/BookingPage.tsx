@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './LoginPage.css'; // Reuse the login page styling
 import { auth } from '../firebase/config';
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, doc, getFirestore, setDoc, Timestamp, query, where, getDocs } from "firebase/firestore";
+import { collection, doc, getFirestore, setDoc, Timestamp, query, where, getDocs, getDoc } from "firebase/firestore";
 import { initializeApp } from 'firebase/app';
 
 const firebaseConfig = {
@@ -44,18 +44,25 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [bookingError, setBookingError] = useState<string>('');
   const [bookingSuccess, setBookingSuccess] = useState<string>('');
+  const [isMember, setIsMember] = useState<boolean | null>(null);
+  const [showMembershipPrompt, setShowMembershipPrompt] = useState<boolean>(false);
 
   // Initial auth check
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // User is signed in
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          setIsMember(userDoc.data().isMember || false);
+        } else {
+          setIsMember(false);
+        }
       } else {
         navigateTo('login', 'Please log in to access the booking page');
       }
     });
     return unsubscribe;
-  }, []);
+  }, [navigateTo]);
 
   // Generate time slots for dropdowns
   useEffect(() => {
@@ -204,6 +211,13 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
       // Reset messages
       setBookingError('');
       setBookingSuccess('');
+      setShowMembershipPrompt(false);
+
+      if (isMember === false) {
+        setBookingError('You must be an ACM member to book a meeting.');
+        setShowMembershipPrompt(true);
+        return;
+      }
 
       // Validate booking times before proceeding
       if (!(await validateBookingTimes())) {
@@ -338,16 +352,30 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
 
                 {/* Error and success message display */}
                 {(bookingError || bookingSuccess) && (
-                  <div style={{
-                    color: bookingError ? '#dc3545' : '#28a745',
-                    fontSize: '0.875rem',
-                    marginTop: '8px',
-                    padding: '8px',
-                    backgroundColor: bookingError ? '#f8d7da' : '#d4edda',
-                    border: `1px solid ${bookingError ? '#f5c6cb' : '#c3e6cb'}`,
-                    borderRadius: '4px'
-                  }}>
-                    {bookingError || bookingSuccess}
+                  <div
+                    style={{
+                      color: bookingError ? '#dc3545' : '#28a745',
+                      fontSize: '0.875rem',
+                      marginTop: '8px',
+                      padding: '8px',
+                      backgroundColor: bookingError ? '#f8d7da' : '#d4edda',
+                      border: `1px solid ${bookingError ? '#f5c6cb' : '#c3e6cb'}`,
+                      borderRadius: '4px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px'
+                    }}
+                  >
+                    <span>{bookingError || bookingSuccess}</span>
+                    {showMembershipPrompt && (
+                      <button
+                        className="login-button"
+                        onClick={() => navigateTo('profile')}
+                        style={{ alignSelf: 'flex-start' }}
+                      >
+                        Go to Profile
+                      </button>
+                    )}
                   </div>
                 )}
               </div>

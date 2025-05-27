@@ -50,10 +50,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
           const db = getFirestore();
           const eventsSnapshot = await getDocs(collection(db, 'events'));
 
+          // track events attended and registered
           const attended: { eventID: string; name: string; date: unknown }[] = [];
           const registered: { eventID: string; name: string; date: unknown }[] = [];
           const updatePromises: Promise<unknown>[] = [];
 
+          // get events and attendees
           eventsSnapshot.forEach((eventDoc) => {
             const data = eventDoc.data();
             const attendees = Array.isArray(data.attendees)
@@ -64,6 +66,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
               : [];
             let changed = false;
 
+            // check if user is attendee
             attendees.forEach((a) => {
               if (a.email && a.email.toLowerCase() === cred.user.email!.toLowerCase()) {
                 attended.push({ eventID: eventDoc.id, name: data.name, date: data.start });
@@ -74,6 +77,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
               }
             });
 
+            // check if user is registered
             regs.forEach((r) => {
               if (r.email && r.email.toLowerCase() === cred.user.email!.toLowerCase()) {
                 registered.push({ eventID: eventDoc.id, name: data.name, date: data.start });
@@ -84,11 +88,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
               }
             });
 
+            // update event in database if user is attendee or registered
             if (changed) {
               updatePromises.push(updateDoc(doc(db, 'events', eventDoc.id), { attendees, registered: regs }));
             }
           });
 
+          // update user in database with events attended and registered
           await Promise.all([
             setDoc(doc(db, 'users', cred.user.uid), {
               email: cred.user.email,

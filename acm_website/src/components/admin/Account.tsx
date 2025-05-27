@@ -11,8 +11,6 @@ const Account: React.FC<AccountProps> = ({ handleLogout }) => (
     <button
       onClick={handleLogout}
       className="logout-button"
-      onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#c82333')}
-      onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#dc3545')}
     >
       Logout
     </button>

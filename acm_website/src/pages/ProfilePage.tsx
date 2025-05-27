@@ -171,7 +171,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
   };
 
   const handleUnsubscribeMailingList = async () => {
-    await updateDoc(doc(db, "users", user.uid), {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const db = getFirestore();
+        await updateDoc(doc(db, "users", user.uid), {
           isOnMailingList: false,
         });
         setIsOnMailingList(false);

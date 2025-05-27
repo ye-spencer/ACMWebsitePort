@@ -59,6 +59,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
           setIsOnMailingList(userData.isOnMailingList || false);
         }
 
+        // get bookings
         const bookingsQuery = query(
           collection(db, "bookings"),
           where("UID", "==", user.uid)
@@ -74,6 +75,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
         setUpcomingBookings(bookings.filter(booking => booking.start > now));
         setPastBookings(bookings.filter(booking => booking.start <= now));
 
+        // get events attended and registered
         if (userDoc.exists()) {
           const userData = userDoc.data();
           const attended: Event[] = userData.eventsAttended.map((event: FirestoreEvent) => ({
@@ -99,6 +101,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
   }, [navigateTo]);
 
   const handlePasswordChange = async () => {
+    // validate passwords
     if (newPassword !== confirmPassword) {
       setPasswordError('Passwords do not match');
       return;
@@ -111,6 +114,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
     try {
       const user = auth.currentUser;
       if (user) {
+        // update password
         await updatePassword(user, newPassword);
         setShowPasswordModal(false);
         setNewPassword('');
@@ -129,10 +133,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
         const user = auth.currentUser;
         if (user) {
           const db = getFirestore();
+          // update user in database
           await updateDoc(doc(db, "users", user.uid), {
             deleted: true,
             deletedAt: new Date()
           });
+          // delete user credentials
           await deleteUser(user);
           navigateTo('home');
         }
@@ -184,10 +190,14 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
   const handleBecomeMember = async () => {
     setMemberError('');
     setMemberSuccess('');
+
+    // check if user satisfies requirements
     if (eventsAttended < 3) {
       setMemberError('You must have attended at least 3 events to become a member.');
       return;
     }
+
+    // update user in database
     try {
       const user = auth.currentUser;
       if (user) {

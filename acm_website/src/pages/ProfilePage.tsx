@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import './LoginPage.css';
 import '../styles/ProfilePage.css';
 import { auth } from '../firebase/config';
-import { onAuthStateChanged, updatePassword, deleteUser, signOut } from "firebase/auth";
+import { EmailAuthProvider, onAuthStateChanged, updatePassword, deleteUser, signOut, reauthenticateWithCredential } from "firebase/auth";
 import { collection, doc, getFirestore, getDoc, getDocs, query, where, deleteDoc, updateDoc } from "firebase/firestore";
 import UserInfoContainer from '../components/profile/UserInfoContainer';
 import EventsContainer from '../components/profile/EventsContainer';
 import PasswordModal from '../components/profile/PasswordModal';
+import VerifyPasswordModal from '../components/profile/VerifyPasswordModal';
 
 interface ProfilePageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
@@ -46,6 +47,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
   const [eventsAttended, setEventsAttended] = useState<number>(0);
   const [memberError, setMemberError] = useState<string>('');
   const [memberSuccess, setMemberSuccess] = useState<string>('');
+  const [showVerifyModal, setShowVerifyModal] = useState<boolean>(false);
+  const [currentPassword, setCurrentPassword] = useState<string>('');
 
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
@@ -99,6 +102,26 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
       }
     });
   }, [navigateTo]);
+
+  const handleVerifyPassword = async () => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        // Verify current password
+        const credential = EmailAuthProvider.credential(user.email!, currentPassword);
+        await reauthenticateWithCredential(user, credential);
+        
+        // If verification successful, show password change modal
+        setShowVerifyModal(false);
+        setCurrentPassword('');
+        setPasswordError('');
+        setShowPasswordModal(true);
+      }
+    } catch (err) {
+      console.error(err);
+      setPasswordError('Incorrect password. Please try again.');
+    }
+  };
 
   const handlePasswordChange = async () => {
     // validate passwords
@@ -259,7 +282,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
           onUnsubscribeMailingList={handleUnsubscribeMailingList}
           onLogout={handleLogout}
           onDeleteAccount={handleDeleteAccount}
-          onChangePassword={() => setShowPasswordModal(true)}
+          onChangePassword={() => setShowVerifyModal(true)}
         />
 
         <EventsContainer
@@ -309,6 +332,19 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
           )}
         />
       </div>
+
+      <VerifyPasswordModal
+        show={showVerifyModal}
+        currentPassword={currentPassword}
+        passwordError={passwordError}
+        onClose={() => {
+          setShowVerifyModal(false);
+          setCurrentPassword('');
+          setPasswordError('');
+        }}
+        onCurrentPasswordChange={setCurrentPassword}
+        onSubmit={handleVerifyPassword}
+      />
 
       <PasswordModal
         show={showPasswordModal}

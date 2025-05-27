@@ -56,6 +56,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
+        // check if user is admin
         if (user.email !== "jhuacmweb@gmail.com") {
           navigateTo('home', 'You do not have permission to access the admin page');
           return;
@@ -96,14 +97,17 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
     e.preventDefault();
     try {
       const db = getFirestore();
+      // get start and end date and time
       const startDateTime = new Date(`${eventStartDate}T${eventStartTime}`);
       const endDateTime = new Date(`${eventEndDate}T${eventEndTime}`);
 
+      // validate start and end date and time
       if (endDateTime <= startDateTime) {
         alert('End time must be after start time');
         return;
       }
 
+      // send event to database
       await addDoc(collection(db, "events"), {
         name: eventTitle,
         description: eventDescription,
@@ -131,8 +135,10 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
   };
 
   const handleRemoveMember = async (uid: string) => {
+    // confirm removal
     if (window.confirm('Are you sure you want to remove this member?')) {
       try {
+        // update user in database
         const db = getFirestore();
         await updateDoc(doc(db, "users", uid), {
           isMember: false,
@@ -140,8 +146,10 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
           deletedAt: Timestamp.now()
         });
 
+        // delete user credentials
         await deleteUser(uid);
 
+        // remove user from members list
         setMembers(prev => prev.filter(member => member.uid !== uid));
       } catch (error) {
         console.error('Error removing member:', error);
@@ -152,6 +160,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
 
   const handleAttendanceUpload = async (e: React.FormEvent) => {
     e.preventDefault();
+    // validate event and file
     if (!selectedEvent || !attendanceFile) {
       alert('Please select an event and upload a file');
       return;

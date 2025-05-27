@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './LoginPage.css';
 import { auth } from '../firebase/config';
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { collection, doc, getFirestore, getDocs, query, where, updateDoc, addDoc, Timestamp, orderBy } from "firebase/firestore";
+import { collection, doc, getFirestore, getDocs, query, where, updateDoc, addDoc, Timestamp, orderBy, arrayUnion } from "firebase/firestore";
+import * as XLSX from 'xlsx';
 import { deleteUser } from '../api';
 
 interface AdminPageProps {
@@ -12,18 +13,21 @@ interface AdminPageProps {
 
 interface Event {
   id: string;
-  title: string;
-  description: string;
-  location: string;
-  link: string;
-  start: Date;
-  end: Date;
+  name: string;
+  date: Date;
+  attendees?: { uid: string; email: string }[];
 }
 
 interface Member {
   uid: string;
   email: string;
   eventsAttended: number;
+}
+
+interface SpreadsheetRow {
+  Email?: string;
+  email?: string;
+  [key: string]: unknown;
 }
 
 const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
@@ -73,12 +77,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
             const data = doc.data();
             return {
               id: doc.id,
-              title: data.title,
-              description: data.description,
-              location: data.location,
-              link: data.link,
-              start: data.start.toDate(),
-              end: data.end.toDate()
+              name: data.name,
+              date: data.start.toDate(),
             };
           });
         setPastEvents(events);
@@ -153,12 +153,100 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
       return;
     }
 
-    // TODO: Implement attendance upload logic
-    // This would involve:
-    // 1. Reading the spreadsheet file
-    // 2. Parsing the attendance data
-    // 3. Updating the eventsAttended field for each user
-    alert('Attendance upload functionality to be implemented');
+    try {
+      const db = getFirestore();
+
+      // Read the spreadsheet file
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = XLSX.utils.sheet_to_json<SpreadsheetRow>(firstSheet);
+
+          // Extract emails from the spreadsheet
+          // Assuming the email column is named 'Email' or 'email'
+          const attendeeEmails = jsonData
+            .map(row => row.Email || row.email)
+            .filter((email): email is string => typeof email === 'string' && email.length > 0)
+            .map(email => email.toLowerCase().trim());
+
+          if (attendeeEmails.length === 0) {
+            throw new Error('No valid emails found in the spreadsheet');
+          }
+
+          // Get all users whose emails match the attendees
+          const usersQuery = query(
+            collection(db, "users"),
+            where("email", "in", attendeeEmails)
+          );
+          const usersSnapshot = await getDocs(usersQuery);
+
+          // Get the event details
+          const event = pastEvents.find(e => e.id === selectedEvent);
+          if (!event) {
+            throw new Error('Event not found');
+          }
+
+          // get attendee list
+          const attendees: { uid: string; email: string }[] = [];
+          const updatePromises = usersSnapshot.docs.map(async (userDoc) => {
+            const userData = userDoc.data();
+            attendees.push({
+              uid: userDoc.id,
+              email: userData.email
+            });
+
+            // Update user's eventsAttended
+            return updateDoc(doc(db, "users", userDoc.id), {
+              eventsAttended: arrayUnion({
+                eventID: event.id,
+                name: event.name,
+                date: event.date
+              })
+            });
+          });
+
+          // Add unknown attendees
+          for (const email of attendeeEmails) {
+            if (attendees.find(a => a.email === email)) {
+              continue;
+            }
+            attendees.push({
+              uid: "unknown",
+              email: email
+            });
+          }
+
+          // Update event's attendees
+          const eventUpdatePromise = updateDoc(doc(db, "events", event.id), {
+            attendees: attendees
+          });
+
+          // Wait for all updates to complete
+          await Promise.all([...updatePromises, eventUpdatePromise]);
+
+          alert(`Successfully processed attendance for ${attendees.length} members`);
+          
+          // Reset form
+          setSelectedEvent('');
+          setAttendanceFile(null);
+        } catch (error) {
+          console.error('Error processing attendance:', error);
+          alert(`Error processing attendance: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+      };
+
+      reader.onerror = () => {
+        throw new Error('Error reading file');
+      };
+
+      reader.readAsArrayBuffer(attendanceFile);
+    } catch (error) {
+      console.error('Error uploading attendance:', error);
+      alert(`Error uploading attendance: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   };
 
   const handleLogout = async () => {
@@ -422,7 +510,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
                 <option value="">Select an event...</option>
                 {pastEvents.map(event => (
                   <option key={event.id} value={event.id}>
-                    {event.title} ({event.start.toLocaleDateString()})
+                    {event.name} ({event.date.toLocaleDateString()})
                   </option>
                 ))}
               </select>

@@ -47,7 +47,7 @@ const HomePage: React.FC<HomePageProps> = ({ navigateTo, error }) => {
           className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
           onClick={() => navigateTo('booking')}
         >
-          Book a Meeting
+          Book Lounge
         </button>
         <button 
           className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"

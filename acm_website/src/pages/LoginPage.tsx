@@ -5,6 +5,7 @@ import { createUserWithEmailAndPassword,
          onAuthStateChanged,
          sendPasswordResetEmail,
          signInWithEmailAndPassword } from "firebase/auth";
+import { collection, doc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
 
 
 interface LoginPageProps {
@@ -44,13 +45,68 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
     }
     // signup with email and password
     createUserWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
-      .then(() => {
-        // Sign-up successful
+      .then(async (cred) => {
+        try {
+          const db = getFirestore();
+          const eventsSnapshot = await getDocs(collection(db, 'events'));
+
+          const attended: { eventID: string; name: string; date: unknown }[] = [];
+          const registered: { eventID: string; name: string; date: unknown }[] = [];
+          const updatePromises: Promise<unknown>[] = [];
+
+          eventsSnapshot.forEach((eventDoc) => {
+            const data = eventDoc.data();
+            const attendees = Array.isArray(data.attendees)
+              ? [...(data.attendees as { uid?: string; email?: string }[])]
+              : [];
+            const regs = Array.isArray(data.registered)
+              ? [...(data.registered as { uid?: string; email?: string }[])]
+              : [];
+            let changed = false;
+
+            attendees.forEach((a) => {
+              if (a.email && a.email.toLowerCase() === cred.user.email!.toLowerCase()) {
+                attended.push({ eventID: eventDoc.id, name: data.name, date: data.start });
+                if (!a.uid || a.uid === 'unknown') {
+                  a.uid = cred.user.uid;
+                  changed = true;
+                }
+              }
+            });
+
+            regs.forEach((r) => {
+              if (r.email && r.email.toLowerCase() === cred.user.email!.toLowerCase()) {
+                registered.push({ eventID: eventDoc.id, name: data.name, date: data.start });
+                if (!r.uid || r.uid === 'unknown') {
+                  r.uid = cred.user.uid;
+                  changed = true;
+                }
+              }
+            });
+
+            if (changed) {
+              updatePromises.push(updateDoc(doc(db, 'events', eventDoc.id), { attendees, registered: regs }));
+            }
+          });
+
+          await Promise.all([
+            setDoc(doc(db, 'users', cred.user.uid), {
+              email: cred.user.email,
+              isMember: false,
+              isOnMailingList: false,
+              eventsAttended: attended,
+              eventsRegistered: registered,
+            }),
+            ...updatePromises,
+          ]);
+        } catch (err) {
+          console.error('Error creating user record:', err);
+        }
       })
       // handle errors
       .catch((error) => {
         setLocalError(error.message);
-    });
+      });
 
   }
 

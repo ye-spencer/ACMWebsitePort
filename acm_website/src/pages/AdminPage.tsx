@@ -131,7 +131,9 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
       try {
         const db = getFirestore();
         await updateDoc(doc(db, "users", uid), {
-          isMember: false
+          isMember: false,
+          deleted: true,
+          deletedAt: Timestamp.now()
         });
 
         await deleteUser(uid);

@@ -88,24 +88,9 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
 
       {/* Past Events */}
       <h1 className="events-title" style={{ position: 'relative', zIndex: 2, color: 'white' }}>Past Events</h1>
-      <div style={{ 
-        position: 'relative', 
-        zIndex: 2,
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-        gap: '1.5rem',
-        marginBottom: '3rem'
-      }}>
+      <div className="events-list" style={{ position: 'relative', zIndex: 2 }}>
         {past_events.map(event => (
-          <div key={event.id} className="event-card" style={{ 
-            position: 'relative', 
-            zIndex: 2,
-            backdropFilter: 'blur(10px)',
-            borderRadius: '10px',
-            padding: '1.5rem',
-            color: 'white',
-            transition: 'transform 0.2s ease'
-          }}>
+          <div key={event.id} className="event-card" style={{ position: 'relative', zIndex: 2, backgroundColor: 'rgba(220, 220, 220, 0.8)' }}>
             <h2 className="event-title">{event.title}</h2>
             <div className="event-details">
               <p><strong>Date:</strong> {event.date}</p>

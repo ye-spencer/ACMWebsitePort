@@ -34,6 +34,34 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
     }
   ];
 
+  // sample past events data
+  const past_events = [
+    {
+      id: 1,
+      title: "Web Development Bootcamp",
+      date: "September 10, 2023",
+      time: "2:00 PM - 5:00 PM",
+      location: "Computer Science Building, Room 101",
+      description: "A comprehensive workshop covering HTML, CSS, and JavaScript fundamentals."
+    },
+    {
+      id: 2,
+      title: "Data Structures & Algorithms Workshop",
+      date: "August 28, 2023",
+      time: "3:00 PM - 6:00 PM",
+      location: "Student Union, Room 201",
+      description: "Deep dive into essential data structures and algorithms for technical interviews."
+    },
+    {
+      id: 3,
+      title: "Summer Tech Meetup",
+      date: "July 15, 2023",
+      time: "4:00 PM - 7:00 PM",
+      location: "Virtual (Zoom)",
+      description: "Networking event with tech professionals and fellow students."
+    }
+  ];
+
   return (
     <div className="events-container" style={{ position: 'relative', zIndex: 1 }}>
       <div className="about-background" style={{ zIndex: -1 }}></div>
@@ -42,7 +70,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
           {error}
         </div>
       )}
-      <h1 className="events-title" style={{ position: 'relative', zIndex: 2 }}>Upcoming Events</h1>
+      <h1 className="events-title" style={{ position: 'relative', zIndex: 2, color: 'white' }}>Upcoming Events</h1>
       <div className="events-list" style={{ position: 'relative', zIndex: 2 }}>
         {events.map(event => (
           <div key={event.id} className="event-card" style={{ position: 'relative', zIndex: 2 }}>
@@ -54,6 +82,22 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
             </div>
             <p className="event-description">{event.description}</p>
             <button className="event-button">RSVP</button>
+          </div>
+        ))}
+      </div>
+
+      {/* Past Events */}
+      <h1 className="events-title" style={{ position: 'relative', zIndex: 2, color: 'white' }}>Past Events</h1>
+      <div className="events-list" style={{ position: 'relative', zIndex: 2 }}>
+        {past_events.map(event => (
+          <div key={event.id} className="event-card" style={{ position: 'relative', zIndex: 2, backgroundColor: 'rgba(220, 220, 220, 0.8)' }}>
+            <h2 className="event-title">{event.title}</h2>
+            <div className="event-details">
+              <p><strong>Date:</strong> {event.date}</p>
+              <p><strong>Time:</strong> {event.time}</p>
+              <p><strong>Location:</strong> {event.location}</p>
+            </div>
+            <p className="event-description">{event.description}</p>
           </div>
         ))}
       </div>

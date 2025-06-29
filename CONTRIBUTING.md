@@ -72,12 +72,15 @@ A homepage with links to all other important aspects of the website
 
 A page containing upcoming events with a register link, along with relevant information. Should be easy to update without directly editing code.
 
-**Possible Components:**
+**Existing Functionality:**
 
 - Event listing with dates, times, and locations
+- Past events archive
+
+**Possible Components:**
+
 - Registration system integration
 - Event details page
-- Past events archive
 - Event categories/tags
 
 ### About Us

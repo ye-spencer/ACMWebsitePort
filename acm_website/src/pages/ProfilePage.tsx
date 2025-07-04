@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/LoginPage.css';
 import '../styles/ProfilePage.css';
+import '../styles/NavBar.css';
 import { auth } from '../firebase/config';
 import { EmailAuthProvider, onAuthStateChanged, updatePassword, deleteUser, signOut, reauthenticateWithCredential } from "firebase/auth";
 import { collection, doc, getFirestore, getDoc, getDocs, query, where, deleteDoc, updateDoc } from "firebase/firestore";
@@ -268,6 +269,14 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
   return (
     <div className="login-page">
       <div className="about-background about-background-low"></div>
+
+      <div className="navbar">
+        <button className="nav-links" onClick={() => navigateTo('about')}>About Us</button>
+        <button className="nav-links" onClick={() => navigateTo('events')}>Events</button>
+        <button className="nav-links" onClick={() => navigateTo('booking')}>Book Lounge</button>
+        <button className="nav-links" onClick={() => navigateTo('profile')}>Profile</button>
+      </div>
+
       <div className="profile-layout">
         {error && <div className="error-message">{error}</div>}
 

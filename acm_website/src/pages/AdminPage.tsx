@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/AdminPage.css';
+import '../styles/Navbar.css';
 import CreateEvent from '../components/admin/CreateEvent';
 import Members from '../components/admin/Members';
 import AttendanceUpload from '../components/admin/AttendanceUpload';
@@ -279,6 +280,14 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
   return (
     <div className="login-page">
       <div className="about-background" style={{ zIndex: -1 }}></div>
+
+      <div className="navbar">
+        <button className="nav-links" onClick={() => navigateTo('about')}>About Us</button>
+        <button className="nav-links" onClick={() => navigateTo('events')}>Events</button>
+        <button className="nav-links" onClick={() => navigateTo('booking')}>Book Lounge</button>
+        <button className="nav-links" onClick={() => navigateTo('admin')}>Admin</button>
+      </div>
+      
       <div className="login-container">
         {error && (
           <div className="error-message">

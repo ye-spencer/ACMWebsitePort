@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, query, collection, where, Timestamp, orderBy, getDocs } from 'firebase/firestore';
 import '../styles/EventsPage.css';
+import '../styles/NavBar.css';
+import { auth } from '../firebase/config';
+import { onAuthStateChanged } from "firebase/auth";
 
 interface EventsPageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
@@ -21,8 +24,11 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const db = getFirestore();
+  
 
   const fetchUpcomingEvents = async () => {
     const upcomingEventsQuery = query(collection(db, "events"), where("start", ">=", Timestamp.now()), orderBy("start", "desc"));
@@ -91,6 +97,13 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
     fetchEvents();
   }, [db]);
 
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      setIsLoggedIn(!!user);
+      setIsAdmin(user?.email === "jhuacmweb@gmail.com");
+    });
+  }, []);
+
   if (loading) {
     return (
       <div className="events-container">
@@ -103,6 +116,16 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
   return (
     <div className="events-container">
       <div className="about-background" style={{ zIndex: -1 }}></div>
+
+      <div className="navbar">
+        <button className="nav-links" onClick={() => navigateTo('about')}>About Us</button>
+        <button className="nav-links" onClick={() => navigateTo('events')}>Events</button>
+        <button className="nav-links" onClick={() => navigateTo('booking')}>Book Lounge</button>
+        <button className="nav-links" onClick={() => navigateTo(isAdmin ? 'admin' : isLoggedIn ? 'profile' : 'login')}>
+          {isAdmin ? 'Admin' : isLoggedIn ? 'Profile' : 'Login'}
+        </button>
+      </div>
+
       {error && (
         <div className="error-message" style={{ position: 'relative', zIndex: 2 }}>
           {error}

@@ -112,7 +112,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
         }
       } else setRegisteredEvents([]);
     });
-  }, []);
+  }, [db]);
 
   const handleRSVP = async (eventID: string) => {
     if (!isLoggedIn) {

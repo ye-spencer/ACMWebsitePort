@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, query, collection, where, Timestamp, orderBy, getDocs } from 'firebase/firestore';
+import { getFirestore, query, collection, where, Timestamp, orderBy, getDocs, updateDoc, doc, arrayUnion, getDoc } from 'firebase/firestore';
 import '../styles/EventsPage.css';
 import '../styles/NavBar.css';
 import { auth } from '../firebase/config';
@@ -13,7 +13,7 @@ interface EventsPageProps {
 interface Event {
   id: string;
   title: string;
-  date: string;
+  date: Date;
   start_time: string;
   end_time: string;
   location: string;
@@ -26,10 +26,10 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [registeredEvents, setRegisteredEvents] = useState<Event[]>([]);
 
   const db = getFirestore();
   
-
   const fetchUpcomingEvents = async () => {
     const upcomingEventsQuery = query(collection(db, "events"), where("start", ">=", Timestamp.now()), orderBy("start", "desc"));
     const upcomingEventsSnapshot = await getDocs(upcomingEventsQuery);
@@ -38,7 +38,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
       return {
         id: doc.id,
         title: data.name || 'Untitled Event',
-        date: data.start ? data.start.toDate().toLocaleDateString() : 'TBD',
+        date: data.start.toDate(),
         start_time: data.start ? data.start.toDate().toLocaleTimeString('en-US', {
           hour: 'numeric',
           minute: '2-digit',
@@ -64,7 +64,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
       return {
         id: doc.id,
         title: data.name || 'Untitled Event',
-        date: data.start ? data.start.toDate().toLocaleDateString() : 'TBD',
+        date: data.start.toDate(),
         start_time: data.start ? data.start.toDate().toLocaleTimeString('en-US', {
           hour: 'numeric',
           minute: '2-digit',
@@ -98,11 +98,43 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
   }, [db]);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       setIsLoggedIn(!!user);
       setIsAdmin(user?.email === "jhuacmweb@gmail.com");
+      if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          const registered: Event[] = userData.eventsRegistered.map((event: any) => ({
+            id: event.eventID,
+          }));
+          setRegisteredEvents(registered);
+        }
+      } else setRegisteredEvents([]);
     });
   }, []);
+
+  const handleRSVP = async (eventID: string) => {
+    if (!isLoggedIn) {
+      navigateTo('login', 'Please log in to register for events.');
+      return;
+    }
+    try {
+      const user = auth.currentUser;
+      const event = upcomingEvents.find(e => e.id === eventID);
+      await updateDoc(doc(db, 'events', eventID), {
+        registered: arrayUnion({ uid: user?.uid, email: user?.email })
+      });
+      if (!user?.uid) throw new Error('User ID not found');
+      await updateDoc(doc(db, 'users', user.uid), {
+        eventsRegistered: arrayUnion({ date: event?.date, eventID: event?.id, title: event?.title })
+      });
+      alert('Successfully registered for the event!');
+    } catch (error) {
+      alert('Error registering for event.');
+      console.error(error);
+    }
+  };
 
   if (loading) {
     return (
@@ -131,6 +163,8 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
           {error}
         </div>
       )}
+
+      {/*Upcoming Events */}
       <h1 className="events-title">Upcoming Events</h1>
       <div className="events-list">
         {upcomingEvents.length === 0 ? (
@@ -139,18 +173,28 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
             <p>Check back soon for new events!</p>
           </div>
         ) : (
-          upcomingEvents.map(event => (
-            <div key={event.id} className="event-card">
-              <h2 className="event-title">{event.title}</h2>
-              <div className="event-details">
-                <p><strong>Date:</strong> {event.date}</p>
-                <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
-                <p><strong>Location:</strong> {event.location}</p>
+          upcomingEvents.map(event => {
+            const isRegistered = registeredEvents.some(e => e.id == event.id);
+            return (
+              <div key={event.id} className="event-card">
+                <h2 className="event-title">{event.title}</h2>
+                <div className="event-details">
+                  <p><strong>Date:</strong> {event.date.toLocaleDateString()}</p>
+                  <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
+                  <p><strong>Location:</strong> {event.location}</p>
+                </div>
+                <p className="event-description">{event.description}</p>
+                <button
+                  className="event-button"
+                  onClick={() => handleRSVP(event.id)}
+                  disabled={isRegistered}
+                  style={isRegistered ? { background: '#aaa', color: '#fff', cursor: 'not-allowed' } : {}}
+                >
+                  {isRegistered ? 'Registered' : 'RSVP'}
+                </button>
               </div>
-              <p className="event-description">{event.description}</p>
-              <button className="event-button">RSVP</button>
-            </div>
-          ))
+            )
+          })
         )}
       </div>
 
@@ -161,7 +205,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
           <div key={event.id} className="event-card" style={{ backgroundColor: 'rgba(220, 220, 220, 0.8)' }}>
             <h2 className="event-title">{event.title}</h2>
             <div className="event-details">
-              <p><strong>Date:</strong> {event.date}</p>
+              <p><strong>Date:</strong> {event.date.toLocaleDateString()}</p>
               <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
               <p><strong>Location:</strong> {event.location}</p>
             </div>

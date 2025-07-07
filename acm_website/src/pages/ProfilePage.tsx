@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/LoginPage.css';
 import '../styles/ProfilePage.css';
-import '../styles/NavBar.css';
 import { auth } from '../firebase/config';
 import { EmailAuthProvider, onAuthStateChanged, updatePassword, deleteUser, signOut, reauthenticateWithCredential } from "firebase/auth";
 import { collection, doc, getFirestore, getDoc, getDocs, query, where, deleteDoc, updateDoc } from "firebase/firestore";
@@ -9,6 +8,7 @@ import UserInfoContainer from '../components/profile/UserInfoContainer';
 import EventsContainer from '../components/profile/EventsContainer';
 import PasswordModal from '../components/profile/PasswordModal';
 import VerifyPasswordModal from '../components/profile/VerifyPasswordModal';
+import Navbar from '../components/Navbar';
 
 interface ProfilePageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
@@ -270,12 +270,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
     <div className="login-page">
       <div className="about-background about-background-low"></div>
 
-      <div className="navbar">
-        <button className="nav-links" onClick={() => navigateTo('about')}>About Us</button>
-        <button className="nav-links" onClick={() => navigateTo('events')}>Events</button>
-        <button className="nav-links" onClick={() => navigateTo('booking')}>Book Lounge</button>
-        <button className="nav-links" onClick={() => navigateTo('profile')}>Profile</button>
-      </div>
+      <Navbar navigateTo={navigateTo} />
 
       <div className="profile-layout">
         {error && <div className="error-message">{error}</div>}

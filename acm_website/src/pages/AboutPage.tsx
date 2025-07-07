@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import placeholderImage from '../assets/depositphotos_104564156-stock-illustration-male-user-icon.jpg';
 import { leadershipData } from '../data/leadership';
 import { alumniData } from '../data/alumni';
+import Navbar from '../components/Navbar';
 import '../styles/FlipCard.css';
-import '../styles/NavBar.css';
-import { auth } from '../firebase/config';
-import { onAuthStateChanged } from "firebase/auth";
 
 interface AboutPageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
@@ -16,9 +14,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
   // State to track which cards are flipped
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
   const [flippedAlumniCards, setFlippedAlumniCards] = useState<number[]>([]);
-  
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+
 
   // Toggle flip state for a card
   const toggleFlip = (index: number) => {
@@ -38,13 +34,6 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
     }
   };
 
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      setIsLoggedIn(!!user);
-      setIsAdmin(user?.email === "jhuacmweb@gmail.com");
-    });
-  }, []);
-
   // Leadership and alumni data now sourced from data files
 
   return (
@@ -56,14 +45,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
           )}
       <div className="about-background" style={{ zIndex: -1 }}></div>
 
-      <div className="navbar">
-        <button className="nav-links" onClick={() => navigateTo('about')}>About Us</button>
-        <button className="nav-links" onClick={() => navigateTo('events')}>Events</button>
-        <button className="nav-links" onClick={() => navigateTo('booking')}>Book Lounge</button>
-        <button className="nav-links" onClick={() => navigateTo(isAdmin ? 'admin' : isLoggedIn ? 'profile' : 'login')}>
-          {isAdmin ? 'Admin' : isLoggedIn ? 'Profile' : 'Login'}
-        </button>
-      </div>
+      <Navbar navigateTo={navigateTo} />
 
       <h1 className="about-title" style={{ position: 'relative', zIndex: 2, color: 'white' }}>About Us</h1>
       

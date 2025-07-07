@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, query, collection, where, Timestamp, orderBy, getDocs, updateDoc, doc, arrayUnion, getDoc } from 'firebase/firestore';
 import '../styles/EventsPage.css';
-import '../styles/NavBar.css';
 import { auth } from '../firebase/config';
 import { onAuthStateChanged } from "firebase/auth";
+import Navbar from '../components/Navbar';
 
 interface EventsPageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
@@ -25,7 +25,6 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [registeredEvents, setRegisteredEvents] = useState<Event[]>([]);
 
   const db = getFirestore();
@@ -100,7 +99,6 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       setIsLoggedIn(!!user);
-      setIsAdmin(user?.email === "jhuacmweb@gmail.com");
       if (user) {
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
@@ -149,14 +147,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
     <div className="events-container">
       <div className="about-background" style={{ zIndex: -1 }}></div>
 
-      <div className="navbar">
-        <button className="nav-links" onClick={() => navigateTo('about')}>About Us</button>
-        <button className="nav-links" onClick={() => navigateTo('events')}>Events</button>
-        <button className="nav-links" onClick={() => navigateTo('booking')}>Book Lounge</button>
-        <button className="nav-links" onClick={() => navigateTo(isAdmin ? 'admin' : isLoggedIn ? 'profile' : 'login')}>
-          {isAdmin ? 'Admin' : isLoggedIn ? 'Profile' : 'Login'}
-        </button>
-      </div>
+      <Navbar navigateTo={navigateTo} />
 
       {error && (
         <div className="error-message" style={{ position: 'relative', zIndex: 2 }}>

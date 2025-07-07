@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/LoginPage.css'; // Reuse the login page styling
 import '../styles/BookingPage.css';
-import '../styles/NavBar.css';
 import TimeSelection from '../components/booking/TimeSelection';
 import CalendarView from '../components/booking/CalendarView';
 import { app, auth } from '../firebase/config';
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, doc, getFirestore, setDoc, Timestamp, query, where, getDocs, getDoc } from "firebase/firestore";
+import Navbar from '../components/Navbar';
 
 const db = getFirestore(app);
 
@@ -39,8 +39,6 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
   const [bookingSuccess, setBookingSuccess] = useState<string>('');
   const [isMember, setIsMember] = useState<boolean | null>(null);
   const [showMembershipPrompt, setShowMembershipPrompt] = useState<boolean>(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
 
   // Initial auth check
   useEffect(() => {
@@ -102,13 +100,6 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
       where("start", "<=", Timestamp.fromDate(new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000))));
     getDocs(q).then((querySnapshot) => {
       setWeek(querySnapshot.docs.map((doc) => [doc.data().start.toDate(), doc.data().end.toDate()]));
-    });
-  }, []);
-
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      setIsLoggedIn(!!user);
-      setIsAdmin(user?.email === "jhuacmweb@gmail.com");
     });
   }, []);
 
@@ -265,14 +256,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
     <div className="login-page">
       <div className="about-background"></div>
 
-      <div className="navbar">
-        <button className="nav-links" onClick={() => navigateTo('about')}>About Us</button>
-        <button className="nav-links" onClick={() => navigateTo('events')}>Events</button>
-        <button className="nav-links" onClick={() => navigateTo('booking')}>Book Lounge</button>
-        <button className="nav-links" onClick={() => navigateTo(isAdmin ? 'admin' : isLoggedIn ? 'profile' : 'login')}>
-          {isAdmin ? 'Admin' : isLoggedIn ? 'Profile' : 'Login'}
-        </button>
-      </div>
+      <Navbar navigateTo={navigateTo} />
 
       <div className="login-container">
         <div className="login-box booking-box">

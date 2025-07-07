@@ -13,7 +13,7 @@
     opacity: 0.8;
     background-color: rgba(50, 50, 50, 0.5);
     backdrop-filter: blur(2px);
-    z-index: 2;
+    z-index: 3;
     padding: 0 32px;
 }
 

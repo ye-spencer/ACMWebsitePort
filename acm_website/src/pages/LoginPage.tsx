@@ -6,7 +6,7 @@ import { createUserWithEmailAndPassword,
          sendPasswordResetEmail,
          signInWithEmailAndPassword } from "firebase/auth";
 import { collection, doc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
-
+import Navbar from '../components/Navbar';
 
 interface LoginPageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
@@ -151,6 +151,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
   return (
     <div className="login-page">
       <div className="about-background" style={{ zIndex: -1 }}></div>
+
+      <Navbar navigateTo={navigateTo} />
+
       <div className="login-container">
         <div className="login-box">
           <form onSubmit={handleLogin}>

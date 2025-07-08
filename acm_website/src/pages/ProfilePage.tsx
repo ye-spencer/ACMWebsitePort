@@ -8,6 +8,7 @@ import UserInfoContainer from '../components/profile/UserInfoContainer';
 import EventsContainer from '../components/profile/EventsContainer';
 import PasswordModal from '../components/profile/PasswordModal';
 import VerifyPasswordModal from '../components/profile/VerifyPasswordModal';
+import Navbar from '../components/Navbar';
 
 interface ProfilePageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
@@ -268,6 +269,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
   return (
     <div className="login-page">
       <div className="about-background about-background-low"></div>
+
+      <Navbar navigateTo={navigateTo} />
+
       <div className="profile-layout">
         {error && <div className="error-message">{error}</div>}
 

@@ -6,6 +6,7 @@ import CalendarView from '../components/booking/CalendarView';
 import { app, auth } from '../firebase/config';
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, doc, getFirestore, setDoc, Timestamp, query, where, getDocs, getDoc } from "firebase/firestore";
+import Navbar from '../components/Navbar';
 
 const db = getFirestore(app);
 
@@ -254,6 +255,9 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
   return (
     <div className="login-page">
       <div className="about-background"></div>
+
+      <Navbar navigateTo={navigateTo} />
+
       <div className="login-container">
         <div className="login-box booking-box">
           {error && <div className="error-message">{error}</div>}

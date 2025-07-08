@@ -192,7 +192,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
           </form>
         </div>
       </div>
-      <button className="home-button" onClick={() => navigateTo('home')}>Back to Home</button>
     </div>
   );
 };

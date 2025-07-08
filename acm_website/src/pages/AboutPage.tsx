@@ -162,8 +162,6 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
         ))}
       </div>
       
-      <button className="home-button" onClick={() => navigateTo('home')}>Back to Home</button>
-      
       <div 
         onClick={() => navigateTo('credits')}
         style={{ 

@@ -115,24 +115,6 @@ const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo, error }) => {
         </div>
       </div>
       
-      <button 
-        className="home-button" 
-        onClick={() => navigateTo('home')}
-        style={{ 
-          padding: '8px 16px',
-          backgroundColor: '#3366cc',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          marginTop: '20px',
-          position: 'relative',
-          zIndex: 2
-        }}
-      >
-        Back to Home
-      </button>
-      
       <div 
         onClick={() => navigateTo('credits')}
         style={{ 

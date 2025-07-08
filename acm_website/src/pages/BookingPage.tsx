@@ -289,7 +289,6 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
           </button>
         </div>
       </div>
-      <button className="home-button" onClick={() => navigateTo('home')}>Back to Home</button>
     </div>
   );
 };

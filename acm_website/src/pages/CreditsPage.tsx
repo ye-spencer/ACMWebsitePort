@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, { useState } from 'react';
 import placeholderImage from '../assets/depositphotos_104564156-stock-illustration-male-user-icon.jpg';
 import '../styles/FlipCard.css';
 import { contributorsData } from '../data/contributors';

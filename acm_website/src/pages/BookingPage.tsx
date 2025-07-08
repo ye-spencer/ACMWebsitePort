@@ -253,7 +253,6 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
 
   return (
     <div className="login-page">
-      <div className="about-background"></div>
       <div className="login-container">
         <div className="login-box booking-box">
           {error && <div className="error-message">{error}</div>}

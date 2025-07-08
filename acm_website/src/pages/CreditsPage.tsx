@@ -26,7 +26,6 @@ const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo, error }) => {
 
   return (
     <div className="about-container" style={{ position: 'relative', zIndex: 1 }}>
-      <div className="about-background" style={{ zIndex: -1 }}></div>
       {error && (
         <div className="error-message" style={{ position: 'relative', zIndex: 2 }}>
           {error}

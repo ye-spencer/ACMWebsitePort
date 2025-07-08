@@ -136,7 +136,6 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
   if (loading) {
     return (
       <div className="events-container">
-        <div className="about-background" style={{ zIndex: -1 }}></div>
         <h1 className="events-title">Loading Events...</h1>
       </div>
     );
@@ -144,7 +143,6 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
 
   return (
     <div className="events-container">
-      <div className="about-background" style={{ zIndex: -1 }}></div>
       {error && (
         <div className="error-message" style={{ position: 'relative', zIndex: 2 }}>
           {error}

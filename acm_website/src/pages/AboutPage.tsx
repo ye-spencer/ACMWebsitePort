@@ -42,7 +42,6 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
               {error}
             </div>
           )}
-      <div className="about-background" style={{ zIndex: -1 }}></div>
       <h1 className="about-title" style={{ position: 'relative', zIndex: 2, color: 'white' }}>About Us</h1>
       
       <div className="about-content" style={{ position: 'relative', zIndex: 2 }}>

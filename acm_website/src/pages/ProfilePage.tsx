@@ -267,7 +267,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
 
   return (
     <div className="login-page">
-      <div className="about-background about-background-low"></div>
       <div className="profile-layout">
         {error && <div className="error-message">{error}</div>}
 

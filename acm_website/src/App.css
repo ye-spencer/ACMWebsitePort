@@ -90,7 +90,7 @@
   background-color: transparent;
 }
 
-.about-background {
+.background-image {
   position: fixed;
   top: 0;
   left: 0;
@@ -100,11 +100,11 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  z-index: 0;
+  z-index: -1;
   opacity: 0.85;
 }
 
-.about-background::before {
+.background-image::before {
   content: '';
   position: absolute;
   top: 0;

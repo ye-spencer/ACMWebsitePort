@@ -47,6 +47,7 @@ function App() {
   };
 
   return <div className="App">
+    <div className="background-image" style={{ zIndex: -1 }}></div>
     <Navbar navigateTo={navigateTo} />
     {renderPage()}
     <div className="credits">

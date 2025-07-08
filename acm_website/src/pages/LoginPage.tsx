@@ -149,7 +149,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
 
   return (
     <div className="login-page">
-      <div className="about-background" style={{ zIndex: -1 }}></div>
       <div className="login-container">
         <div className="login-box">
           <form onSubmit={handleLogin}>

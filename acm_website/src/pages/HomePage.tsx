@@ -9,7 +9,6 @@ const HomePage: React.FC<HomePageProps> = ({ navigateTo, error }) => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] p-8" style={{ position: 'relative', zIndex: 1 }}>
-      <div className="about-background" style={{ zIndex: -1 }}></div>      
       {error && (
         <div className="error-message" style={{ position: 'relative', zIndex: 2 }}>
           {error}

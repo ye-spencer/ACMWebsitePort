@@ -70,7 +70,7 @@ const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo, error }) => {
                 </div>
                 <div className="flip-card-back">
                   <h3 style={{ margin: '0 0 5px 0', fontSize: '1rem' }}>{contributor.name}</h3>
-                  <h4 style={{ margin: '0 0 5px 0', fontWeight: 'normal', fontSize: '0.9rem' }}>{contributor.role}</h4>
+                  <h4 style={{ margin: '0 0 5px 0', fontWeight: 'normal', fontSize: '0.8rem' }}>{contributor.role}</h4>
                   <p style={{ fontSize: '0.8rem', margin: '0 0 8px 0', color: 'inherit' }}>{contributor.bio}</p>
                   <a 
                     href={contributor.linkedin} 

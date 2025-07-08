@@ -10,29 +10,29 @@ export const contributorsData: ContributorData[] = [
   {
     name: "Alan Li",
     role: "About Us",
-    bio: "2026",
+    bio: "CS '26, ACM Board",
     linkedin: "https://www.linkedin.com/in/alanli6/",
     imagePath: "/images/contributors/john.jpg"
   },
   {
-    name: "Jane Smith",
-    role: "UI/UX Designer",
-    bio: "Created the visual design and user experience.",
-    linkedin: "https://www.linkedin.com/in/jhu-acm-design",
+    name: "Ria Talwar",
+    role: "User authentication, databases, admin management",
+    bio: "CS '27, ACM Board",
+    linkedin: "https://www.linkedin.com/in/ria-talwar-cs2027",
     imagePath: "/images/contributors/jane.jpg"
   },
   {
-    name: "Alex Johnson",
-    role: "Backend Developer",
-    bio: "Built the server infrastructure and APIs.",
-    linkedin: "https://www.linkedin.com/in/jhu-acm-backend",
+    name: "Shreyasi Poddar",
+    role: "Events page and navigation",
+    bio: "CS '28",
+    linkedin: "https://www.linkedin.com/in/shreyasi-poddar-074a78371/",
     imagePath: "/images/contributors/alex.jpg"
   },
   {
-    name: "Sam Wilson",
-    role: "Content Manager",
-    bio: "Developed and organized website content.",
-    linkedin: "https://www.linkedin.com/in/jhu-acm-content",
+    name: "Daniel Sung",
+    role: "Login page UI/UX",
+    bio: "CS and Econ '28",
+    linkedin: "https://www.linkedin.com/in/dsung1/",
     imagePath: "/images/contributors/sam.jpg"
   }
 ];

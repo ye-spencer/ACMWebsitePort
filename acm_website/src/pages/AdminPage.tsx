@@ -324,13 +324,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
         {/* Logout Container */}
         <Account handleLogout={handleLogout} />
       </div>
-
-      <button
-        className="home-button home-fixed"
-        onClick={() => navigateTo('home')}
-      >
-        Back to Home
-      </button>
     </div>
   );
 };

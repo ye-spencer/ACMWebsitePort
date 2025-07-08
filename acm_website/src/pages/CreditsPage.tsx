@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, { useState } from 'react';
 import placeholderImage from '../assets/depositphotos_104564156-stock-illustration-male-user-icon.jpg';
 import '../styles/FlipCard.css';
 import { contributorsData } from '../data/contributors';
@@ -109,24 +109,6 @@ const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo, error }) => {
           <p><a href="mailto:acm@jhu.edu" style={{ color: 'white', textDecoration: 'underline' }}>acm@jhu.edu</a></p>
         </div>
       </div>
-      
-      <button 
-        className="home-button" 
-        onClick={() => navigateTo('home')}
-        style={{ 
-          padding: '8px 16px',
-          backgroundColor: '#3366cc',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          marginTop: '20px',
-          position: 'relative',
-          zIndex: 2
-        }}
-      >
-        Back to Home
-      </button>
     </div>
   );
 };

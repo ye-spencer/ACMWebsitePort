@@ -21,6 +21,7 @@ const Navbar: React.FC<NavbarProps> = ({ navigateTo, error }) => {
 
   return (
       <div className="navbar">
+        <button className="nav-links" onClick={() => navigateTo('home')}>Home</button>
         <button className="nav-links" onClick={() => navigateTo('about')}>About Us</button>
         <button className="nav-links" onClick={() => navigateTo('events')}>Events</button>
         <button className="nav-links" onClick={() => navigateTo('booking')}>Book Lounge</button>

@@ -360,10 +360,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
         onConfirmPasswordChange={setConfirmPassword}
         onSubmit={handlePasswordChange}
       />
-
-      <button className="home-button back-home-button" onClick={() => navigateTo('home')}>
-        Back to Home
-      </button>
     </div>
   );
 };

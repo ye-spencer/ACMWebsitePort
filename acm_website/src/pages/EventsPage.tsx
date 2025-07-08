@@ -198,7 +198,6 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
           </div>
         ))}
       </div>
-      <button className="home-button" onClick={() => navigateTo('home')} style={{ position: 'relative', zIndex: 2 }}>Back to Home</button>
     </div>
   );
 };

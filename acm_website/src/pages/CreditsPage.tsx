@@ -2,7 +2,6 @@ import React, { useState} from 'react';
 import placeholderImage from '../assets/depositphotos_104564156-stock-illustration-male-user-icon.jpg';
 import '../styles/FlipCard.css';
 import { contributorsData } from '../data/contributors';
-import Navbar from '../components/Navbar';
 
 interface CreditsPageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
@@ -28,9 +27,6 @@ const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo, error }) => {
   return (
     <div className="about-container" style={{ position: 'relative', zIndex: 1 }}>
       <div className="about-background" style={{ zIndex: -1 }}></div>
-
-      <Navbar navigateTo={navigateTo} />
-
       {error && (
         <div className="error-message" style={{ position: 'relative', zIndex: 2 }}>
           {error}
@@ -132,27 +128,6 @@ const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo, error }) => {
       >
         Back to Home
       </button>
-      
-      <div 
-        onClick={() => navigateTo('credits')}
-        style={{ 
-          fontSize: '0.8rem', 
-          textAlign: 'center', 
-          position: 'fixed',
-          bottom: '0',
-          left: '0',
-          right: '0',
-          color: 'white',
-          opacity: 0.8,
-          cursor: 'pointer',
-          backgroundColor: 'rgba(50, 50, 50, 0.5)',
-          padding: '8px 0',
-          backdropFilter: 'blur(2px)',
-          zIndex: 2
-        }}
-      >
-        made with lots of ❤️ @JHU ACM
-      </div>
     </div>
   );
 };

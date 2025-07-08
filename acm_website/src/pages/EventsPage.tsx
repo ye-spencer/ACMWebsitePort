@@ -3,7 +3,6 @@ import { getFirestore, query, collection, where, Timestamp, orderBy, getDocs, up
 import '../styles/EventsPage.css';
 import { auth } from '../firebase/config';
 import { onAuthStateChanged } from "firebase/auth";
-import Navbar from '../components/Navbar';
 
 interface EventsPageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
@@ -146,9 +145,6 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
   return (
     <div className="events-container">
       <div className="about-background" style={{ zIndex: -1 }}></div>
-
-      <Navbar navigateTo={navigateTo} />
-
       {error && (
         <div className="error-message" style={{ position: 'relative', zIndex: 2 }}>
           {error}
@@ -205,10 +201,6 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
         ))}
       </div>
       <button className="home-button" onClick={() => navigateTo('home')} style={{ position: 'relative', zIndex: 2 }}>Back to Home</button>
-      
-      <div className="credits" onClick={() => navigateTo('credits')}>
-        Made with lots of ❤️ by JHU ACM
-      </div>
     </div>
   );
 };

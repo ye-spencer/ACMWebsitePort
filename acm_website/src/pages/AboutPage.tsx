@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import placeholderImage from '../assets/depositphotos_104564156-stock-illustration-male-user-icon.jpg';
 import { leadershipData } from '../data/leadership';
 import { alumniData } from '../data/alumni';
-import Navbar from '../components/Navbar';
 import '../styles/FlipCard.css';
 
 interface AboutPageProps {
@@ -44,9 +43,6 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
             </div>
           )}
       <div className="about-background" style={{ zIndex: -1 }}></div>
-
-      <Navbar navigateTo={navigateTo} />
-
       <h1 className="about-title" style={{ position: 'relative', zIndex: 2, color: 'white' }}>About Us</h1>
       
       <div className="about-content" style={{ position: 'relative', zIndex: 2 }}>
@@ -163,26 +159,6 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
       </div>
       
       <button className="home-button" onClick={() => navigateTo('home')}>Back to Home</button>
-      
-      <div 
-        onClick={() => navigateTo('credits')}
-        style={{ 
-          fontSize: '0.8rem', 
-          textAlign: 'center', 
-          position: 'fixed',
-          bottom: '0',
-          left: '0',
-          right: '0',
-          color: 'white',
-          opacity: 0.8,
-          cursor: 'pointer',
-          backgroundColor: 'rgba(50, 50, 50, 0.5)',
-          padding: '8px 0',
-          backdropFilter: 'blur(2px)'
-        }}
-      >
-        made with lots of ❤️ @JHU ACM
-      </div>
     </div>
   );
 };

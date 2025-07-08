@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage';
 import BookingPage from './pages/BookingPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
+import Navbar from './components/Navbar';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -45,7 +46,13 @@ function App() {
     }
   };
 
-  return <div className="App">{renderPage()}</div>;
+  return <div className="App">
+    <Navbar navigateTo={navigateTo} />
+    {renderPage()}
+    <div className="credits">
+      made with lots of ❤️ @jhu acm
+    </div> 
+  </div>;
 }
 
 export default App;

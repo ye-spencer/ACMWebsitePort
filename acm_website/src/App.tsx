@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import './App.css';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
@@ -10,9 +11,9 @@ import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
 import Navbar from './components/Navbar';
 
-function App() {
-  const [currentPage, setCurrentPage] = useState('home');
+function AppContent() {
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const navigateTo = (page: string, errorMessage?: string) => {
     if (errorMessage) {
@@ -20,40 +21,36 @@ function App() {
     } else {
       setError('');
     }
-    setCurrentPage(page);
+    navigate(`/${page === 'home' ? '' : page}`);
   };
 
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'home':
-        return <HomePage navigateTo={navigateTo} error={error} />;
-      case 'about':
-        return <AboutPage navigateTo={navigateTo} error={error} />;
-      case 'events':
-        return <EventsPage navigateTo={navigateTo} error={error} />;
-      case 'credits':
-        return <CreditsPage navigateTo={navigateTo} error={error} />;
-      case 'login':
-        return <LoginPage navigateTo={navigateTo} error={error} />;
-      case 'booking':
-        return <BookingPage navigateTo={navigateTo} error={error} />;
-      case 'profile':
-        return <ProfilePage navigateTo={navigateTo} error={error} />;
-      case 'admin':
-        return <AdminPage navigateTo={navigateTo} error={error} />;
-      default:
-        return <HomePage navigateTo={navigateTo} error={error} />;
-    }
-  };
+  return (
+    <div className="App">
+      <div className="background-image" style={{ zIndex: -1 }}></div>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<HomePage navigateTo={navigateTo} error={error} />} />
+        <Route path="/about" element={<AboutPage navigateTo={navigateTo} error={error} />} />
+        <Route path="/events" element={<EventsPage navigateTo={navigateTo} error={error} />} />
+        <Route path="/credits" element={<CreditsPage navigateTo={navigateTo} error={error} />} />
+        <Route path="/login" element={<LoginPage navigateTo={navigateTo} error={error} />} />
+        <Route path="/booking" element={<BookingPage navigateTo={navigateTo} error={error} />} />
+        <Route path="/profile" element={<ProfilePage navigateTo={navigateTo} error={error} />} />
+        <Route path="/admin" element={<AdminPage navigateTo={navigateTo} error={error} />} />
+      </Routes>
+      <div className="credits" onClick={() => navigateTo('credits')}>
+        made with lots of ❤️ @jhu acm
+      </div> 
+    </div>
+  );
+}
 
-  return <div className="App">
-    <div className="background-image" style={{ zIndex: -1 }}></div>
-    <Navbar navigateTo={navigateTo} />
-    {renderPage()}
-    <div className="credits">
-      made with lots of ❤️ @jhu acm
-    </div> 
-  </div>;
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
+  );
 }
 
 export default App;

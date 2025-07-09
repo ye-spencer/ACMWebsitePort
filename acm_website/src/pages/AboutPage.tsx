@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import placeholderImage from '../assets/depositphotos_104564156-stock-illustration-male-user-icon.jpg';
 import { leadershipData } from '../data/leadership';
 import { alumniData } from '../data/alumni';
+import { FaInstagram, FaEnvelope } from 'react-icons/fa';
 import '../styles/FlipCard.css';
 
 interface AboutPageProps {
@@ -49,8 +50,35 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
           We are a student organization of the Johns Hopkins University dedicated to furthering the knowledge and advancement of computers and 
           information technology through the free exchange of ideas and information. As a chapter of the oldest computing society in the world, the JHU ACM 
           is a place for diverse backgrounds and interests, and serves the JHU community as a whole. During the semester, the ACM has weekly meetings in 
-          Malone announced via email and posted on our <a href="#" className="link" style={{ color: 'white', textDecoration: 'underline' }}>Facebook</a> page and the <a href="#" className="link" style={{ color: 'white', textDecoration: 'underline' }}>Events</a> section of this website.
+          Malone announced via email and posted on our <a href="https://www.instagram.com/jhuacm/" className="link" style={{ color: 'white', textDecoration: 'underline' }}>Instagram</a> page and the <a href="/events" className="link" style={{ color: 'white', textDecoration: 'underline' }}>Events</a> section of this website.
         </p>
+
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          verticalAlign: 'middle',
+          marginTop: '40px',
+          opacity: '0.5',
+          backgroundColor: 'white',
+          padding: '10px',
+          borderRadius: '10px'
+        }}>
+          <a 
+            href="https://www.instagram.com/jhuacm/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ margin: '0 10px', display: 'flex', alignItems: 'center' }}
+          >
+            <FaInstagram size={20} /> <span style={{ marginLeft: '10px' }}>@jhuacm</span>
+          </a>
+          <a 
+            href="mailto:jhuacmofficers@gmail.com" 
+            style={{ margin: '0 10px', display: 'flex', alignItems: 'center' }}
+          >
+            <FaEnvelope size={20} /> <span style={{ marginLeft: '10px' }}>jhuacmofficers@gmail.com</span>
+          </a>
+        </div>
       </div>
       
       <h2 className="leadership-title" style={{ position: 'relative', zIndex: 2, color: 'white' }}>Officers</h2>

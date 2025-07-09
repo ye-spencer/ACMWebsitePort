@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/HomePage.css';
+import { useNavigate } from 'react-router-dom';
 
 interface HomePageProps {
   error?: string;
@@ -9,7 +10,8 @@ const HomePage: React.FC<HomePageProps> = ({ error }) => {
   const [showHero, setShowHero] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
-
+  const navigate = useNavigate();
+  
   const handleArrowClick = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
@@ -191,7 +193,7 @@ const HomePage: React.FC<HomePageProps> = ({ error }) => {
                   <span className="cta-text">Get Involved</span>
                   <button
                     className="cta-button"
-                    onClick={() => window.open('/login')}
+                    onClick={() => navigate('/login')}
                   >
                     <svg 
                       width="24" 

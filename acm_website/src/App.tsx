@@ -29,7 +29,7 @@ function AppContent() {
       <div className="background-image" style={{ zIndex: -1 }}></div>
       <Navbar />
       <Routes>
-        <Route path="/" element={<HomePage navigateTo={navigateTo} error={error} />} />
+        <Route path="/" element={<HomePage error={error} />} />
         <Route path="/about" element={<AboutPage navigateTo={navigateTo} error={error} />} />
         <Route path="/events" element={<EventsPage navigateTo={navigateTo} error={error} />} />
         <Route path="/credits" element={<CreditsPage navigateTo={navigateTo} error={error} />} />

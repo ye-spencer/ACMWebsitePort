@@ -60,9 +60,12 @@ If you have any questions, feel free to email us at <jhuacmofficers@gmail.com>
 
 A homepage with links to all other important aspects of the website
 
+**Existing Functionality:**
+
+- Navigation menu (Shreyasi)
+
 **Possible Components:**
 
-- Navigation menu
 - Hero section with ACM mission statement
 - Quick links to important sections
 - News/announcements section
@@ -74,12 +77,12 @@ A page containing upcoming events with a register link, along with relevant info
 
 **Existing Functionality:**
 
-- Event listing with dates, times, and locations
-- Past events archive
+- Event listing with dates, times, and locations (Shreyasi)
+- Past events archive (Shreyasi)
+- Registration system integration (Shreyasi)
 
 **Possible Components:**
 
-- Registration system integration
 - Event details page
 - Event categories/tags
 
@@ -102,12 +105,12 @@ Likely the most complex part of the website (but not that complex still). Studen
 
 **Existing Functionality:**
 
-- Sign up, sign in
-- Booking management on profile page
-- Event management on profile page
-- Event attendance tracking
-- Membership request
-- Mailing list subscription management
+- Sign up, sign in (Ria)
+- Booking management on profile page (Ria)
+- Event management on profile page (Ria)
+- Event attendance tracking (Ria)
+- Membership request (Ria)
+- Mailing list subscription management (Ria)
 
 **Possible Components:**
 
@@ -117,9 +120,9 @@ Likely the most complex part of the website (but not that complex still). Studen
 
 **Existing Functionality:**
 
-- Event creation
-- Member management
-- Attendance upload
+- Event creation (Ria)
+- Member management (Ria)
+- Attendance upload (Ria)
 
 **Possible Components:**
 
@@ -131,8 +134,8 @@ A page that allows members to book the ACM lounge for a period of time, and also
 
 **Existing Functionality:**
 
-- Available and unavailable times with dates/times
-- Limit of registration time/occurrences
+- Available and unavailable times with dates/times (Ria)
+- Limit of registration time/occurrences (Ria)
 
 **Possible Components:**
 

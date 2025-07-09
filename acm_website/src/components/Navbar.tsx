@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import '../styles/NavBar.css';
 import { auth } from '../firebase/config';
 import { onAuthStateChanged } from "firebase/auth";
+import logo from '../assets/logo.png';
 
-interface NavbarProps {
-  navigateTo: (page: string, errorMessage?: string) => void;
-  error?: string;
-}
-
-const Navbar: React.FC<NavbarProps> = ({ navigateTo, error }) => {
+const Navbar: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -21,13 +18,18 @@ const Navbar: React.FC<NavbarProps> = ({ navigateTo, error }) => {
 
   return (
       <div className="navbar">
-        <button className="nav-links" onClick={() => navigateTo('home')}>Home</button>
-        <button className="nav-links" onClick={() => navigateTo('about')}>About Us</button>
-        <button className="nav-links" onClick={() => navigateTo('events')}>Events</button>
-        <button className="nav-links" onClick={() => navigateTo('booking')}>Book Lounge</button>
-        <button className="nav-links" onClick={() => navigateTo(isAdmin ? 'admin' : isLoggedIn ? 'profile' : 'login')}>
-          {isAdmin ? 'Admin' : isLoggedIn ? 'Profile' : 'Login'}
-        </button>
+        <Link to="/" className="navbar-logo">
+          <img src={logo} alt="ACM Logo" className="logo" />
+        </Link>
+        <div className="nav-links-container">
+          <Link to="/" className="nav-links">Home</Link>
+          <Link to="/about" className="nav-links">About Us</Link>
+          <Link to="/events" className="nav-links">Events</Link>
+          <Link to="/booking" className="nav-links">Book Lounge</Link>
+          <Link to={isAdmin ? '/admin' : isLoggedIn ? '/profile' : '/login'} className="nav-links">
+            {isAdmin ? 'Admin' : isLoggedIn ? 'Profile' : 'Login'}
+          </Link>
+        </div>
       </div>
   );
 };

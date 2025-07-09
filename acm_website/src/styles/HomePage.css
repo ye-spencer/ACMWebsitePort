@@ -1,0 +1,293 @@
+/* HomePage Styles */
+
+/* Override App.css root styles that interfere with HomePage */
+.home-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  z-index: 1000 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+}
+
+/* Ensure root doesn't constrain us when HomePage is active */
+.home-container ~ * {
+  display: none;
+}
+
+.welcome-section-container {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 2rem !important;
+  z-index: 1 !important;
+  margin: 0 !important;
+  max-width: none !important;
+}
+
+.welcome-content {
+  text-align: center !important;
+  position: relative !important;
+  z-index: 2 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.welcome-title {
+  font-size: 3rem !important;
+  font-weight: bold !important;
+  margin-bottom: 1rem !important;
+  color: white !important;
+  text-align: center !important;
+}
+
+.welcome-subtitle {
+  font-size: 1.125rem !important;
+  color: white !important;
+  opacity: 0.9 !important;
+  text-align: center !important;
+}
+
+.arrow-container {
+  position: fixed !important;
+  bottom: 10vh !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 10 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.arrow-button {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 2px solid white !important;
+  border-radius: 50% !important;
+  width: 60px !important;
+  height: 60px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  backdrop-filter: blur(10px) !important;
+  transition: all 0.3s ease !important;
+  color: white !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.arrow-button:hover {
+  transform: scale(1.1) !important;
+}
+
+.hero-section-container {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 1 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.hero-content {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 2rem !important;
+  overflow-y: auto !important;
+  margin: 0 !important;
+  max-width: none !important;
+}
+
+.hero-inner {
+  text-align: center !important;
+  max-width: 64rem !important;
+  margin: 0 auto !important;
+  position: relative !important;
+  z-index: 2 !important;
+  width: 100% !important;
+}
+
+.hero-title {
+  font-size: 2.25rem !important;
+  font-weight: bold !important;
+  margin-bottom: 1.5rem !important;
+  color: white !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+}
+
+.hero-description {
+  font-size: 1.25rem !important;
+  color: white !important;
+  line-height: 1.6 !important;
+  max-width: 48rem !important;
+  margin: 0 auto 3rem auto !important;
+  text-align: center !important;
+}
+
+.content-section {
+  max-width: 48rem !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+}
+
+.cards-container {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+  gap: 1.5rem !important;
+  margin-bottom: 2rem !important;
+  width: 100% !important;
+}
+
+.feature-card {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(10px) !important;
+  border-radius: 12px !important;
+  padding: 1.5rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  text-align: center !important;
+}
+
+.card-title {
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+  color: white !important;
+  margin-bottom: 0.5rem !important;
+  text-align: center !important;
+}
+
+.card-description {
+  color: white !important;
+  opacity: 0.9 !important;
+  text-align: center !important;
+}
+
+.cta-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 1rem !important;
+  width: 100% !important;
+}
+
+.cta-text {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  color: white !important;
+}
+
+.cta-button {
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  padding: 2px !important;
+  vertical-align: middle !important;
+  color: white !important;
+  transition: color 0.2s ease !important;
+}
+
+.cta-button:hover {
+  color: #d1d5db !important;
+}
+
+.cta-arrow {
+  display: block !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .welcome-title {
+    font-size: 2.5rem !important;
+  }
+  
+  .hero-title {
+    font-size: 2rem !important;
+  }
+  
+  .hero-description {
+    font-size: 1.125rem !important;
+  }
+  
+  .cards-container {
+    grid-template-columns: 1fr !important;
+  }
+} 
+
+/* Animation for HomePage hero section */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDelayed {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  85% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  92% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 1s ease-out;
+}
+
+.fade-in-down {
+  animation: fadeInDown 1s ease-out;
+}
+
+.arrow-container {
+  transform: translateX(-50%);
+}
+
+.arrow-button-centered {
+  transform: translateX(-50%);
+}

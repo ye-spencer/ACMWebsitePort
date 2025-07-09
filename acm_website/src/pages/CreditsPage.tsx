@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import placeholderImage from '../assets/depositphotos_104564156-stock-illustration-male-user-icon.jpg';
 import '../styles/FlipCard.css';
 import { contributorsData } from '../data/contributors';
-import Navbar from '../components/Navbar';
 
 interface CreditsPageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
@@ -27,10 +26,6 @@ const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo, error }) => {
 
   return (
     <div className="about-container" style={{ position: 'relative', zIndex: 1 }}>
-      <div className="about-background" style={{ zIndex: -1 }}></div>
-
-      <Navbar navigateTo={navigateTo} />
-
       {error && (
         <div className="error-message" style={{ position: 'relative', zIndex: 2 }}>
           {error}
@@ -74,7 +69,7 @@ const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo, error }) => {
                 </div>
                 <div className="flip-card-back">
                   <h3 style={{ margin: '0 0 5px 0', fontSize: '1rem' }}>{contributor.name}</h3>
-                  <h4 style={{ margin: '0 0 5px 0', fontWeight: 'normal', fontSize: '0.9rem' }}>{contributor.role}</h4>
+                  <h4 style={{ margin: '0 0 5px 0', fontWeight: 'normal', fontSize: '0.8rem' }}>{contributor.role}</h4>
                   <p style={{ fontSize: '0.8rem', margin: '0 0 8px 0', color: 'inherit' }}>{contributor.bio}</p>
                   <a 
                     href={contributor.linkedin} 
@@ -113,27 +108,6 @@ const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo, error }) => {
           <p style={{ color: 'white' }}>For questions or feedback about this website, please contact:</p>
           <p><a href="mailto:acm@jhu.edu" style={{ color: 'white', textDecoration: 'underline' }}>acm@jhu.edu</a></p>
         </div>
-      </div>
-      
-      <div 
-        onClick={() => navigateTo('credits')}
-        style={{ 
-          fontSize: '0.8rem', 
-          textAlign: 'center', 
-          position: 'fixed',
-          bottom: '0',
-          left: '0',
-          right: '0',
-          color: 'white',
-          opacity: 0.8,
-          cursor: 'pointer',
-          backgroundColor: 'rgba(50, 50, 50, 0.5)',
-          padding: '8px 0',
-          backdropFilter: 'blur(2px)',
-          zIndex: 2
-        }}
-      >
-        made with lots of ❤️ @JHU ACM
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import placeholderImage from '../assets/depositphotos_104564156-stock-illustration-male-user-icon.jpg';
 import { leadershipData } from '../data/leadership';
 import { alumniData } from '../data/alumni';
+import Navbar from '../components/Navbar';
 import '../styles/FlipCard.css';
 
 interface AboutPageProps {
@@ -9,11 +10,11 @@ interface AboutPageProps {
   error?: string;
 }
 
-
 const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
   // State to track which cards are flipped
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
   const [flippedAlumniCards, setFlippedAlumniCards] = useState<number[]>([]);
+
 
   // Toggle flip state for a card
   const toggleFlip = (index: number) => {
@@ -43,6 +44,9 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
             </div>
           )}
       <div className="about-background" style={{ zIndex: -1 }}></div>
+
+      <Navbar navigateTo={navigateTo} />
+
       <h1 className="about-title" style={{ position: 'relative', zIndex: 2, color: 'white' }}>About Us</h1>
       
       <div className="about-content" style={{ position: 'relative', zIndex: 2 }}>
@@ -157,8 +161,6 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
           </div>
         ))}
       </div>
-      
-      <button className="home-button" onClick={() => navigateTo('home')}>Back to Home</button>
       
       <div 
         onClick={() => navigateTo('credits')}

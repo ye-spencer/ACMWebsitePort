@@ -26,12 +26,12 @@ const Navbar: React.FC<NavbarProps> = ({ navigateTo }) => {
           <img src={logo} alt="ACM Logo" className="logo" />
         </Link>
         <div className="nav-links-container">
-          <Link to="/" onClick={() => navigateTo('home', '')} className="nav-links">Home</Link>
-          <Link to="/about" onClick={() => navigateTo('about', '')} className="nav-links">About Us</Link>
-          <Link to="/events" onClick={() => navigateTo('events', '')} className="nav-links">Events</Link>
-          <Link to="/booking" onClick={() => navigateTo('booking', '')} className="nav-links">Book Lounge</Link>
+          <Link to="#" onClick={() => navigateTo('home', '')} className="nav-links">Home</Link>
+          <Link to="#" onClick={() => navigateTo('about', '')} className="nav-links">About Us</Link>
+          <Link to="#" onClick={() => navigateTo('events', '')} className="nav-links">Events</Link>
+          <Link to="#" onClick={() => navigateTo('booking', '')} className="nav-links">Book Lounge</Link>
           <Link 
-            to={isAdmin ? '/admin' : isLoggedIn ? '/profile' : '/login'} 
+            to="#"
             onClick={() => navigateTo(isAdmin ? 'admin' : isLoggedIn ? 'profile' : 'login', '')} 
             className="nav-links"
           >

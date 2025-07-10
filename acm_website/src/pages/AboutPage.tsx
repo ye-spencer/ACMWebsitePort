@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
-import placeholderImage from '../assets/depositphotos_104564156-stock-illustration-male-user-icon.jpg';
+import React from 'react';
 import { leadershipData } from '../data/leadership';
 import { alumniData } from '../data/alumni';
 import { FaInstagram, FaEnvelope } from 'react-icons/fa';
+import FlipCard from '../components/FlipCard';
 import '../styles/AboutPage.css';
-import '../styles/FlipCard.css';
 
 interface AboutPageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
@@ -12,28 +11,6 @@ interface AboutPageProps {
 }
 
 const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
-  // State to track which cards are flipped
-  const [flippedCards, setFlippedCards] = useState<number[]>([]);
-  const [flippedAlumniCards, setFlippedAlumniCards] = useState<number[]>([]);
-
-  // Toggle flip state for a card
-  const toggleFlip = (index: number) => {
-    if (flippedCards.includes(index)) {
-      setFlippedCards(flippedCards.filter(i => i !== index));
-    } else {
-      setFlippedCards([...flippedCards, index]);
-    }
-  };
-
-  // Toggle flip state for an alumni card
-  const toggleAlumniFlip = (index: number) => {
-    if (flippedAlumniCards.includes(index)) {
-      setFlippedAlumniCards(flippedAlumniCards.filter(i => i !== index));
-    } else {
-      setFlippedAlumniCards([...flippedAlumniCards, index]);
-    }
-  };
-
   return (
     <div className="about-page">
       <div className="about-layout">
@@ -87,81 +64,13 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
         {/* Officers Section */}
         <div className="about-section">
           <h2 className="section-title">Officers</h2>
-          <div className="members-grid">
-            {leadershipData.map((leader, index) => (
-              <div 
-                key={index} 
-                className={`flip-card ${flippedCards.includes(index) ? 'flipped' : ''}`}
-                onClick={() => toggleFlip(index)}
-              >
-                <div className="flip-card-inner">
-                  <div className="flip-card-front">
-                    <img 
-                      src={leader.imagePath || placeholderImage} 
-                      alt={`${leader.name}`} 
-                      onError={(e) => {
-                        e.currentTarget.src = placeholderImage;
-                      }}
-                    />
-                  </div>
-                  <div className="flip-card-back">
-                    <h3 className="member-name">{leader.name}</h3>
-                    <h4 className="member-role">{leader.role}</h4>
-                    <p className="member-bio">{leader.bio}</p>
-                    <a 
-                      href={leader.linkedin} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="member-linkedin"
-                    >
-                      LinkedIn
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <FlipCard data={leadershipData} />
         </div>
         
         {/* Alumni Section */}
         <div className="about-section">
           <h2 className="section-title">Alumni</h2>
-          <div className="members-grid">
-            {alumniData.map((alumni, index) => (
-              <div 
-                key={index} 
-                className={`flip-card ${flippedAlumniCards.includes(index) ? 'flipped' : ''}`}
-                onClick={() => toggleAlumniFlip(index)}
-              >
-                <div className="flip-card-inner">
-                  <div className="flip-card-front">
-                    <img 
-                      src={alumni.imagePath || placeholderImage} 
-                      alt={`${alumni.name}`} 
-                      onError={(e) => {
-                        e.currentTarget.src = placeholderImage;
-                      }}
-                    />
-                  </div>
-                  <div className="flip-card-back">
-                    <h3 className="member-name">{alumni.name}</h3>
-                    <h4 className="member-role">{alumni.role}</h4>
-                    <p className="member-bio">{alumni.bio}</p>
-                    <a 
-                      href={alumni.linkedin} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="member-linkedin"
-                    >
-                      LinkedIn
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <FlipCard data={alumniData} />
         </div>
       </div>
     </div>

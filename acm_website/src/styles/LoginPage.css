@@ -106,11 +106,6 @@
   font-size: 0.875rem;
 }
 
-.input-group input:invalid {
-  border-color: #0055a5;
-  animation: shake 0.5s ease-in-out;
-}
-
 .button-group {
   display: flex;
   flex-direction: column;
@@ -249,17 +244,7 @@
   }
 }
 
-@keyframes shake {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-5px);
-  }
-  75% {
-    transform: translateX(5px);
-  }
-}
+
 
 @keyframes gradientShift {
   0%, 100% {

@@ -333,12 +333,6 @@
 }
 
 /* Booking Actions */
-.booking-actions {
-  display: flex;
-  justify-content: center;
-  padding-top: 1rem;
-}
-
 .booking-actions-inline {
   display: flex;
   justify-content: center;

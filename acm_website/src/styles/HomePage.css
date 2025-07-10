@@ -102,29 +102,7 @@
   animation: slideInUp 2s ease-out;
 }
 
-.primary-cta {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1.75rem;
-  background: linear-gradient(135deg, #0055a5, #003366);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 25px rgba(0, 85, 165, 0.3);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
 
-.primary-cta:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 35px rgba(0, 85, 165, 0.4);
-  background: linear-gradient(135deg, #003f7f, #002244);
-}
 
 .secondary-cta {
   padding: 0.875rem 1.75rem;
@@ -356,7 +334,6 @@
     gap: 0.75rem;
   }
   
-  .primary-cta,
   .secondary-cta {
     width: 200px;
     justify-content: center;
@@ -385,7 +362,6 @@
     font-size: 0.95rem;
   }
   
-  .primary-cta,
   .secondary-cta {
     font-size: 0.875rem;
     padding: 0.75rem 1.5rem;

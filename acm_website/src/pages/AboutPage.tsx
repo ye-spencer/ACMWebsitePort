@@ -34,7 +34,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
               We are a student organization of the Johns Hopkins University dedicated to furthering the knowledge and advancement of computers and 
               information technology through the free exchange of ideas and information. As a chapter of the oldest computing society in the world, the JHU ACM 
               is a place for diverse backgrounds and interests, and serves the JHU community as a whole. During the semester, the ACM has weekly meetings in 
-              Malone announced via email and posted on our <a href="https://www.instagram.com/jhuacm/" className="about-link" target="_blank" rel="noopener noreferrer">Instagram</a> page and the <a onClick={() => navigateTo('events')} className="about-link">Events</a> section of this website.
+              Malone announced via email and posted on our <a href="https://www.instagram.com/jhuacm/" className="about-link" target="_blank" rel="noopener noreferrer">Instagram</a> page and the <a href="#" onClick={(e) => { e.preventDefault(); navigateTo('events'); }} className="about-link">Events</a> section of this website.
             </p>
 
             <div className="benefits-section">
@@ -67,7 +67,8 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
                   <span>jhuacmofficers@gmail.com</span>
                 </a>
                 <a 
-                  onClick={() => navigateTo('events')}
+                  href="#"
+                  onClick={(e) => { e.preventDefault(); navigateTo('events'); }}
                   className="contact-item"
                 >
                   <FaCalendar size={20} />

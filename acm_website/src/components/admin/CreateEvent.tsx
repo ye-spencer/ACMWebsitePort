@@ -2,6 +2,8 @@ import React from 'react';
 import '../../styles/AdminPage.css';
 
 interface CreateEventProps {
+  eventCategory: string;
+  setEventCategory: (v: string) => void;
   eventTitle: string;
   setEventTitle: (v: string) => void;
   eventDescription: string;
@@ -22,6 +24,8 @@ interface CreateEventProps {
 }
 
 const CreateEvent: React.FC<CreateEventProps> = ({
+  eventCategory,
+  setEventCategory,
   eventTitle,
   setEventTitle,
   eventDescription,
@@ -43,6 +47,19 @@ const CreateEvent: React.FC<CreateEventProps> = ({
   <div className="login-box">
     <h2 className="admin-header">Create New Event</h2>
     <form onSubmit={handleCreateEvent} className="admin-form">
+      <select
+        value={eventCategory}
+        onChange={(e) => setEventCategory(e.target.value)}
+        required
+        className="admin-select"
+      >
+        <option value="">Select Category</option>
+        <option value="Workshop">Workshop</option>
+        <option value="Social">Social</option>
+        <option value="Competition">Competition</option>
+        <option value="Talk">Talk</option>
+        <option value="Other">Other</option>
+      </select>
       <input
         type="text"
         placeholder="Event Title"

@@ -11,6 +11,7 @@ interface EventsPageProps {
 
 interface Event {
   id: string;
+  category: string;
   title: string;
   date: Date;
   start_time: string;
@@ -25,6 +26,8 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [registeredEvents, setRegisteredEvents] = useState<Event[]>([]);
+  const [upcomingCategory, setUpcomingCategory] = useState<string>('All');
+  const [pastCategory, setPastCategory] = useState<string>('All');
 
   const db = getFirestore();
   
@@ -35,6 +38,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
       const data = doc.data();
       return {
         id: doc.id,
+        category: data.category || 'Other',
         title: data.name || 'Untitled Event',
         date: data.start.toDate(),
         start_time: data.start ? data.start.toDate().toLocaleTimeString('en-US', {
@@ -61,6 +65,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
       const data = doc.data();
       return {
         id: doc.id,
+        category: data.category || 'Other',
         title: data.name || 'Untitled Event',
         date: data.start.toDate(),
         start_time: data.start ? data.start.toDate().toLocaleTimeString('en-US', {
@@ -133,6 +138,19 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
     }
   };
 
+  let upcomingCategories = Array.from(new Set(upcomingEvents.map(event => event.category)));
+  upcomingCategories = upcomingCategories.filter(cat => cat != 'Other');
+  upcomingCategories.push('Other');
+  upcomingCategories.unshift('All');
+
+  let pastCategories = Array.from(new Set(pastEvents.map(event => event.category)));
+  pastCategories = pastCategories.filter(cat => cat != 'Other');
+  pastCategories.push('Other');
+  pastCategories.unshift('All');
+
+  const filteredUpcoming = upcomingCategory == 'All' ? upcomingEvents : upcomingEvents.filter(event => event.category == upcomingCategory);
+  const filteredPast = pastCategory == 'All' ? pastEvents : pastEvents.filter(event => event.category == pastCategory);
+
   if (loading) {
     return (
       <div className="events-container">
@@ -151,14 +169,28 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
 
       {/*Upcoming Events */}
       <h1 className="events-title">Upcoming Events</h1>
+      <div className="filter-container">
+        <div className="filter">
+          <label className="filter-label">Category</label>
+          <select
+            value={upcomingCategory}
+            onChange={(e) => setUpcomingCategory(e.target.value)}
+            className="filter-select"
+          >
+            {upcomingCategories.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
+      </div>
       <div className="events-list">
-        {upcomingEvents.length === 0 ? (
+        {filteredUpcoming.length == 0 ? (
           <div className="no-events-message">
             <p>No upcoming events at the moment.</p>
             <p>Check back soon for new events!</p>
           </div>
         ) : (
-          upcomingEvents.map(event => {
+          filteredUpcoming.map(event => {
             const isRegistered = registeredEvents.some(e => e.id == event.id);
             return (
               <div key={event.id} className="event-card">
@@ -185,8 +217,22 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
 
       {/* Past Events */}
       <h1 className="events-title">Past Events</h1>
+      <div className="filter-container">
+        <div className="filter">
+          <label className="filter-label">Category</label>
+          <select
+            value={pastCategory}
+            onChange={(e) => setPastCategory(e.target.value)}
+            className="filter-select"
+          >
+            {pastCategories.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
+      </div>
       <div className="events-list">
-        {pastEvents.map(event => (
+        {filteredPast.map(event => (
           <div key={event.id} className="event-card" style={{ backgroundColor: 'rgba(220, 220, 220, 0.8)' }}>
             <h2 className="event-title">{event.title}</h2>
             <div className="event-details">

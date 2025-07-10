@@ -39,7 +39,7 @@ function AppContent() {
         <Route path="/admin" element={<AdminPage navigateTo={navigateTo} error={error} />} />
       </Routes>
       <div className="credits" onClick={() => navigateTo('credits')}>
-        made with lots of ❤️ @jhu acm
+        made with lots of ❤️ by acm@hopkins
       </div> 
     </div>
   );

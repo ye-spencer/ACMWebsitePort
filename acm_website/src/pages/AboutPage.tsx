@@ -1,7 +1,7 @@
 import React from 'react';
 import { leadershipData } from '../data/leadership';
 import { alumniData } from '../data/alumni';
-import { FaInstagram, FaEnvelope } from 'react-icons/fa';
+import { FaInstagram, FaEnvelope, FaCalendar } from 'react-icons/fa';
 import FlipCard from '../components/FlipCard';
 import '../styles/AboutPage.css';
 
@@ -37,6 +37,16 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
               Malone announced via email and posted on our <a href="https://www.instagram.com/jhuacm/" className="about-link" target="_blank" rel="noopener noreferrer">Instagram</a> page and the <a onClick={() => navigateTo('events')} className="about-link">Events</a> section of this website.
             </p>
 
+            <div className="benefits-section">
+              <h3 className="benefits-title">Membership Benefits</h3>
+              <p className="about-description">
+                You can participate in exciting projects to bring new and interesting services to the JHU community, and voice your concerns about issues like information access, security, and privacy. You'll receive an account on our computer system that grants you access to a huge, ever-increasing range of services.
+              </p>
+              <p className="about-description">
+                You'll be able to use the workstations and printers in our office in Malone Hall, have 50 GiB of storage space on our systems that you can access from anywhere in the world, host a website using that storage space, run virtual machines on our cluster, get email at acm.jhu.edu / jhuacm.org, access our computing resources for any project, locally or over the internet via SSH and use our gitlab instance to host projects. Members also get J-Card access to the office, so you can come in at any time, 24/7. The ACM office is a great place to just relax or even (gasp!) work. And we have soda, coffee, snacks, and a microwave. Members can run for an executive board position in the future, and there are many opportunities to organize programs and connect with industry experts.
+              </p>
+            </div>
+
             <div className="contact-section">
               <h3 className="contact-title">Get in Touch</h3>
               <div className="contact-links">
@@ -55,6 +65,13 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
                 >
                   <FaEnvelope size={20} />
                   <span>jhuacmofficers@gmail.com</span>
+                </a>
+                <a 
+                  onClick={() => navigateTo('events')}
+                  className="contact-item"
+                >
+                  <FaCalendar size={20} />
+                  <span>Events</span>
                 </a>
               </div>
             </div>

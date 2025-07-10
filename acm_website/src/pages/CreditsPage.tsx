@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import placeholderImage from '../assets/depositphotos_104564156-stock-illustration-male-user-icon.jpg';
 import '../styles/FlipCard.css';
 import { contributorsData } from '../data/contributors';
+import { FaEnvelope } from 'react-icons/fa';
 
 interface CreditsPageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
@@ -105,8 +106,12 @@ const CreditsPage: React.FC<CreditsPageProps> = ({ navigateTo, error }) => {
         
         <div style={{ marginBottom: '30px' }}>
           <h2 style={{ color: 'white', marginBottom: '10px' }}>Contact</h2>
-          <p style={{ color: 'white' }}>For questions or feedback about this website, please contact:</p>
-          <p><a href="mailto:acm@jhu.edu" style={{ color: 'white', textDecoration: 'underline' }}>acm@jhu.edu</a></p>
+          <p style={{ color: 'white', display: 'flex', alignItems: 'center' }}>
+            <span style={{ marginRight: '4px' }}>For questions or feedback about this website, please contact </span>
+            <a href="mailto:jhuacmweb@gmail.com" style={{ color: 'white', display: 'flex', alignItems: 'center' }}>
+              <FaEnvelope /> <span style={{ marginLeft: '4px' }}>jhuacmweb@gmail.com</span>
+            </a>
+          </p>
         </div>
       </div>
     </div>

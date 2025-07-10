@@ -3,6 +3,7 @@ import placeholderImage from '../assets/depositphotos_104564156-stock-illustrati
 import { leadershipData } from '../data/leadership';
 import { alumniData } from '../data/alumni';
 import { FaInstagram, FaEnvelope } from 'react-icons/fa';
+import '../styles/AboutPage.css';
 import '../styles/FlipCard.css';
 
 interface AboutPageProps {
@@ -14,7 +15,6 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
   // State to track which cards are flipped
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
   const [flippedAlumniCards, setFlippedAlumniCards] = useState<number[]>([]);
-
 
   // Toggle flip state for a card
   const toggleFlip = (index: number) => {
@@ -34,155 +34,135 @@ const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
     }
   };
 
-  // Leadership and alumni data now sourced from data files
-
   return (
-    <div className="about-container" style={{ position: 'relative', zIndex: 1 }}>
-      {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
-      <h1 className="about-title" style={{ position: 'relative', zIndex: 2, color: 'white' }}>About Us</h1>
-      
-      <div className="about-content" style={{ position: 'relative', zIndex: 2 }}>
-        <p style={{ color: 'white' }}>
-          We are a student organization of the Johns Hopkins University dedicated to furthering the knowledge and advancement of computers and 
-          information technology through the free exchange of ideas and information. As a chapter of the oldest computing society in the world, the JHU ACM 
-          is a place for diverse backgrounds and interests, and serves the JHU community as a whole. During the semester, the ACM has weekly meetings in 
-          Malone announced via email and posted on our <a href="https://www.instagram.com/jhuacm/" className="link" style={{ color: 'white', textDecoration: 'underline' }}>Instagram</a> page and the <a href="/events" className="link" style={{ color: 'white', textDecoration: 'underline' }}>Events</a> section of this website.
-        </p>
-
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          verticalAlign: 'middle',
-          marginTop: '40px',
-          opacity: '0.5',
-          backgroundColor: 'white',
-          padding: '10px',
-          borderRadius: '10px'
-        }}>
-          <a 
-            href="https://www.instagram.com/jhuacm/" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            style={{ margin: '0 10px', display: 'flex', alignItems: 'center' }}
-          >
-            <FaInstagram size={20} /> <span style={{ marginLeft: '10px' }}>@jhuacm</span>
-          </a>
-          <a 
-            href="mailto:jhuacmofficers@gmail.com" 
-            style={{ margin: '0 10px', display: 'flex', alignItems: 'center' }}
-          >
-            <FaEnvelope size={20} /> <span style={{ marginLeft: '10px' }}>jhuacmofficers@gmail.com</span>
-          </a>
+    <div className="about-page">
+      <div className="about-layout">
+        {/* Page Header */}
+        <div className="page-header">
+          <h1 className="page-title">About Us</h1>
+          <p className="page-subtitle">Learn more about the Johns Hopkins ACM chapter</p>
         </div>
-      </div>
-      
-      <h2 className="leadership-title" style={{ position: 'relative', zIndex: 2, color: 'white' }}>Officers</h2>
-      
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(4, 1fr)', 
-        gap: '20px', 
-        margin: '30px 0' 
-      }}>
-        {leadershipData.map((leader, index) => (
-          <div 
-            key={index} 
-            className={`flip-card ${flippedCards.includes(index) ? 'flipped' : ''}`}
-            onClick={() => toggleFlip(index)}
-            style={{ cursor: 'pointer' }}
-          >
-            <div className="flip-card-inner">
-              <div className="flip-card-front">
-                <img 
-                  src={leader.imagePath || placeholderImage} 
-                  alt={`${leader.name}`} 
-                  onError={(e) => {
-                    e.currentTarget.src = placeholderImage;
-                  }}
-                />
-              </div>
-              <div className="flip-card-back" style={{ color: 'white' }}>
-                <h3 style={{ margin: '0 0 5px 0', fontSize: '1rem', color: 'white' }}>{leader.name}</h3>
-                <h4 style={{ margin: '0 0 5px 0', fontWeight: 'normal', fontSize: '0.9rem', color: 'white' }}>{leader.role}</h4>
-                <p style={{ fontSize: '0.8rem', margin: '0 0 8px 0', color: 'white' }}>{leader.bio}</p>
+
+        {error && (
+          <div className="about-section error-section">
+            <div className="error-message">{error}</div>
+          </div>
+        )}
+
+        {/* About Content Section */}
+        <div className="about-section">
+          <h2 className="section-title">Our Mission</h2>
+          <div className="about-content">
+            <p className="about-description">
+              We are a student organization of the Johns Hopkins University dedicated to furthering the knowledge and advancement of computers and 
+              information technology through the free exchange of ideas and information. As a chapter of the oldest computing society in the world, the JHU ACM 
+              is a place for diverse backgrounds and interests, and serves the JHU community as a whole. During the semester, the ACM has weekly meetings in 
+              Malone announced via email and posted on our <a href="https://www.instagram.com/jhuacm/" className="about-link" target="_blank" rel="noopener noreferrer">Instagram</a> page and the <a onClick={() => navigateTo('events')} className="about-link">Events</a> section of this website.
+            </p>
+
+            <div className="contact-section">
+              <h3 className="contact-title">Get in Touch</h3>
+              <div className="contact-links">
                 <a 
-                  href={leader.linkedin} 
+                  href="https://www.instagram.com/jhuacm/" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    color: '#0077b5',
-                    textDecoration: 'none',
-                    fontSize: '0.8rem',
-                    backgroundColor: 'white',
-                    padding: '2px 8px',
-                    borderRadius: '4px',
-                    display: 'inline-block'
-                  }}
+                  className="contact-item"
                 >
-                  LinkedIn
+                  <FaInstagram size={20} />
+                  <span>@jhuacm</span>
+                </a>
+                <a 
+                  href="mailto:jhuacmofficers@gmail.com" 
+                  className="contact-item"
+                >
+                  <FaEnvelope size={20} />
+                  <span>jhuacmofficers@gmail.com</span>
                 </a>
               </div>
             </div>
           </div>
-        ))}
-      </div>
-      
-      <h2 className="alumni-title" style={{ color: 'white', marginTop: '40px' }}>Alumni</h2>
-      
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(4, 1fr)', 
-        gap: '20px', 
-        margin: '30px 0' 
-      }}>
-        {alumniData.map((alumni, index) => (
-          <div 
-            key={index} 
-            className={`flip-card ${flippedAlumniCards.includes(index) ? 'flipped' : ''}`}
-            onClick={() => toggleAlumniFlip(index)}
-            style={{ cursor: 'pointer' }}
-          >
-            <div className="flip-card-inner">
-              <div className="flip-card-front">
-                <img 
-                  src={alumni.imagePath || placeholderImage} 
-                  alt={`${alumni.name}`} 
-                  onError={(e) => {
-                    e.currentTarget.src = placeholderImage;
-                  }}
-                />
+        </div>
+        
+        {/* Officers Section */}
+        <div className="about-section">
+          <h2 className="section-title">Officers</h2>
+          <div className="members-grid">
+            {leadershipData.map((leader, index) => (
+              <div 
+                key={index} 
+                className={`flip-card ${flippedCards.includes(index) ? 'flipped' : ''}`}
+                onClick={() => toggleFlip(index)}
+              >
+                <div className="flip-card-inner">
+                  <div className="flip-card-front">
+                    <img 
+                      src={leader.imagePath || placeholderImage} 
+                      alt={`${leader.name}`} 
+                      onError={(e) => {
+                        e.currentTarget.src = placeholderImage;
+                      }}
+                    />
+                  </div>
+                  <div className="flip-card-back">
+                    <h3 className="member-name">{leader.name}</h3>
+                    <h4 className="member-role">{leader.role}</h4>
+                    <p className="member-bio">{leader.bio}</p>
+                    <a 
+                      href={leader.linkedin} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="member-linkedin"
+                    >
+                      LinkedIn
+                    </a>
+                  </div>
+                </div>
               </div>
-              <div className="flip-card-back" style={{ color: 'white' }}>
-                <h3 style={{ margin: '0 0 5px 0', fontSize: '1rem', color: 'white' }}>{alumni.name}</h3>
-                <h4 style={{ margin: '0 0 5px 0', fontWeight: 'normal', fontSize: '0.9rem', color: 'white' }}>{alumni.role}</h4>
-                <p style={{ fontSize: '0.8rem', margin: '0 0 8px 0', color: 'white' }}>{alumni.bio}</p>
-                <a 
-                  href={alumni.linkedin} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    color: '#0077b5',
-                    textDecoration: 'none',
-                    fontSize: '0.8rem',
-                    backgroundColor: 'white',
-                    padding: '2px 8px',
-                    borderRadius: '4px',
-                    display: 'inline-block'
-                  }}
-                >
-                  LinkedIn
-                </a>
-              </div>
-            </div>
+            ))}
           </div>
-        ))}
+        </div>
+        
+        {/* Alumni Section */}
+        <div className="about-section">
+          <h2 className="section-title">Alumni</h2>
+          <div className="members-grid">
+            {alumniData.map((alumni, index) => (
+              <div 
+                key={index} 
+                className={`flip-card ${flippedAlumniCards.includes(index) ? 'flipped' : ''}`}
+                onClick={() => toggleAlumniFlip(index)}
+              >
+                <div className="flip-card-inner">
+                  <div className="flip-card-front">
+                    <img 
+                      src={alumni.imagePath || placeholderImage} 
+                      alt={`${alumni.name}`} 
+                      onError={(e) => {
+                        e.currentTarget.src = placeholderImage;
+                      }}
+                    />
+                  </div>
+                  <div className="flip-card-back">
+                    <h3 className="member-name">{alumni.name}</h3>
+                    <h4 className="member-role">{alumni.role}</h4>
+                    <p className="member-bio">{alumni.bio}</p>
+                    <a 
+                      href={alumni.linkedin} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="member-linkedin"
+                    >
+                      LinkedIn
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

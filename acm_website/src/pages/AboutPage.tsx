@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import placeholderImage from '../assets/depositphotos_104564156-stock-illustration-male-user-icon.jpg';
+import React from 'react';
 import { leadershipData } from '../data/leadership';
 import { alumniData } from '../data/alumni';
-import '../styles/FlipCard.css';
+import { FaInstagram, FaEnvelope, FaCalendar } from 'react-icons/fa';
+import FlipCard from '../components/FlipCard';
+import '../styles/AboutPage.css';
 
 interface AboutPageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
@@ -10,151 +11,85 @@ interface AboutPageProps {
 }
 
 const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
-  // State to track which cards are flipped
-  const [flippedCards, setFlippedCards] = useState<number[]>([]);
-  const [flippedAlumniCards, setFlippedAlumniCards] = useState<number[]>([]);
-
-
-  // Toggle flip state for a card
-  const toggleFlip = (index: number) => {
-    if (flippedCards.includes(index)) {
-      setFlippedCards(flippedCards.filter(i => i !== index));
-    } else {
-      setFlippedCards([...flippedCards, index]);
-    }
-  };
-
-  // Toggle flip state for an alumni card
-  const toggleAlumniFlip = (index: number) => {
-    if (flippedAlumniCards.includes(index)) {
-      setFlippedAlumniCards(flippedAlumniCards.filter(i => i !== index));
-    } else {
-      setFlippedAlumniCards([...flippedAlumniCards, index]);
-    }
-  };
-
-  // Leadership and alumni data now sourced from data files
-
   return (
-    <div className="about-container" style={{ position: 'relative', zIndex: 1 }}>
-      {error && (
-            <div className="error-message">
-              {error}
+    <div className="about-page">
+      <div className="about-layout">
+        {/* Page Header */}
+        <div className="page-header">
+          <h1 className="page-title">About Us</h1>
+          <p className="page-subtitle">Learn more about the Johns Hopkins ACM chapter</p>
+        </div>
+
+        {error && (
+          <div className="about-section error-section">
+            <div className="error-message">{error}</div>
+          </div>
+        )}
+
+        {/* About Content Section */}
+        <div className="about-section">
+          <h2 className="section-title">Our Mission</h2>
+          <div className="about-content">
+            <p className="about-description">
+              We are a student organization of the Johns Hopkins University dedicated to furthering the knowledge and advancement of computers and 
+              information technology through the free exchange of ideas and information. As a chapter of the oldest computing society in the world, the JHU ACM 
+              is a place for diverse backgrounds and interests, and serves the JHU community as a whole. During the semester, the ACM has weekly meetings in 
+              Malone announced via email and posted on our <a href="https://www.instagram.com/jhuacm/" className="about-link" target="_blank" rel="noopener noreferrer">Instagram</a> page and the <a href="#" onClick={(e) => { e.preventDefault(); navigateTo('events'); }} className="about-link">Events</a> section of this website.
+            </p>
+
+            <div className="benefits-section">
+              <h3 className="benefits-title">Membership Benefits</h3>
+              <p className="about-description">
+                You can participate in exciting projects to bring new and interesting services to the JHU community, and voice your concerns about issues like information access, security, and privacy. You'll receive an account on our computer system that grants you access to a huge, ever-increasing range of services.
+              </p>
+              <p className="about-description">
+                You'll be able to use the workstations and printers in our office in Malone Hall, have 50 GiB of storage space on our systems that you can access from anywhere in the world, host a website using that storage space, run virtual machines on our cluster, get email at acm.jhu.edu / jhuacm.org, access our computing resources for any project, locally or over the internet via SSH and use our gitlab instance to host projects. Members also get J-Card access to the office, so you can come in at any time, 24/7. The ACM office is a great place to just relax or even (gasp!) work. And we have soda, coffee, snacks, and a microwave. Members can run for an executive board position in the future, and there are many opportunities to organize programs and connect with industry experts.
+              </p>
             </div>
-          )}
-      <h1 className="about-title" style={{ position: 'relative', zIndex: 2, color: 'white' }}>About Us</h1>
-      
-      <div className="about-content" style={{ position: 'relative', zIndex: 2 }}>
-        <p style={{ color: 'white' }}>
-          We are a student organization of the Johns Hopkins University dedicated to furthering the knowledge and advancement of computers and 
-          information technology through the free exchange of ideas and information. As a chapter of the oldest computing society in the world, the JHU ACM 
-          is a place for diverse backgrounds and interests, and serves the JHU community as a whole. During the semester, the ACM has weekly meetings in 
-          Malone announced via email and posted on our <a href="#" className="link" style={{ color: 'white', textDecoration: 'underline' }}>Facebook</a> page and the <a href="#" className="link" style={{ color: 'white', textDecoration: 'underline' }}>Events</a> section of this website.
-        </p>
-      </div>
-      
-      <h2 className="leadership-title" style={{ position: 'relative', zIndex: 2, color: 'white' }}>Officers</h2>
-      
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(4, 1fr)', 
-        gap: '20px', 
-        margin: '30px 0' 
-      }}>
-        {leadershipData.map((leader, index) => (
-          <div 
-            key={index} 
-            className={`flip-card ${flippedCards.includes(index) ? 'flipped' : ''}`}
-            onClick={() => toggleFlip(index)}
-            style={{ cursor: 'pointer' }}
-          >
-            <div className="flip-card-inner">
-              <div className="flip-card-front">
-                <img 
-                  src={leader.imagePath || placeholderImage} 
-                  alt={`${leader.name}`} 
-                  onError={(e) => {
-                    e.currentTarget.src = placeholderImage;
-                  }}
-                />
-              </div>
-              <div className="flip-card-back" style={{ color: 'white' }}>
-                <h3 style={{ margin: '0 0 5px 0', fontSize: '1rem', color: 'white' }}>{leader.name}</h3>
-                <h4 style={{ margin: '0 0 5px 0', fontWeight: 'normal', fontSize: '0.9rem', color: 'white' }}>{leader.role}</h4>
-                <p style={{ fontSize: '0.8rem', margin: '0 0 8px 0', color: 'white' }}>{leader.bio}</p>
+
+            <div className="contact-section">
+              <h3 className="contact-title">Get in Touch</h3>
+              <div className="contact-links">
                 <a 
-                  href={leader.linkedin} 
+                  href="https://www.instagram.com/jhuacm/" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    color: '#0077b5',
-                    textDecoration: 'none',
-                    fontSize: '0.8rem',
-                    backgroundColor: 'white',
-                    padding: '2px 8px',
-                    borderRadius: '4px',
-                    display: 'inline-block'
-                  }}
+                  className="contact-item"
                 >
-                  LinkedIn
+                  <FaInstagram size={20} />
+                  <span>@jhuacm</span>
+                </a>
+                <a 
+                  href="mailto:jhuacmofficers@gmail.com" 
+                  className="contact-item"
+                >
+                  <FaEnvelope size={20} />
+                  <span>jhuacmofficers@gmail.com</span>
+                </a>
+                <a 
+                  href="#"
+                  onClick={(e) => { e.preventDefault(); navigateTo('events'); }}
+                  className="contact-item"
+                >
+                  <FaCalendar size={20} />
+                  <span>Events</span>
                 </a>
               </div>
             </div>
           </div>
-        ))}
-      </div>
-      
-      <h2 className="alumni-title" style={{ color: 'white', marginTop: '40px' }}>Alumni</h2>
-      
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(4, 1fr)', 
-        gap: '20px', 
-        margin: '30px 0' 
-      }}>
-        {alumniData.map((alumni, index) => (
-          <div 
-            key={index} 
-            className={`flip-card ${flippedAlumniCards.includes(index) ? 'flipped' : ''}`}
-            onClick={() => toggleAlumniFlip(index)}
-            style={{ cursor: 'pointer' }}
-          >
-            <div className="flip-card-inner">
-              <div className="flip-card-front">
-                <img 
-                  src={alumni.imagePath || placeholderImage} 
-                  alt={`${alumni.name}`} 
-                  onError={(e) => {
-                    e.currentTarget.src = placeholderImage;
-                  }}
-                />
-              </div>
-              <div className="flip-card-back" style={{ color: 'white' }}>
-                <h3 style={{ margin: '0 0 5px 0', fontSize: '1rem', color: 'white' }}>{alumni.name}</h3>
-                <h4 style={{ margin: '0 0 5px 0', fontWeight: 'normal', fontSize: '0.9rem', color: 'white' }}>{alumni.role}</h4>
-                <p style={{ fontSize: '0.8rem', margin: '0 0 8px 0', color: 'white' }}>{alumni.bio}</p>
-                <a 
-                  href={alumni.linkedin} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    color: '#0077b5',
-                    textDecoration: 'none',
-                    fontSize: '0.8rem',
-                    backgroundColor: 'white',
-                    padding: '2px 8px',
-                    borderRadius: '4px',
-                    display: 'inline-block'
-                  }}
-                >
-                  LinkedIn
-                </a>
-              </div>
-            </div>
-          </div>
-        ))}
+        </div>
+        
+        {/* Officers Section */}
+        <div className="about-section">
+          <h2 className="section-title">Officers</h2>
+          <FlipCard data={leadershipData} />
+        </div>
+        
+        {/* Alumni Section */}
+        <div className="about-section">
+          <h2 className="section-title">Alumni</h2>
+          <FlipCard data={alumniData} />
+        </div>
       </div>
     </div>
   );

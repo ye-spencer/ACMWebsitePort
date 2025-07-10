@@ -6,15 +6,17 @@ interface AccountProps {
 }
 
 const Account: React.FC<AccountProps> = ({ handleLogout }) => (
-  <div className="login-box">
+  <>
     <h2 className="admin-header">Account</h2>
-    <button
-      onClick={handleLogout}
-      className="logout-button"
-    >
-      Logout
-    </button>
-  </div>
+    <div className="admin-form">
+      <button
+        onClick={handleLogout}
+        className="admin-btn secondary w-full"
+      >
+        Logout
+      </button>
+    </div>
+  </>
 );
 
 export default Account;

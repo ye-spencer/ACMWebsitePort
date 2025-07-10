@@ -40,7 +40,7 @@ const CreateEvent: React.FC<CreateEventProps> = ({
   setEventEndTime,
   handleCreateEvent
 }) => (
-  <div className="login-box">
+  <>
     <h2 className="admin-header">Create New Event</h2>
     <form onSubmit={handleCreateEvent} className="admin-form">
       <input
@@ -117,9 +117,9 @@ const CreateEvent: React.FC<CreateEventProps> = ({
           />
         </div>
       </div>
-      <button type="submit" className="login-button mt-10">Create Event</button>
+      <button type="submit" className="admin-btn primary w-full mt-10">Create Event</button>
     </form>
-  </div>
+  </>
 );
 
 export default CreateEvent;

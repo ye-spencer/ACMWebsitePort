@@ -28,51 +28,65 @@ const UserInfoContainer: React.FC<UserInfoProps> = ({
   onChangePassword,
 }) => {
   return (
-    <div className="login-box profile-section">
-      <h2 className="section-title-small">Profile Information</h2>
-      <div className="profile-info-grid">
-        <div>
-          <strong>Email:</strong> {email}
+    <div className="profile-section">
+      <h2 className="section-title">Profile Information</h2>
+      
+      <div className="profile-info-sections">
+        <div className="info-card">
+          <div className="info-label">Account Email</div>
+          <div className="info-value">{email}</div>
         </div>
-        <div>
-          <strong>ACM Member:</strong>{' '}
-          {isMember ? (
-            'Yes'
-          ) : (
-            <button className="login-button" onClick={onBecomeMember}>
-              Become a Member
-            </button>
-          )}
-          {(memberError || memberSuccess) && (
-            <div
-              className={`member-message ${memberError ? 'error' : 'success'}`}
-            >
-              {memberError || memberSuccess}
+
+        <div className="info-card">
+          <div className="info-label">ACM Membership</div>
+          <div className="info-content">
+            <div className="info-actions">
+              <div className={`info-value ${isMember ? 'status-active' : ''}`}>
+                {isMember ? 'Active Member' : 'Not a member'}
+              </div>
+              {!isMember && (
+                <button className="profile-btn primary" onClick={onBecomeMember}>
+                  Become a Member
+                </button>
+              )}
             </div>
-          )}
+            {(memberError || memberSuccess) && (
+              <div className={`member-message ${memberError ? 'error' : 'success'}`}>
+                {memberError || memberSuccess}
+              </div>
+            )}
+          </div>
         </div>
-        <div>
-          <strong>Mailing List:</strong>{' '}
-          {isOnMailingList ? (
-            <>
-              <button className="login-button" onClick={onUnsubscribeMailingList}>
+
+        <div className="info-card">
+          <div className="info-label">Mailing List</div>
+          <div className="info-actions">
+            <div className="info-value">
+              {isOnMailingList ? 'Subscribed' : 'Not subscribed'}
+            </div>
+            {isOnMailingList ? (
+              <button className="profile-btn secondary" onClick={onUnsubscribeMailingList}>
                 Unsubscribe
               </button>
-            </>
-          ) : (
-            <button className="login-button" onClick={onJoinMailingList}>
-              Subscribe
-            </button>
-          )}
+            ) : (
+              <button className="profile-btn primary" onClick={onJoinMailingList}>
+                Subscribe
+              </button>
+            )}
+          </div>
         </div>
-        <div className="profile-buttons">
-          <button className="login-button" onClick={onChangePassword}>
+      </div>
+
+      <div className="profile-actions">
+        <h3 className="actions-title">Account Management</h3>
+        <div className="actions-grid">
+          <button className="profile-btn primary" onClick={onChangePassword}>
             Change Password
           </button>
-          <button className="login-button logout-button" onClick={onLogout}>
+          <button className="profile-btn secondary" onClick={onLogout}>
             Logout
           </button>
-          <button className="login-button delete-account-button" onClick={onDeleteAccount}>
+          <button className="profile-btn danger" onClick={onDeleteAccount}>
             Delete Account
           </button>
         </div>

@@ -27,7 +27,7 @@ function AppContent() {
   return (
     <div className="App">
       <div className="background-image" style={{ zIndex: -1 }}></div>
-      <Navbar />
+      <Navbar navigateTo={navigateTo} />
       <Routes>
         <Route path="/" element={<HomePage error={error} />} />
         <Route path="/about" element={<AboutPage navigateTo={navigateTo} error={error} />} />
@@ -39,7 +39,7 @@ function AppContent() {
         <Route path="/admin" element={<AdminPage navigateTo={navigateTo} error={error} />} />
       </Routes>
       <div className="credits" onClick={() => navigateTo('credits')}>
-        made with lots of ❤️ @jhu acm
+        made with lots of ❤️ by acm@hopkins
       </div> 
     </div>
   );

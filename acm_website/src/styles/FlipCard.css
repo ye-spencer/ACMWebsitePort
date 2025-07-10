@@ -1,20 +1,30 @@
+/* Enhanced Flip Card Styles for Professional Design */
+
 .flip-card {
   background-color: transparent;
   width: 100%;
-  height: 200px;
+  height: 220px;
   perspective: 1000px;
   margin: 0 auto;
   display: flex;
   justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.flip-card:hover {
+  transform: scale(1.02);
 }
 
 .flip-card-inner {
   position: relative;
-  width: 150px;
-  height: 150px;
+  width: 180px;
+  height: 180px;
   text-align: center;
-  transition: transform 0.6s;
+  transition: transform 0.6s ease-in-out;
   transform-style: preserve-3d;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 .flip-card.flipped .flip-card-inner {
@@ -27,29 +37,169 @@
   height: 100%;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  border-radius: 8px;
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 }
 
 .flip-card-front {
   background-color: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .flip-card-back {
-  background-color: rgba(70, 70, 70, 0.9);
+  background: linear-gradient(135deg, rgba(0, 51, 102, 0.95), rgba(0, 85, 165, 0.95));
   color: white;
   transform: rotateY(180deg);
-  padding: 10px;
+  padding: 1rem;
   box-sizing: border-box;
   overflow-y: auto;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+}
+
+.flip-card-back::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.3));
+  border-radius: 12px 12px 0 0;
 }
 
 .flip-card-front img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.flip-card:hover .flip-card-front img {
+  filter: brightness(1.1) contrast(1.05);
+  transform: scale(1.05);
+}
+
+/* Member Details Styling */
+.member-name {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: white;
+  font-weight: 600;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.member-role {
+  margin: 0 0 0.75rem 0;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.member-bio {
+  font-size: 0.8rem;
+  margin: 0 0 1rem 0;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  line-height: 1.4;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.member-linkedin {
+  color: white;
+  text-decoration: none;
+  font-size: 0.8rem;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  padding: 0.5rem 1rem;
   border-radius: 8px;
+  display: inline-block;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.member-linkedin:hover {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .flip-card {
+    height: 200px;
+  }
+  
+  .flip-card-inner {
+    width: 160px;
+    height: 160px;
+  }
+  
+  .member-name {
+    font-size: 0.9rem;
+  }
+  
+  .member-role {
+    font-size: 0.8rem;
+  }
+  
+  .member-bio {
+    font-size: 0.75rem;
+  }
+  
+  .member-linkedin {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .flip-card {
+    height: 180px;
+  }
+  
+  .flip-card-inner {
+    width: 140px;
+    height: 140px;
+  }
+  
+  .member-name {
+    font-size: 0.85rem;
+    margin-bottom: 0.4rem;
+  }
+  
+  .member-role {
+    font-size: 0.75rem;
+    margin-bottom: 0.6rem;
+  }
+  
+  .member-bio {
+    font-size: 0.7rem;
+    margin-bottom: 0.8rem;
+  }
+  
+  .member-linkedin {
+    font-size: 0.7rem;
+    padding: 0.35rem 0.7rem;
+  }
 }

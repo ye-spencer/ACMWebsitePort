@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/LoginPage.css'; // Reuse the login page styling
 import '../styles/BookingPage.css';
 import TimeSelection from '../components/booking/TimeSelection';
 import CalendarView from '../components/booking/CalendarView';
@@ -252,12 +251,21 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
   };
 
   return (
-    <div className="login-page">
-      <div className="login-container">
-        <div className="login-box booking-box">
-          {error && <div className="error-message">{error}</div>}
+    <div className="booking-page">
+      <div className="booking-layout">
+        <div className="page-header">
+          <h1 className="page-title">Room Booking</h1>
+          <p className="page-subtitle">Schedule a time to use the ACM Lounge in Malone Hall</p>
+        </div>
 
-          <div className="booking-wrapper">
+        {error && (
+          <div className="booking-section error-section">
+            <div className="error-message">{error}</div>
+          </div>
+        )}
+
+        <div className="booking-content">
+          <div className="booking-section time-selection-section">
             <TimeSelection
               dates={dates}
               startTime={startTime}
@@ -269,19 +277,19 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
               onDateChange={handleDateChange}
               onStartTimeChange={handleStartTimeChange}
               onEndTimeChange={handleEndTimeChange}
+              onBooking={handleBooking}
               navigateTo={navigateTo}
               formatDate={formatDate}
             />
+          </div>
+
+          <div className="booking-section calendar-section">
             <CalendarView
               dates={dates}
               isTimeSlotBooked={isTimeSlotBooked}
               formatDate={formatDate}
             />
           </div>
-
-          <button className="login-button book-room-button" onClick={handleBooking}>
-            Book Room
-          </button>
         </div>
       </div>
     </div>

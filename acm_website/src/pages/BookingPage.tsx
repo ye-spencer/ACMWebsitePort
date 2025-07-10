@@ -255,7 +255,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
       <div className="booking-layout">
         <div className="page-header">
           <h1 className="page-title">Room Booking</h1>
-          <p className="page-subtitle">Schedule your meeting room time</p>
+          <p className="page-subtitle">Schedule a time to use the ACM Lounge in Malone Hall</p>
         </div>
 
         {error && (

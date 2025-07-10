@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/LoginPage.css';
 import '../styles/ProfilePage.css';
 import { auth } from '../firebase/config';
 import { EmailAuthProvider, onAuthStateChanged, updatePassword, deleteUser, signOut, reauthenticateWithCredential } from "firebase/auth";
@@ -266,7 +265,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
   };
 
   return (
-    <div className="login-page">
+    <div className="profile-page page-container">
       <div className="profile-layout">
         {error && <div className="error-message">{error}</div>}
 

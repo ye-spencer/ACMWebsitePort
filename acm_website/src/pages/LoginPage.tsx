@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/LoginPage.css'; // Import the CSS file for styling
 import { auth } from '../firebase/config';
 import { createUserWithEmailAndPassword,
@@ -16,23 +16,29 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
 
   const [userCredentials, setUserCredentials] = useState({email: '', password: ''});
   const [localError, setLocalError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  
   const handleCredentials = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserCredentials({...userCredentials, [e.target.name]: e.target.value});
   };
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      if (error?.includes('booking')) {
-        navigateTo('booking');
-      } else {
-        navigateTo('home');
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        if (error?.includes('booking')) {
+          navigateTo('booking');
+        } else {
+          navigateTo('home');
+        }
       }
-    }
-  });
+    });
+    return unsubscribe;
+  }, [navigateTo, error]);
 
   function handleSignup(e: React.FormEvent) {
     e.preventDefault();
     setLocalError('');
+    setIsLoading(true);
     userCredentials.email = userCredentials.email.toLowerCase();
 
     // validate jhu email
@@ -40,6 +46,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
     const validDomains = ['jh.edu', 'jhu.edu', 'cs.jhu.com'];
     if (!validDomains.includes(domain)) {
       setLocalError('Error: Invalid email domain. Please use a valid JHU email.');
+      setIsLoading(false);
       return;
     }
     // signup with email and password
@@ -111,13 +118,16 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
       // handle errors
       .catch((error) => {
         setLocalError(error.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
-
   }
 
   function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLocalError('');
+    setIsLoading(true);
     userCredentials.email = userCredentials.email.toLowerCase();
 
     signInWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
@@ -126,6 +136,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
       })
       .catch((error) => {
         setLocalError(error.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -148,9 +161,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
   }
 
   return (
-    <div className="login-page">
+    <div className="login-page page-container">
       <div className="login-container">
         <div className="login-box">
+          <h1>Welcome</h1>
+          <p className="login-description">Sign in or create an account with a JHU email address.</p>
           <form onSubmit={handleLogin}>
             {(error || localError) && (
               <div className="error-message">
@@ -162,7 +177,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
               <input
                 type="email"
                 id="email"
-                placeholder="EMAIL"
+                placeholder="Email Address"
                 name="email"
                 onChange={(e) => handleCredentials(e)}
                 required
@@ -173,17 +188,31 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
               <input
                 type="password"
                 id="password"
-                placeholder="PASSWORD"
+                placeholder="Password"
                 name="password"
                 onChange={(e) => handleCredentials(e)}
                 required
               />
             </div>
-            <button className="login-button" onClick={(e) => handleLogin(e)}>LOGIN</button>
-            <button className="signup-button" onClick={(e) => handleSignup(e)}>
-              SIGN-UP
-            </button>
-            <p onClick={handlePasswordReset} className="forgot-password">Forgot password?</p>
+            <div className="button-group">
+              <button 
+                className="login-button" 
+                onClick={(e) => handleLogin(e)}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Signing In...' : 'Sign In'}
+              </button>
+              <button 
+                className="signup-button" 
+                onClick={(e) => handleSignup(e)}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Creating Account...' : 'Create Account'}
+              </button>
+            </div>
+            <p onClick={handlePasswordReset} className="forgot-password">
+              Forgot your password?
+            </p>
           </form>
         </div>
       </div>

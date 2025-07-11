@@ -22,7 +22,7 @@ const AttendanceUpload: React.FC<AttendanceUploadProps> = ({
   setAttendanceFile,
   handleAttendanceUpload
 }) => (
-  <div className="login-box">
+  <>
     <h2 className="admin-header">Upload Attendance</h2>
     <form onSubmit={handleAttendanceUpload} className="admin-form">
       <div>
@@ -43,19 +43,25 @@ const AttendanceUpload: React.FC<AttendanceUploadProps> = ({
       </div>
       <div>
         <label className="admin-label">Upload Spreadsheet</label>
-        <input
-          type="file"
-          accept=".csv,.xlsx,.xls"
-          onChange={(e) => setAttendanceFile(e.target.files?.[0] || null)}
-          required
-          className="admin-input"
-        />
+        <div className="file-input-wrapper">
+          <input
+            type="file"
+            accept=".csv,.xlsx,.xls"
+            onChange={(e) => setAttendanceFile(e.target.files?.[0] || null)}
+            required
+            className="file-input"
+            id="attendance-file"
+          />
+          <label htmlFor="attendance-file" className="file-input-label">
+            📄 Choose spreadsheet file (.csv, .xlsx, .xls)
+          </label>
+        </div>
       </div>
-      <button type="submit" className="login-button mt-10">
+      <button type="submit" className="admin-btn primary w-full mt-10">
         Upload Attendance
       </button>
     </form>
-  </div>
+  </>
 );
 
 export default AttendanceUpload;

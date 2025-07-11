@@ -13,7 +13,7 @@ interface MembersProps {
 }
 
 const Members: React.FC<MembersProps> = ({ members, handleRemoveMember }) => (
-  <div className="login-box">
+  <>
     <h2 className="admin-header">Manage Members</h2>
     <div className="table-container">
       <table className="admin-table">
@@ -33,6 +33,7 @@ const Members: React.FC<MembersProps> = ({ members, handleRemoveMember }) => (
                 <button
                   onClick={() => handleRemoveMember(member.uid)}
                   className="remove-btn"
+                  title="Remove member"
                 >
                   ×
                 </button>
@@ -42,7 +43,7 @@ const Members: React.FC<MembersProps> = ({ members, handleRemoveMember }) => (
         </tbody>
       </table>
     </div>
-  </div>
+  </>
 );
 
 export default Members;

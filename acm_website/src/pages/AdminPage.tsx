@@ -55,7 +55,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
   const [attendanceFile, setAttendanceFile] = useState<File | null>(null);
 
   useEffect(() => {
-    onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         // check if user is admin
         if (user.email !== "jhuacmweb@gmail.com") {
@@ -92,6 +92,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
         navigateTo('login', 'Please log in to access the admin page');
       }
     });
+    return unsubscribe;
   }, [navigateTo]);
 
   const handleCreateEvent = async (e: React.FormEvent) => {
@@ -280,54 +281,69 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
   }
 
   return (
-    <div className="login-page">
-      <div className="login-container">
+    <div className="admin-page">
+      <div className="admin-layout">
+        <div className="page-header">
+          <h1 className="page-title">Admin Dashboard</h1>
+          <p className="page-subtitle">Manage events, members, and attendance</p>
+        </div>
+
         {error && (
-          <div className="error-message">
-            {error}
+          <div className="admin-section error-section">
+            <div className="error-message">
+              {error}
+            </div>
           </div>
         )}
 
-        {/* Create Event Container */}
-        <CreateEvent
-          eventCategory={eventCategory}
-          setEventCategory={setEventCategory}
-          eventTitle={eventTitle}
-          setEventTitle={setEventTitle}
-          eventDescription={eventDescription}
-          setEventDescription={setEventDescription}
-          eventLocation={eventLocation}
-          setEventLocation={setEventLocation}
-          eventLink={eventLink}
-          setEventLink={setEventLink}
-          eventStartDate={eventStartDate}
-          setEventStartDate={setEventStartDate}
-          eventStartTime={eventStartTime}
-          setEventStartTime={setEventStartTime}
-          eventEndDate={eventEndDate}
-          setEventEndDate={setEventEndDate}
-          eventEndTime={eventEndTime}
-          setEventEndTime={setEventEndTime}
-          handleCreateEvent={handleCreateEvent}
-        />
+        {/* Create Event Section */}
+        <div className="admin-section">
+          <CreateEvent
+            eventCategory={eventCategory}
+            setEventCategory={setEventCategory}
+            eventTitle={eventTitle}
+            setEventTitle={setEventTitle}
+            eventDescription={eventDescription}
+            setEventDescription={setEventDescription}
+            eventLocation={eventLocation}
+            setEventLocation={setEventLocation}
+            eventLink={eventLink}
+            setEventLink={setEventLink}
+            eventStartDate={eventStartDate}
+            setEventStartDate={setEventStartDate}
+            eventStartTime={eventStartTime}
+            setEventStartTime={setEventStartTime}
+            eventEndDate={eventEndDate}
+            setEventEndDate={setEventEndDate}
+            eventEndTime={eventEndTime}
+            setEventEndTime={setEventEndTime}
+            handleCreateEvent={handleCreateEvent}
+          />
+        </div>
 
-        {/* Members Container */}
-        <Members
-          members={members}
-          handleRemoveMember={handleRemoveMember}
-        />
+        {/* Members Section */}
+        <div className="admin-section">
+          <Members
+            members={members}
+            handleRemoveMember={handleRemoveMember}
+          />
+        </div>
 
-        {/* Attendance Upload Container */}
-        <AttendanceUpload
-          pastEvents={pastEvents}
-          selectedEvent={selectedEvent}
-          setSelectedEvent={setSelectedEvent}
-          setAttendanceFile={setAttendanceFile}
-          handleAttendanceUpload={handleAttendanceUpload}
-        />
+        {/* Attendance Upload Section */}
+        <div className="admin-section">
+          <AttendanceUpload
+            pastEvents={pastEvents}
+            selectedEvent={selectedEvent}
+            setSelectedEvent={setSelectedEvent}
+            setAttendanceFile={setAttendanceFile}
+            handleAttendanceUpload={handleAttendanceUpload}
+          />
+        </div>
 
-        {/* Logout Container */}
-        <Account handleLogout={handleLogout} />
+        {/* Account Section */}
+        <div className="admin-section">
+          <Account handleLogout={handleLogout} />
+        </div>
       </div>
     </div>
   );

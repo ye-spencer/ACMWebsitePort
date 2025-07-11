@@ -102,7 +102,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
   }, [db]);
 
   useEffect(() => {
-    onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setIsLoggedIn(!!user);
       if (user) {
         const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -115,6 +115,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
         }
       } else setRegisteredEvents([]);
     });
+    return unsubscribe;
   }, [db]);
 
   const handleRSVP = async (eventID: string) => {

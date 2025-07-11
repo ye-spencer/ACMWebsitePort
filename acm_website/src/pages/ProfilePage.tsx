@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/LoginPage.css';
 import '../styles/ProfilePage.css';
 import { auth } from '../firebase/config';
 import { EmailAuthProvider, onAuthStateChanged, updatePassword, deleteUser, signOut, reauthenticateWithCredential } from "firebase/auth";
@@ -51,7 +50,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
   const [currentPassword, setCurrentPassword] = useState<string>('');
 
   useEffect(() => {
-    onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setEmail(user.email || '');
         const db = getFirestore();
@@ -101,6 +100,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
         navigateTo('login', 'Please log in to access your profile');
       }
     });
+    return unsubscribe;
   }, [navigateTo]);
 
   const handleVerifyPassword = async () => {
@@ -266,7 +266,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
   };
 
   return (
-    <div className="login-page">
+    <div className="profile-page page-container">
       <div className="profile-layout">
         {error && <div className="error-message">{error}</div>}
 

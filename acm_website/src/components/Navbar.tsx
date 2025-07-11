@@ -1,25 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/NavBar.css';
-import { auth } from '../firebase/config';
-import { onAuthStateChanged } from "firebase/auth";
+import { useApp } from '../hooks/useApp';
 import logo from '../assets/logo.png';
 
-interface NavbarProps {
-  navigateTo: (page: string, errorMessage?: string) => void;
-}
-
-const Navbar: React.FC<NavbarProps> = ({ navigateTo }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsLoggedIn(!!user);
-      setIsAdmin(user?.email === "jhuacmweb@gmail.com");
-    });
-    return unsubscribe;
-  }, []);
+const Navbar: React.FC = () => {
+  const { isLoggedIn, isAdmin, navigateTo } = useApp();
 
   return (
       <div className="navbar">

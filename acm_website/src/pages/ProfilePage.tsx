@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/ProfilePage.css';
 import { auth } from '../firebase/config';
-import { EmailAuthProvider, onAuthStateChanged, updatePassword, deleteUser, signOut, reauthenticateWithCredential } from "firebase/auth";
+import { EmailAuthProvider, updatePassword, deleteUser, signOut, reauthenticateWithCredential } from "firebase/auth";
 import { collection, doc, getFirestore, getDoc, getDocs, query, where, deleteDoc, updateDoc } from "firebase/firestore";
+import { useApp } from '../hooks/useApp';
 import UserInfoContainer from '../components/profile/UserInfoContainer';
 import EventsContainer from '../components/profile/EventsContainer';
 import PasswordModal from '../components/profile/PasswordModal';
 import VerifyPasswordModal from '../components/profile/VerifyPasswordModal';
-
-interface ProfilePageProps {
-  navigateTo: (page: string, errorMessage?: string) => void;
-  error?: string;
-}
 
 interface Booking {
   id: string;
@@ -31,7 +27,8 @@ interface FirestoreEvent {
   date: { toDate: () => Date };
 }
 
-const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
+const ProfilePage: React.FC = () => {
+  const { user, navigateTo, error, authLoading } = useApp();
   const [email, setEmail] = useState<string>('');
   const [isMember, setIsMember] = useState<boolean>(false);
   const [isOnMailingList, setIsOnMailingList] = useState<boolean>(false);
@@ -50,8 +47,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
   const [currentPassword, setCurrentPassword] = useState<string>('');
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
+    // Don't redirect while authentication is still loading
+    if (authLoading) {
+      return;
+    }
+
+    if (user) {
+      const loadUserData = async () => {
         setEmail(user.email || '');
         const db = getFirestore();
         const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -96,12 +98,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
           setPastEvents(attended.filter(event => event.date <= now));
           setEventsAttended(attended.length);
         }
-      } else {
-        navigateTo('login', 'Please log in to access your profile');
-      }
-    });
-    return unsubscribe;
-  }, [navigateTo]);
+      };
+      
+      loadUserData();
+    } else {
+      navigateTo('login', 'Please log in to access your profile');
+    }
+  }, [user, navigateTo, authLoading]);
 
   const handleVerifyPassword = async () => {
     try {

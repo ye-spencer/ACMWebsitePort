@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase/config';
 import { onAuthStateChanged, User } from 'firebase/auth';
@@ -47,17 +47,17 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       setAuthLoading(false);
     });
 
-    return () => unsubscribe();
+    return unsubscribe;
   }, []);
 
-  const navigateTo = (page: string, errorMessage?: string) => {
+  const navigateTo = useCallback((page: string, errorMessage?: string) => {
     if (errorMessage) {
       setError(errorMessage);
     } else {
       setError('');
     }
     navigate(`/${page === 'home' ? '' : page}`);
-  };
+  }, [navigate, setError]);
 
   const clearError = () => {
     setError('');

@@ -3,6 +3,7 @@ import { getFirestore, query, collection, where, Timestamp, orderBy, getDocs, up
 import '../styles/EventsPage.css';
 import { auth } from '../firebase/config';
 import { onAuthStateChanged } from "firebase/auth";
+import { eventCategories } from "../components/admin/CreateEvent.tsx";
 
 interface EventsPageProps {
   navigateTo: (page: string, errorMessage?: string) => void;
@@ -26,8 +27,8 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [registeredEvents, setRegisteredEvents] = useState<Event[]>([]);
-  const [upcomingCategory, setUpcomingCategory] = useState<string>('All');
-  const [pastCategory, setPastCategory] = useState<string>('All');
+  const [selectedUpcomingCategory, setSelectedUpcomingCategory] = useState<string>('All');
+  const [selectedPastCategory, setSelectedPastCategory] = useState<string>('All');
 
   const db = getFirestore();
   
@@ -138,18 +139,8 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
     }
   };
 
-  let upcomingCategories = Array.from(new Set(upcomingEvents.map(event => event.category)));
-  upcomingCategories = upcomingCategories.filter(cat => cat != 'Other');
-  upcomingCategories.push('Other');
-  upcomingCategories.unshift('All');
-
-  let pastCategories = Array.from(new Set(pastEvents.map(event => event.category)));
-  pastCategories = pastCategories.filter(cat => cat != 'Other');
-  pastCategories.push('Other');
-  pastCategories.unshift('All');
-
-  const filteredUpcoming = upcomingCategory == 'All' ? upcomingEvents : upcomingEvents.filter(event => event.category == upcomingCategory);
-  const filteredPast = pastCategory == 'All' ? pastEvents : pastEvents.filter(event => event.category == pastCategory);
+  const filteredUpcoming = selectedUpcomingCategory == 'All' ? upcomingEvents : upcomingEvents.filter(event => event.category == selectedUpcomingCategory);
+  const filteredPast = selectedPastCategory == 'All' ? pastEvents : pastEvents.filter(event => event.category == selectedPastCategory);
 
   if (loading) {
     return (
@@ -173,46 +164,51 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
         <div className="filter">
           <label className="filter-label">Category</label>
           <select
-            value={upcomingCategory}
-            onChange={(e) => setUpcomingCategory(e.target.value)}
+            value={selectedUpcomingCategory}
+            onChange={(e) => setSelectedUpcomingCategory(e.target.value)}
             className="filter-select"
           >
-            {upcomingCategories.map(cat => (
+            <option value="All">All</option>
+            {eventCategories.map(cat => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>
         </div>
       </div>
       <div className="events-list">
-        {filteredUpcoming.length == 0 ? (
+        {upcomingEvents.length == 0 ? (
           <div className="no-events-message">
             <p>No upcoming events at the moment.</p>
             <p>Check back soon for new events!</p>
           </div>
-        ) : (
-          filteredUpcoming.map(event => {
-            const isRegistered = registeredEvents.some(e => e.id == event.id);
-            return (
-              <div key={event.id} className="event-card">
-                <h2 className="event-title">{event.title}</h2>
-                <div className="event-details">
-                  <p><strong>Date:</strong> {event.date.toLocaleDateString()}</p>
-                  <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
-                  <p><strong>Location:</strong> {event.location}</p>
-                </div>
-                <p className="event-description">{event.description}</p>
-                <button
-                  className="event-button"
-                  onClick={() => handleRSVP(event.id)}
-                  disabled={isRegistered}
-                  style={isRegistered ? { background: '#aaa', color: '#fff', cursor: 'not-allowed' } : {}}
-                >
-                  {isRegistered ? 'Registered' : 'RSVP'}
-                </button>
+        ) : ( filteredUpcoming.length == 0 ? (
+          <div className="no-events-message">
+            <p>No events match the current filter.</p>
+            <p>Try modifying your search.</p>
+          </div>
+        ) : ( filteredUpcoming.map(event => {
+          const isRegistered = registeredEvents.some(e => e.id == event.id);
+          return (
+            <div key={event.id} className="event-card">
+              <span className="event-category-badge">{event.category}</span>
+              <h2 className="event-title">{event.title}</h2>
+              <div className="event-details">
+                <p><strong>Date:</strong> {event.date.toLocaleDateString()}</p>
+                <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
+                <p><strong>Location:</strong> {event.location}</p>
               </div>
-            )
-          })
-        )}
+              <p className="event-description">{event.description}</p>
+              <button
+                className="event-button"
+                onClick={() => handleRSVP(event.id)}
+                disabled={isRegistered}
+                style={isRegistered ? { background: '#aaa', color: '#fff', cursor: 'not-allowed' } : {}}
+              >
+                {isRegistered ? 'Registered' : 'RSVP'}
+              </button>
+            </div>
+          )})
+        ))}
       </div>
 
       {/* Past Events */}
@@ -221,19 +217,26 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
         <div className="filter">
           <label className="filter-label">Category</label>
           <select
-            value={pastCategory}
-            onChange={(e) => setPastCategory(e.target.value)}
+            value={selectedPastCategory}
+            onChange={(e) => setSelectedPastCategory(e.target.value)}
             className="filter-select"
           >
-            {pastCategories.map(cat => (
+            <option value="All">All</option>
+            {eventCategories.map(cat => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>
         </div>
       </div>
       <div className="events-list">
-        {filteredPast.map(event => (
+        {filteredPast.length == 0 ? (
+          <div className="no-events-message">
+            <p>No events match the current filter.</p>
+            <p>Try modifying your search.</p>
+          </div>
+        ) : ( filteredPast.map(event => (
           <div key={event.id} className="event-card" style={{ backgroundColor: 'rgba(220, 220, 220, 0.8)' }}>
+            <span className="event-category-badge">{event.category}</span>
             <h2 className="event-title">{event.title}</h2>
             <div className="event-details">
               <p><strong>Date:</strong> {event.date.toLocaleDateString()}</p>
@@ -242,7 +245,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
             </div>
             <p className="event-description">{event.description}</p>
           </div>
-        ))}
+        )))}
       </div>
     </div>
   );

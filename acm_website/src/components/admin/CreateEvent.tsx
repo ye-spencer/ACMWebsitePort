@@ -23,6 +23,8 @@ interface CreateEventProps {
   handleCreateEvent: (e: React.FormEvent) => void;
 }
 
+export const eventCategories = ["Workshop", "Social", "Competition", "Talk", "Other"];
+
 const CreateEvent: React.FC<CreateEventProps> = ({
   eventCategory,
   setEventCategory,
@@ -54,11 +56,9 @@ const CreateEvent: React.FC<CreateEventProps> = ({
         className="admin-select"
       >
         <option value="">Select Category</option>
-        <option value="Workshop">Workshop</option>
-        <option value="Social">Social</option>
-        <option value="Competition">Competition</option>
-        <option value="Talk">Talk</option>
-        <option value="Other">Other</option>
+        {eventCategories.map(cat => (
+          <option key={cat} value={cat}>{cat}</option>
+        ))}
       </select>
       <input
         type="text"

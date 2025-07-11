@@ -68,4 +68,22 @@
 .event-card {
     position: relative;
     z-index: 2;
+    width: 700px;
+}
+
+.event-category-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #003366;
+  color: #fff;
+  padding: 3px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  z-index: 3;
+  pointer-events: none;
+  user-select: none;
 }

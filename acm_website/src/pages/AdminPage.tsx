@@ -31,9 +31,10 @@ interface SpreadsheetRow {
 }
 
 const AdminPage: React.FC = () => {
-  const { user, isAdmin, navigateTo, error, authLoading } = useApp();
+  const { user, isAdmin, navigateTo, error, authLoading, setError } = useApp();
   const [members, setMembers] = useState<Member[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
+  const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
   
   // Event form state
   const [eventCategory, setEventCategory] = useState<string>('');
@@ -51,51 +52,45 @@ const AdminPage: React.FC = () => {
   const [attendanceFile, setAttendanceFile] = useState<File | null>(null);
 
   useEffect(() => {
-    // Don't redirect while authentication is still loading
-    if (authLoading) {
+    // Don't redirect while authentication is still loading or during logout
+    if (authLoading || isLoggingOut) {
+      return;
+    }
+    if (!isAdmin) {
+      navigateTo('login', 'You do not have permission to access the admin page');
       return;
     }
 
-    if (user) {
-      // check if user is admin
-      if (!isAdmin) {
-        navigateTo('home', 'You do not have permission to access the admin page');
-        return;
-      }
-      
-      const fetchAdminData = async () => {
-        const db = getFirestore();
+    const fetchAdminData = async () => {
+      const db = getFirestore();
 
-        // Fetch members
-        const membersQuery = query(collection(db, "users"), where("isMember", "==", true));
-        const membersSnapshot = await getDocs(membersQuery);
-        const membersData: Member[] = membersSnapshot.docs.map(doc => ({
-          uid: doc.id,
-          email: doc.data().email,
-          eventsAttended: doc.data().eventsAttended?.length || 0
-        }));
-        setMembers(membersData);
+      // Fetch members
+      const membersQuery = query(collection(db, "users"), where("isMember", "==", true));
+      const membersSnapshot = await getDocs(membersQuery);
+      const membersData: Member[] = membersSnapshot.docs.map(doc => ({
+        uid: doc.id,
+        email: doc.data().email,
+        eventsAttended: doc.data().eventsAttended?.length || 0
+      }));
+      setMembers(membersData);
 
-        // Fetch past events
-        const eventsQuery = query(collection(db, "events"), where("end", "<", Timestamp.now()), orderBy("start", "desc"));
-        const eventsSnapshot = await getDocs(eventsQuery);
-        const events: Event[] = eventsSnapshot.docs
-          .map(doc => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              name: data.name,
-              date: data.start.toDate(),
-            };
-          });
-        setPastEvents(events);
-      };
+      // Fetch past events
+      const eventsQuery = query(collection(db, "events"), where("end", "<", Timestamp.now()), orderBy("start", "desc"));
+      const eventsSnapshot = await getDocs(eventsQuery);
+      const events: Event[] = eventsSnapshot.docs
+        .map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            name: data.name,
+            date: data.start.toDate(),
+          };
+        });
+      setPastEvents(events);
+    };
 
-      fetchAdminData();
-    } else {
-      navigateTo('login', 'Please log in to access the admin page');
-    }
-  }, [user, isAdmin, navigateTo, authLoading]);
+    fetchAdminData();
+  }, [user, isAdmin, navigateTo, authLoading, isLoggingOut]);
 
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,7 +102,7 @@ const AdminPage: React.FC = () => {
 
       // validate start and end date and time
       if (endDateTime <= startDateTime) {
-        alert('End time must be after start time');
+        setError('End time must be after start time');
         return;
       }
 
@@ -136,7 +131,7 @@ const AdminPage: React.FC = () => {
       alert('Event created successfully!');
     } catch (error) {
       console.error('Error creating event:', error);
-      alert('Failed to create event. Please try again.');
+      setError('Failed to create event. Please try again.');
     }
   };
 
@@ -159,7 +154,7 @@ const AdminPage: React.FC = () => {
         setMembers(prev => prev.filter(member => member.uid !== uid));
       } catch (error) {
         console.error('Error removing member:', error);
-        alert('Failed to remove member. Please try again.');
+        setError('Failed to remove member. Please try again.');
       }
     }
   };
@@ -168,7 +163,7 @@ const AdminPage: React.FC = () => {
     e.preventDefault();
     // validate event and file
     if (!selectedEvent || !attendanceFile) {
-      alert('Please select an event and upload a file');
+      setError('Please select an event and upload a file');
       return;
     }
 
@@ -253,7 +248,7 @@ const AdminPage: React.FC = () => {
           setAttendanceFile(null);
         } catch (error) {
           console.error('Error processing attendance:', error);
-          alert(`Error processing attendance: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          setError(`Error processing attendance: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
       };
 
@@ -264,17 +259,19 @@ const AdminPage: React.FC = () => {
       reader.readAsArrayBuffer(attendanceFile);
     } catch (error) {
       console.error('Error uploading attendance:', error);
-      alert(`Error uploading attendance: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setError(`Error uploading attendance: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
   const handleLogout = async () => {
     try {
+      setIsLoggingOut(true);
       await signOut(auth);
       navigateTo('login', 'You have been logged out');
     } catch (error) {
       console.error('Error signing out:', error);
-      alert('Failed to log out. Please try again.');
+      setError('Failed to log out. Please try again.');
+      setIsLoggingOut(false); // Reset on error
     }
   };
 

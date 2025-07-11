@@ -3,11 +3,7 @@ import '../styles/HomePage.css';
 import { FaCalendarAlt, FaUsers } from 'react-icons/fa';
 import { useApp } from '../hooks/useApp';
 
-interface HomePageProps {
-  error?: string;
-}
-
-const HomePage: React.FC<HomePageProps> = () => {
+const HomePage: React.FC = () => {
   const { error, navigateTo } = useApp();
 
   return (

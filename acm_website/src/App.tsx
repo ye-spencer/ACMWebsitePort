@@ -26,9 +26,9 @@ function AppContent() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/admin" element={<AdminPage />} />
       </Routes>
-      <div className="credits">
+      <a className="credits" href="/credits">
         made with lots of ❤️ by acm@hopkins
-      </div> 
+      </a> 
     </div>
   );
 }

@@ -56,8 +56,11 @@ const AdminPage: React.FC = () => {
     if (authLoading || isLoggingOut) {
       return;
     }
-    if (!isAdmin) {
-      navigateTo('login', 'You do not have permission to access the admin page');
+    if (!isAdmin && user) {
+      navigateTo('profile', 'You do not have permission to access the admin page');
+      return;
+    } else if (!user) {
+      navigateTo('login', 'Please log in to access the admin page');
       return;
     }
 

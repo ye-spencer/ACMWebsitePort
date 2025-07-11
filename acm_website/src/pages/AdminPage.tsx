@@ -5,15 +5,11 @@ import Members from '../components/admin/Members';
 import AttendanceUpload from '../components/admin/AttendanceUpload';
 import Account from '../components/admin/Account';
 import { auth } from '../firebase/config';
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { collection, doc, getFirestore, getDocs, query, where, updateDoc, addDoc, Timestamp, orderBy, arrayUnion } from "firebase/firestore";
+import { useApp } from '../contexts/AppContext';
 import * as XLSX from 'xlsx';
 import { deleteUser } from '../api';
-
-interface AdminPageProps {
-  navigateTo: (page: string, errorMessage?: string) => void;
-  error?: string;
-}
 
 interface Event {
   id: string;
@@ -34,8 +30,8 @@ interface SpreadsheetRow {
   [key: string]: unknown;
 }
 
-const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+const AdminPage: React.FC = () => {
+  const { user, isAdmin, navigateTo, error } = useApp();
   const [members, setMembers] = useState<Member[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
   
@@ -54,14 +50,14 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
   const [attendanceFile, setAttendanceFile] = useState<File | null>(null);
 
   useEffect(() => {
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // check if user is admin
-        if (user.email !== "jhuacmweb@gmail.com") {
-          navigateTo('home', 'You do not have permission to access the admin page');
-          return;
-        }
-        setIsAdmin(true);
+    if (user) {
+      // check if user is admin
+      if (!isAdmin) {
+        navigateTo('home', 'You do not have permission to access the admin page');
+        return;
+      }
+      
+      const fetchAdminData = async () => {
         const db = getFirestore();
 
         // Fetch members
@@ -87,11 +83,13 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
             };
           });
         setPastEvents(events);
-      } else {
-        navigateTo('login', 'Please log in to access the admin page');
-      }
-    });
-  }, [navigateTo]);
+      };
+
+      fetchAdminData();
+    } else {
+      navigateTo('login', 'Please log in to access the admin page');
+    }
+  }, [user, isAdmin, navigateTo]);
 
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();

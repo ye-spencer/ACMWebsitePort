@@ -8,7 +8,7 @@ import { collection, doc, getDocs, getFirestore, setDoc, updateDoc } from "fireb
 import { useApp } from '../contexts/AppContext';
 
 const LoginPage: React.FC = () => {
-  const { user, navigateTo, error, setError } = useApp();
+  const { user, navigateTo, error } = useApp();
   const [userCredentials, setUserCredentials] = useState({email: '', password: ''});
   const [localError, setLocalError] = useState('');
   const [isLoading, setIsLoading] = useState(false);

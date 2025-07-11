@@ -2,6 +2,7 @@ import React from 'react';
 import '../styles/HomePage.css';
 import { useApp } from '../contexts/AppContext';
 import FlipCard from '../components/FlipCard';
+import { leadershipData } from '../data/leadership';
 
 const HomePage: React.FC = () => {
   const { error } = useApp();
@@ -16,7 +17,7 @@ const HomePage: React.FC = () => {
         </p>
       </div>
       <div className="cards-container">
-        <FlipCard />
+        <FlipCard data={leadershipData} />
       </div>
     </div>
   );

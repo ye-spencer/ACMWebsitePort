@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, query, collection, where, Timestamp, orderBy, getDocs, updateDoc, doc, arrayUnion, getDoc } from 'firebase/firestore';
 import '../styles/EventsPage.css';
-import { auth } from '../firebase/config';
-import { onAuthStateChanged } from "firebase/auth";
-
-interface EventsPageProps {
-  navigateTo: (page: string, errorMessage?: string) => void;
-  error?: string;
-}
+import { useApp } from '../contexts/AppContext';
 
 interface Event {
   id: string;
@@ -19,11 +13,11 @@ interface Event {
   description: string;
 }
 
-const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
+const EventsPage: React.FC = () => {
+  const { user, isLoggedIn, navigateTo, error } = useApp();
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [registeredEvents, setRegisteredEvents] = useState<Event[]>([]);
 
   const db = getFirestore();
@@ -96,9 +90,8 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
   }, [db]);
 
   useEffect(() => {
-    onAuthStateChanged(auth, async (user) => {
-      setIsLoggedIn(!!user);
-      if (user) {
+    if (user) {
+      const fetchUserRegistrations = async () => {
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
           const userData = userDoc.data();
@@ -107,9 +100,12 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
           }));
           setRegisteredEvents(registered);
         }
-      } else setRegisteredEvents([]);
-    });
-  }, [db]);
+      };
+      fetchUserRegistrations();
+    } else {
+      setRegisteredEvents([]);
+    }
+  }, [user, db]);
 
   const handleRSVP = async (eventID: string) => {
     if (!isLoggedIn) {
@@ -117,7 +113,6 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
       return;
     }
     try {
-      const user = auth.currentUser;
       const event = upcomingEvents.find(e => e.id === eventID);
       await updateDoc(doc(db, 'events', eventID), {
         registered: arrayUnion({ uid: user?.uid, email: user?.email })

@@ -3,14 +3,12 @@ import { leadershipData } from '../data/leadership';
 import { alumniData } from '../data/alumni';
 import { FaInstagram, FaEnvelope, FaCalendar } from 'react-icons/fa';
 import FlipCard from '../components/FlipCard';
+import { useApp } from '../contexts/AppContext';
 import '../styles/AboutPage.css';
 
-interface AboutPageProps {
-  navigateTo: (page: string, errorMessage?: string) => void;
-  error?: string;
-}
+const AboutPage: React.FC = () => {
+  const { navigateTo, error } = useApp();
 
-const AboutPage: React.FC<AboutPageProps> = ({ navigateTo, error }) => {
   return (
     <div className="about-page">
       <div className="about-layout">

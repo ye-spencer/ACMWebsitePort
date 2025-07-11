@@ -2,14 +2,12 @@ import React from 'react';
 import { contributorsData } from '../data/contributors';
 import { FaEnvelope } from 'react-icons/fa';
 import FlipCard from '../components/FlipCard';
+import { useApp } from '../contexts/AppContext';
 import '../styles/CreditsPage.css';
 
-interface CreditsPageProps {
-  navigateTo: (page: string, errorMessage?: string) => void;
-  error?: string;
-}
+const CreditsPage: React.FC = () => {
+  const { error } = useApp();
 
-const CreditsPage: React.FC<CreditsPageProps> = ({ error }) => {
   return (
     <div className="credits-page">
       <div className="credits-layout">

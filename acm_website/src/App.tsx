@@ -10,8 +10,10 @@ import BookingPage from './pages/BookingPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
 import Navbar from './components/Navbar';
+import { useApp } from './hooks/useApp';
 
 function AppContent() {
+  const { navigateTo } = useApp();
   return (
     <div className="App">
       <div className="background-image" style={{ zIndex: -1 }}></div>
@@ -26,7 +28,7 @@ function AppContent() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/admin" element={<AdminPage />} />
       </Routes>
-      <a className="credits" href="/credits">
+      <a className="credits" href="#" onClick={(e) => {e.preventDefault(); navigateTo('credits')}}>
         made with lots of ❤️ by acm@hopkins
       </a> 
     </div>

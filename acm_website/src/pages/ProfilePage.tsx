@@ -28,7 +28,7 @@ interface FirestoreEvent {
 }
 
 const ProfilePage: React.FC = () => {
-  const { user, navigateTo, error } = useApp();
+  const { user, navigateTo, error, authLoading } = useApp();
   const [email, setEmail] = useState<string>('');
   const [isMember, setIsMember] = useState<boolean>(false);
   const [isOnMailingList, setIsOnMailingList] = useState<boolean>(false);
@@ -47,6 +47,11 @@ const ProfilePage: React.FC = () => {
   const [currentPassword, setCurrentPassword] = useState<string>('');
 
   useEffect(() => {
+    // Don't redirect while authentication is still loading
+    if (authLoading) {
+      return;
+    }
+
     if (user) {
       const loadUserData = async () => {
         setEmail(user.email || '');
@@ -99,7 +104,7 @@ const ProfilePage: React.FC = () => {
     } else {
       navigateTo('login', 'Please log in to access your profile');
     }
-  }, [user, navigateTo]);
+  }, [user, navigateTo, authLoading]);
 
   const handleVerifyPassword = async () => {
     try {

@@ -15,7 +15,7 @@ interface TimeSlot {
 }
 
 const BookingPage: React.FC = () => {
-  const { user, navigateTo, error } = useApp();
+  const { user, navigateTo, error, authLoading } = useApp();
   const [startTime, setStartTime] = useState<Date>(() => {
     const date = new Date();
     date.setHours(9, 0, 0, 0);
@@ -36,6 +36,11 @@ const BookingPage: React.FC = () => {
 
   // Initial auth check
   useEffect(() => {
+    // Don't redirect while authentication is still loading
+    if (authLoading) {
+      return;
+    }
+
     if (user) {
       const fetchUserMembership = async () => {
         const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -49,7 +54,7 @@ const BookingPage: React.FC = () => {
     } else {
       navigateTo('login', 'Please log in to access the booking page');
     }
-  }, [user, navigateTo]);
+  }, [user, navigateTo, authLoading]);
 
   // Generate time slots for dropdowns
   useEffect(() => {

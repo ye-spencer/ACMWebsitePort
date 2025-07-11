@@ -31,7 +31,7 @@ interface SpreadsheetRow {
 }
 
 const AdminPage: React.FC = () => {
-  const { user, isAdmin, navigateTo, error } = useApp();
+  const { user, isAdmin, navigateTo, error, authLoading } = useApp();
   const [members, setMembers] = useState<Member[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
   
@@ -51,6 +51,11 @@ const AdminPage: React.FC = () => {
   const [attendanceFile, setAttendanceFile] = useState<File | null>(null);
 
   useEffect(() => {
+    // Don't redirect while authentication is still loading
+    if (authLoading) {
+      return;
+    }
+
     if (user) {
       // check if user is admin
       if (!isAdmin) {
@@ -90,7 +95,7 @@ const AdminPage: React.FC = () => {
     } else {
       navigateTo('login', 'Please log in to access the admin page');
     }
-  }, [user, isAdmin, navigateTo]);
+  }, [user, isAdmin, navigateTo, authLoading]);
 
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -40,6 +40,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
   
   // Event form state
+  const [eventCategory, setEventCategory] = useState<string>('');
   const [eventTitle, setEventTitle] = useState<string>('');
   const [eventDescription, setEventDescription] = useState<string>('');
   const [eventLocation, setEventLocation] = useState<string>('');
@@ -110,6 +111,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
 
       // send event to database
       await addDoc(collection(db, "events"), {
+        category: eventCategory,
         name: eventTitle,
         description: eventDescription,
         location: eventLocation,
@@ -119,6 +121,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
       });
 
       // Reset form
+      setEventCategory('');
       setEventTitle('');
       setEventDescription('');
       setEventLocation('');
@@ -296,6 +299,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
         {/* Create Event Section */}
         <div className="admin-section">
           <CreateEvent
+            eventCategory={eventCategory}
+            setEventCategory={setEventCategory}
             eventTitle={eventTitle}
             setEventTitle={setEventTitle}
             eventDescription={eventDescription}

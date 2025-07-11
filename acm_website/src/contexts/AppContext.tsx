@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useEffect, useState, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase/config';
 import { onAuthStateChanged, User } from 'firebase/auth';
 
-interface AppContextType {
+export interface AppContextType {
   // Auth state
   user: User | null;
   isLoggedIn: boolean;
@@ -88,15 +88,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       {children}
     </AppContext.Provider>
   );
-};
-
-// Custom hook for using the app context
-export const useApp = (): AppContextType => {
-  const context = useContext(AppContext);
-  if (context === undefined) {
-    throw new Error('useApp must be used within an AppProvider');
-  }
-  return context;
 };
 
 export default AppContext;

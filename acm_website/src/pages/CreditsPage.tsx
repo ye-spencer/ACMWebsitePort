@@ -2,7 +2,7 @@ import React from 'react';
 import { contributorsData } from '../data/contributors';
 import { FaEnvelope } from 'react-icons/fa';
 import FlipCard from '../components/FlipCard';
-import { useApp } from '../contexts/AppContext';
+import { useApp } from '../hooks/useApp';
 import '../styles/CreditsPage.css';
 
 const CreditsPage: React.FC = () => {

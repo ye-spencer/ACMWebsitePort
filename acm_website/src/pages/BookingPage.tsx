@@ -4,7 +4,7 @@ import TimeSelection from '../components/booking/TimeSelection';
 import CalendarView from '../components/booking/CalendarView';
 import { app } from '../firebase/config';
 import { collection, doc, getFirestore, setDoc, Timestamp, query, where, getDocs, getDoc } from "firebase/firestore";
-import { useApp } from '../contexts/AppContext';
+import { useApp } from '../hooks/useApp';
 
 const db = getFirestore(app);
 

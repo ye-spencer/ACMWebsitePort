@@ -5,7 +5,7 @@ import { createUserWithEmailAndPassword,
          sendPasswordResetEmail,
          signInWithEmailAndPassword } from "firebase/auth";
 import { collection, doc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
-import { useApp } from '../contexts/AppContext';
+import { useApp } from '../hooks/useApp';
 
 const LoginPage: React.FC = () => {
   const { user, navigateTo, error } = useApp();

@@ -3,7 +3,7 @@ import '../styles/ProfilePage.css';
 import { auth } from '../firebase/config';
 import { EmailAuthProvider, updatePassword, deleteUser, signOut, reauthenticateWithCredential } from "firebase/auth";
 import { collection, doc, getFirestore, getDoc, getDocs, query, where, deleteDoc, updateDoc } from "firebase/firestore";
-import { useApp } from '../contexts/AppContext';
+import { useApp } from '../hooks/useApp';
 import UserInfoContainer from '../components/profile/UserInfoContainer';
 import EventsContainer from '../components/profile/EventsContainer';
 import PasswordModal from '../components/profile/PasswordModal';

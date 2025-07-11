@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, query, collection, where, Timestamp, orderBy, getDocs, updateDoc, doc, arrayUnion, getDoc } from 'firebase/firestore';
 import '../styles/EventsPage.css';
-import { useApp } from '../contexts/AppContext';
+import { useApp } from '../hooks/useApp';
 
 interface Event {
   id: string;

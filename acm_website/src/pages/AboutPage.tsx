@@ -3,7 +3,7 @@ import { leadershipData } from '../data/leadership';
 import { alumniData } from '../data/alumni';
 import { FaInstagram, FaEnvelope, FaCalendar } from 'react-icons/fa';
 import FlipCard from '../components/FlipCard';
-import { useApp } from '../contexts/AppContext';
+import { useApp } from '../hooks/useApp';
 import '../styles/AboutPage.css';
 
 const AboutPage: React.FC = () => {

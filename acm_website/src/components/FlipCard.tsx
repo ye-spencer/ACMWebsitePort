@@ -1,17 +1,10 @@
 import React, { useState } from 'react';
 import placeholderImage from '../assets/depositphotos_104564156-stock-illustration-male-user-icon.jpg';
 import '../styles/FlipCard.css';
-
-interface MemberData {
-  name: string;
-  role: string;
-  bio: string;
-  linkedin: string;
-  imagePath?: string;
-}
+import { PersonData } from '../types';
 
 interface FlipCardProps {
-  data: MemberData[];
+  data: PersonData[];
   className?: string;
 }
 

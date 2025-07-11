@@ -9,35 +9,16 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { collection, doc, getFirestore, getDocs, query, where, updateDoc, addDoc, Timestamp, orderBy, arrayUnion } from "firebase/firestore";
 import * as XLSX from 'xlsx';
 import { deleteUser } from '../api';
+import { PageProps, EventSummary, Member, SpreadsheetRow, EventAttendee } from '../types';
 
-interface AdminPageProps {
-  navigateTo: (page: string, errorMessage?: string) => void;
-  error?: string;
-}
-
-interface Event {
-  id: string;
-  name: string;
-  date: Date;
-  attendees?: { uid: string; email: string }[];
-}
-
-interface Member {
-  uid: string;
-  email: string;
-  eventsAttended: number;
-}
-
-interface SpreadsheetRow {
-  Email?: string;
-  email?: string;
-  [key: string]: unknown;
+interface AdminPageProps extends PageProps {
+  // Extends the common page props
 }
 
 const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [members, setMembers] = useState<Member[]>([]);
-  const [pastEvents, setPastEvents] = useState<Event[]>([]);
+  const [pastEvents, setPastEvents] = useState<EventSummary[]>([]);
   
   // Event form state
   const [eventTitle, setEventTitle] = useState<string>('');
@@ -77,12 +58,12 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
         // Fetch past events
         const eventsQuery = query(collection(db, "events"), where("end", "<", Timestamp.now()), orderBy("start", "desc"));
         const eventsSnapshot = await getDocs(eventsQuery);
-        const events: Event[] = eventsSnapshot.docs
+        const events: EventSummary[] = eventsSnapshot.docs
           .map(doc => {
             const data = doc.data();
             return {
               id: doc.id,
-              name: data.name,
+              title: data.name,
               date: data.start.toDate(),
             };
           });
@@ -204,7 +185,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
           }
 
           // get attendee list
-          const attendees: { uid: string; email: string }[] = [];
+          const attendees: EventAttendee[] = [];
           const updatePromises = usersSnapshot.docs.map(async (userDoc) => {
             const userData = userDoc.data();
             attendees.push({
@@ -216,7 +197,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
             return updateDoc(doc(db, "users", userDoc.id), {
               eventsAttended: arrayUnion({
                 eventID: event.id,
-                name: event.name,
+                name: event.title,
                 date: event.date
               })
             });

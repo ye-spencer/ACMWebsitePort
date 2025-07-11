@@ -5,18 +5,12 @@ import CalendarView from '../components/booking/CalendarView';
 import { app, auth } from '../firebase/config';
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, doc, getFirestore, setDoc, Timestamp, query, where, getDocs, getDoc } from "firebase/firestore";
+import { PageProps, TimeSlot } from '../types';
 
 const db = getFirestore(app);
 
-interface BookingPageProps {
-  navigateTo: (page: string, errorMessage?: string) => void;
-  error?: string;
-}
-
-interface TimeSlot {
-  hour: number;
-  minute: number;
-  label: string;
+interface BookingPageProps extends PageProps {
+  // Extends the common page props
 }
 
 const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {

@@ -7,28 +7,10 @@ import UserInfoContainer from '../components/profile/UserInfoContainer';
 import EventsContainer from '../components/profile/EventsContainer';
 import PasswordModal from '../components/profile/PasswordModal';
 import VerifyPasswordModal from '../components/profile/VerifyPasswordModal';
+import { PageProps, Booking, EventSummary, EventAttendance, EventRegistration } from '../types';
 
-interface ProfilePageProps {
-  navigateTo: (page: string, errorMessage?: string) => void;
-  error?: string;
-}
-
-interface Booking {
-  id: string;
-  start: Date;
-  end: Date;
-}
-
-interface Event {
-  id: string;
-  title: string;
-  date: Date;
-}
-
-interface FirestoreEvent {
-  eventID: string;
-  name: string;
-  date: { toDate: () => Date };
+interface ProfilePageProps extends PageProps {
+  // Extends the common page props
 }
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
@@ -41,8 +23,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
   const [passwordError, setPasswordError] = useState<string>('');
   const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
   const [pastBookings, setPastBookings] = useState<Booking[]>([]);
-  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
-  const [pastEvents, setPastEvents] = useState<Event[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<EventSummary[]>([]);
+  const [pastEvents, setPastEvents] = useState<EventSummary[]>([]);
   const [eventsAttended, setEventsAttended] = useState<number>(0);
   const [memberError, setMemberError] = useState<string>('');
   const [memberSuccess, setMemberSuccess] = useState<string>('');
@@ -80,17 +62,17 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
         // get events attended and registered
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          const attended: Event[] = userData.eventsAttended.map((event: FirestoreEvent) => ({
+          const attended: EventSummary[] = userData.eventsAttended?.map((event: EventAttendance) => ({
             id: event.eventID,
             title: event.name,
-            date: event.date.toDate(),
-          }));
+            date: event.date instanceof Date ? event.date : event.date.toDate(),
+          })) || [];
 
-          const registered: Event[] = userData.eventsRegistered.map((event: FirestoreEvent) => ({
+          const registered: EventSummary[] = userData.eventsRegistered?.map((event: EventRegistration) => ({
             id: event.eventID,
-            title: event.name,
-            date: event.date.toDate(),
-          }));
+            title: event.name || event.title || 'Untitled Event',
+            date: event.date instanceof Date ? event.date : event.date.toDate(),
+          })) || [];
 
           setUpcomingEvents(registered.filter(event => event.date > now));
           setPastEvents(attended.filter(event => event.date <= now));

@@ -1,11 +1,6 @@
 import React from 'react';
 import '../../styles/BookingPage.css';
-
-interface TimeSlot {
-  hour: number;
-  minute: number;
-  label: string;
-}
+import { TimeSlot } from '../../types';
 
 interface TimeSelectionProps {
   dates: Date[];

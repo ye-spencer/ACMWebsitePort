@@ -1,14 +1,9 @@
 import React from 'react';
 import '../../styles/AdminPage.css';
-
-interface EventItem {
-  id: string;
-  name: string;
-  date: Date;
-}
+import { EventSummary } from '../../types';
 
 interface AttendanceUploadProps {
-  pastEvents: EventItem[];
+  pastEvents: EventSummary[];
   selectedEvent: string;
   setSelectedEvent: (id: string) => void;
   setAttendanceFile: (f: File | null) => void;
@@ -36,7 +31,7 @@ const AttendanceUpload: React.FC<AttendanceUploadProps> = ({
           <option value="">Select an event...</option>
           {pastEvents.map(event => (
             <option key={event.id} value={event.id}>
-              {event.name} ({event.date.toLocaleDateString()})
+              {event.title} ({event.date.toLocaleDateString()})
             </option>
           ))}
         </select>

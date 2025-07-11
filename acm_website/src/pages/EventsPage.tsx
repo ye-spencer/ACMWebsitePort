@@ -3,20 +3,10 @@ import { getFirestore, query, collection, where, Timestamp, orderBy, getDocs, up
 import '../styles/EventsPage.css';
 import { auth } from '../firebase/config';
 import { onAuthStateChanged } from "firebase/auth";
+import { PageProps, Event } from '../types';
 
-interface EventsPageProps {
-  navigateTo: (page: string, errorMessage?: string) => void;
-  error?: string;
-}
-
-interface Event {
-  id: string;
-  title: string;
-  date: Date;
-  start_time: string;
-  end_time: string;
-  location: string;
-  description: string;
+interface EventsPageProps extends PageProps {
+  // Extends the common page props
 }
 
 const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
@@ -33,9 +23,11 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
     const upcomingEventsSnapshot = await getDocs(upcomingEventsQuery);
     const upcomingEvents: Event[] = upcomingEventsSnapshot.docs.map(doc => {
       const data = doc.data();
+      const eventTitle = data.name || 'Untitled Event';
       return {
         id: doc.id,
-        title: data.name || 'Untitled Event',
+        title: eventTitle,
+        name: eventTitle,
         date: data.start.toDate(),
         start_time: data.start ? data.start.toDate().toLocaleTimeString('en-US', {
           hour: 'numeric',
@@ -59,9 +51,11 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
     const pastEventsSnapshot = await getDocs(pastEventsQuery);
     const pastEvents: Event[] = pastEventsSnapshot.docs.map(doc => {
       const data = doc.data();
+      const eventTitle = data.name || 'Untitled Event';
       return {
         id: doc.id,
-        title: data.name || 'Untitled Event',
+        title: eventTitle,
+        name: eventTitle,
         date: data.start.toDate(),
         start_time: data.start ? data.start.toDate().toLocaleTimeString('en-US', {
           hour: 'numeric',

@@ -50,7 +50,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
   const [currentPassword, setCurrentPassword] = useState<string>('');
 
   useEffect(() => {
-    onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setEmail(user.email || '');
         const db = getFirestore();
@@ -100,6 +100,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
         navigateTo('login', 'Please log in to access your profile');
       }
     });
+    return unsubscribe;
   }, [navigateTo]);
 
   const handleVerifyPassword = async () => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/LoginPage.css'; // Import the CSS file for styling
 import { auth } from '../firebase/config';
 import { createUserWithEmailAndPassword,
@@ -22,15 +22,18 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
     setUserCredentials({...userCredentials, [e.target.name]: e.target.value});
   };
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      if (error?.includes('booking')) {
-        navigateTo('booking');
-      } else {
-        navigateTo('home');
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        if (error?.includes('booking')) {
+          navigateTo('booking');
+        } else {
+          navigateTo('home');
+        }
       }
-    }
-  });
+    });
+    return unsubscribe;
+  }, [navigateTo, error]);
 
   function handleSignup(e: React.FormEvent) {
     e.preventDefault();

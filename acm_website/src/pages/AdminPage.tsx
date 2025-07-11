@@ -54,7 +54,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
   const [attendanceFile, setAttendanceFile] = useState<File | null>(null);
 
   useEffect(() => {
-    onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         // check if user is admin
         if (user.email !== "jhuacmweb@gmail.com") {
@@ -91,6 +91,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
         navigateTo('login', 'Please log in to access the admin page');
       }
     });
+    return unsubscribe;
   }, [navigateTo]);
 
   const handleCreateEvent = async (e: React.FormEvent) => {

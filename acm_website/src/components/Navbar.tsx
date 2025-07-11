@@ -14,10 +14,11 @@ const Navbar: React.FC<NavbarProps> = ({ navigateTo }) => {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsLoggedIn(!!user);
       setIsAdmin(user?.email === "jhuacmweb@gmail.com");
     });
+    return unsubscribe;
   }, []);
 
   return (

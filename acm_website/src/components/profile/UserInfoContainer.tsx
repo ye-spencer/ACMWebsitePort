@@ -28,7 +28,7 @@ const UserInfoContainer: React.FC<UserInfoProps> = ({
   onChangePassword,
 }) => {
   return (
-    <div className="profile-section">
+    <div className="page-section">
       <h2 className="section-title">Profile Information</h2>
       
       <div className="profile-info-sections">

@@ -1,5 +1,4 @@
 import React from 'react';
-import '../../styles/BookingPage.css';
 import { TimeSlot } from '../../types';
 
 interface TimeSelectionProps {

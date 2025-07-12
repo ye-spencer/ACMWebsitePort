@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../styles/Pages.css';
 import '../styles/ProfilePage.css';
 import { auth } from '../firebase/config';
 import { EmailAuthProvider, updatePassword, deleteUser, signOut, reauthenticateWithCredential } from "firebase/auth";
@@ -253,8 +254,8 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="profile-page page-container">
-      <div className="profile-layout">
+    <div className="page profile-page">
+      <div className="page-layout">
         {error && <div className="error-message">{error}</div>}
 
         <UserInfoContainer
@@ -278,7 +279,7 @@ const ProfilePage: React.FC = () => {
           upcomingItems={upcomingBookings}
           pastItems={pastBookings}
           renderUpcomingItem={(booking) => (
-            <div className="booking-item upcoming" key={booking.id}>
+            <div className="profile-booking-item upcoming" key={booking.id}>
               <span>
                 {formatDate(booking.start)} • {formatTime(booking.start)} - {formatTime(booking.end)}
               </span>
@@ -288,7 +289,7 @@ const ProfilePage: React.FC = () => {
             </div>
           )}
           renderPastItem={(booking) => (
-            <div className="booking-item" key={booking.id}>
+            <div className="profile-booking-item" key={booking.id}>
               {formatDate(booking.start)} • {formatTime(booking.start)} - {formatTime(booking.end)}
             </div>
           )}
@@ -301,17 +302,17 @@ const ProfilePage: React.FC = () => {
           upcomingItems={upcomingEvents}
           pastItems={pastEvents}
           renderUpcomingItem={(event, index) => (
-            <div className="event-item" key={`${event.id}-${index}`}>
-              <h4 className="event-title">{event.name}</h4>
-              <p className="event-date">
+            <div className="profile-event-item" key={`${event.id}-${index}`}>
+              <h4 className="profile-event-title">{event.name}</h4>
+              <p className="profile-event-date">
                 {formatDate(event.date)} • {formatTime(event.date)}
               </p>
             </div>
           )}
           renderPastItem={(event, index) => (
-            <div className="event-item" key={`${event.id}-${index}`}>
-              <h4 className="event-title">{event.name}</h4>
-              <p className="event-date">
+            <div className="profile-event-item" key={`${event.id}-${index}`}>
+              <h4 className="profile-event-title">{event.name}</h4>
+              <p className="profile-event-date">
                 {formatDate(event.date)} • {formatTime(event.date)}
               </p>
             </div>

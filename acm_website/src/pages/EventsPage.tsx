@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, query, collection, where, Timestamp, orderBy, getDocs, updateDoc, doc, arrayUnion, getDoc } from 'firebase/firestore';
+import '../styles/Pages.css';
 import '../styles/EventsPage.css';
 import { useApp } from '../hooks/useApp';
 import { eventCategories } from "../components/admin/CreateEvent.tsx";
@@ -131,8 +132,8 @@ const EventsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="events-page">
-        <div className="events-layout">
+      <div className="page events-page">
+        <div className="page-layout">
           <div className="loading-container">
             <div className="loading-spinner"></div>
             <div className="loading-text">Loading Events</div>
@@ -144,8 +145,8 @@ const EventsPage: React.FC = () => {
   }
 
   return (
-    <div className="events-page">
-      <div className="events-layout">
+    <div className="page events-page">
+      <div className="page-layout">
         {/* Page Header */}
         <div className="page-header">
           <h1 className="page-title">Events</h1>
@@ -153,13 +154,13 @@ const EventsPage: React.FC = () => {
         </div>
 
         {error && (
-          <div className="events-section error-section">
+          <div className="page-section error-section">
             <div className="error-message">{error}</div>
           </div>
         )}
 
         {/* Upcoming Events Section */}
-        <div className="events-section">
+        <div className="page-section">
           <h2 className="section-title">Upcoming Events</h2>
           <div className="filter-container">
             <div className="filter">
@@ -216,7 +217,7 @@ const EventsPage: React.FC = () => {
         </div>
 
         {/* Past Events Section */}
-        <div className="events-section">
+        <div className="page-section">
           <h2 className="section-title">Past Events</h2>
           <div className="filter-container">
             <div className="filter">

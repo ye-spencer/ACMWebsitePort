@@ -1,74 +1,7 @@
-/* Profile Page Styles */
-
+/* Profile Page Specific Styles */
 .profile-page {
-  min-height: 100vh;
-  padding: 2rem;
-  position: relative;
-  background: linear-gradient(135deg, rgba(0, 51, 102, 0.05), rgba(0, 85, 165, 0.05));
-}
-
-.profile-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
   min-width: 40vw;
-  max-width: 80vw;
-  width: 100%;
-  margin: 0 auto;
-  animation: fadeInUp 0.6s ease-out;
-  box-sizing: border-box;
-}
-
-.profile-section {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  flex-shrink: 0;
-  box-sizing: border-box;
-}
-
-.profile-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #003366, #0055a5, #003366);
-  background-size: 200% 100%;
-  animation: gradientShift 3s ease-in-out infinite;
-}
-
-.profile-section:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-}
-
-.section-title {
-  margin-bottom: 1.5rem;
-  color: #1a1a1a;
-  font-size: 1.5rem;
-  font-weight: 600;
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid #e2e8f0;
-  position: relative;
-}
-
-.section-title::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 60px;
-  height: 2px;
-  background: linear-gradient(90deg, #003366, #0055a5);
+  max-width: 40vw;
 }
 
 .section-title-small {
@@ -329,8 +262,8 @@
   transform: scale(1.1);
 }
 
-.booking-item,
-.event-item {
+.profile-booking-item,
+.profile-event-item {
   padding: 1rem;
   background: rgba(248, 250, 252, 0.8);
   border-radius: 12px;
@@ -341,14 +274,14 @@
   animation: slideInLeft 0.4s ease-out;
 }
 
-.booking-item:hover,
-.event-item:hover {
+.profile-booking-item:hover,
+.profile-event-item:hover {
   background: rgba(0, 85, 165, 0.05);
   border-color: rgba(0, 85, 165, 0.2);
   transform: translateX(5px);
 }
 
-.booking-item.upcoming {
+.profile-booking-item.upcoming {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -356,14 +289,14 @@
   border-color: rgba(0, 85, 165, 0.3);
 }
 
-.event-title {
+.profile-event-title {
   margin: 0 0 0.5rem 0;
   color: #1a1a1a;
   font-weight: 600;
   font-size: 1rem;
 }
 
-.event-date {
+.profile-event-date {
   margin: 0;
   color: #6b7280;
   font-size: 0.875rem;
@@ -491,92 +424,8 @@
   font-style: italic;
 }
 
-.error-message {
-  background: linear-gradient(135deg, #fee2e2, #fecaca);
-  border: 1px solid #f87171;
-  color: #dc2626;
-  padding: 1rem;
-  border-radius: 12px;
-  margin-bottom: 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  animation: slideInDown 0.4s ease-out;
-  box-shadow: 0 4px 10px rgba(220, 38, 38, 0.1);
-}
-
-/* Animations */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideInScale {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes gradientShift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
-  .profile-page {
-    padding: 1rem;
-  }
-  
-  .profile-section {
-    padding: 1.5rem;
-  }
-  
   .profile-info-sections {
     gap: 1rem;
   }
@@ -595,11 +444,7 @@
     gap: 0.75rem;
   }
   
-
-  
-
-  
-  .booking-item.upcoming {
+  .profile-booking-item.upcoming {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
@@ -609,22 +454,12 @@
     padding: 1.5rem;
     width: 350px;
   }
-  
-
 }
 
 @media (max-width: 480px) {
-  .profile-page {
-    padding: 0.5rem;
-  }
-  
   .profile-section {
     padding: 1rem;
     border-radius: 16px;
-  }
-  
-  .section-title {
-    font-size: 1.25rem;
   }
   
   .info-card {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../styles/Pages.css';
 import '../styles/AdminPage.css';
 import CreateEvent from '../components/admin/CreateEvent';
 import Members from '../components/admin/Members';
@@ -265,15 +266,15 @@ const AdminPage: React.FC = () => {
   }
 
   return (
-    <div className="admin-page">
-      <div className="admin-layout">
+    <div className="page">
+      <div className="page-layout">
         <div className="page-header">
           <h1 className="page-title">Admin Dashboard</h1>
           <p className="page-subtitle">Manage events, members, and attendance</p>
         </div>
 
         {error && (
-          <div className="admin-section error-section">
+          <div className="page-section error-section">
             <div className="error-message">
               {error}
             </div>
@@ -281,7 +282,7 @@ const AdminPage: React.FC = () => {
         )}
 
         {/* Create Event Section */}
-        <div className="admin-section">
+        <div className="page-section">
           <CreateEvent
             eventCategory={eventCategory}
             setEventCategory={setEventCategory}
@@ -306,7 +307,7 @@ const AdminPage: React.FC = () => {
         </div>
 
         {/* Members Section */}
-        <div className="admin-section">
+        <div className="page-section">
           <Members
             members={members}
             handleRemoveMember={handleRemoveMember}
@@ -314,7 +315,7 @@ const AdminPage: React.FC = () => {
         </div>
 
         {/* Attendance Upload Section */}
-        <div className="admin-section">
+        <div className="page-section">
           <AttendanceUpload
             pastEvents={pastEvents}
             selectedEvent={selectedEvent}
@@ -325,7 +326,7 @@ const AdminPage: React.FC = () => {
         </div>
 
         {/* Account Section */}
-        <div className="admin-section">
+        <div className="page-section">
           <Account handleLogout={handleLogout} />
         </div>
       </div>

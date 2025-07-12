@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../styles/Pages.css';
 import '../styles/LoginPage.css'; // Import the CSS file for styling
 import { auth } from '../firebase/config';
 import { createUserWithEmailAndPassword,

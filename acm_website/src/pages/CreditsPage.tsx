@@ -3,14 +3,15 @@ import { contributorsData } from '../data/contributors';
 import { FaEnvelope } from 'react-icons/fa';
 import FlipCard from '../components/FlipCard';
 import { useApp } from '../hooks/useApp';
+import '../styles/Pages.css';
 import '../styles/CreditsPage.css';
 
 const CreditsPage: React.FC = () => {
   const { error } = useApp();
 
   return (
-    <div className="credits-page">
-      <div className="credits-layout">
+    <div className="page">
+      <div className="page-layout">
         {/* Page Header */}
         <div className="page-header">
           <h1 className="page-title">Credits</h1>
@@ -18,13 +19,13 @@ const CreditsPage: React.FC = () => {
         </div>
 
         {error && (
-          <div className="credits-section error-section">
+          <div className="page-section error-section">
             <div className="error-message">{error}</div>
           </div>
         )}
 
         {/* Contributors Section - Full Width, First */}
-        <div className="credits-section contributors-section">
+        <div className="page-section contributors-section">
           <h2 className="section-title">Contributors</h2>
           <FlipCard data={contributorsData} />
         </div>

@@ -3,12 +3,9 @@ import '../styles/Pages.css';
 import '../styles/BookingPage.css';
 import TimeSelection from '../components/booking/TimeSelection';
 import CalendarView from '../components/booking/CalendarView';
-import { app } from '../firebase/config';
-import { collection, doc, getFirestore, setDoc, Timestamp, query, where, getDocs, getDoc } from "firebase/firestore";
 import { TimeSlot } from '../types';
 import { useApp } from '../hooks/useApp';
-
-const db = getFirestore(app);
+import { getUserData, getWeekBookings, createBooking } from '../api';
 
 const BookingPage: React.FC = () => {
   const { user, navigateTo, error, authLoading } = useApp();
@@ -39,10 +36,11 @@ const BookingPage: React.FC = () => {
 
     if (user) {
       const fetchUserMembership = async () => {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-          setIsMember(userDoc.data().isMember || false);
-        } else {
+        try {
+          const userData = await getUserData(user.uid);
+          setIsMember(userData.isMember || false);
+        } catch (error) {
+          console.error('Error fetching user membership:', error);
           setIsMember(false);
         }
       };
@@ -88,14 +86,19 @@ const BookingPage: React.FC = () => {
 
   useEffect(() => {
     // get bookings for the current week
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const q = query(collection(db, "bookings"), 
-      where("start", ">=", Timestamp.fromDate(today)), 
-      where("start", "<=", Timestamp.fromDate(new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000))));
-    getDocs(q).then((querySnapshot) => {
-      setWeek(querySnapshot.docs.map((doc) => [doc.data().start.toDate(), doc.data().end.toDate()]));
-    });
+    const fetchWeekBookings = async () => {
+      try {
+        const bookings = await getWeekBookings();
+        const weekBookings = bookings.map((booking: any) => [
+          new Date(booking.start),
+          new Date(booking.end)
+        ]);
+        setWeek(weekBookings);
+      } catch (error) {
+        console.error('Error fetching week bookings:', error);
+      }
+    };
+    fetchWeekBookings();
   }, []);
 
   const formatDate = (date: Date): string => {
@@ -151,27 +154,6 @@ const BookingPage: React.FC = () => {
       return false;
     }
 
-    // Check if user already has a booking on this day
-    if (user) {
-      const startOfDay = new Date(startTime);
-      startOfDay.setHours(0, 0, 0, 0);
-      const endOfDay = new Date(startTime);
-      endOfDay.setHours(23, 59, 59, 999);
-
-      const q = query(
-        collection(db, "bookings"),
-        where("UID", "==", user.uid),
-        where("start", ">=", Timestamp.fromDate(startOfDay)),
-        where("start", "<=", Timestamp.fromDate(endOfDay))
-      );
-
-      const querySnapshot = await getDocs(q);
-      if (!querySnapshot.empty) {
-        setBookingError('You already have a booking on this day');
-        return false;
-      }
-    }
-
     // Check if any part of the requested time slot is already booked
     const checkTime = new Date(startTime);
     while (checkTime < endTime) {
@@ -212,17 +194,25 @@ const BookingPage: React.FC = () => {
         return;
       }
 
-      // add booking to database
-      await setDoc(doc(db, "bookings", user.uid + startTime.toDateString()), {
-        UID: user.uid,
-        start: Timestamp.fromDate(startTime),
-        end: Timestamp.fromDate(endTime)
-      });
+      // Create booking via API
+      await createBooking(user.uid, startTime.toISOString(), endTime.toISOString());
 
       setBookingSuccess('Room successfully booked!');
+      
+      // Refresh week bookings
+      const bookings = await getWeekBookings();
+      const weekBookings = bookings.map((booking: any) => [
+        new Date(booking.start),
+        new Date(booking.end)
+      ]);
+      setWeek(weekBookings);
     } catch (error) {
       console.error('Error booking:', error);
-      setBookingError('Failed to create booking. Please try again.');
+      if (error instanceof Error) {
+        setBookingError(error.message);
+      } else {
+        setBookingError('Failed to create booking. Please try again.');
+      }
     }
   };
 

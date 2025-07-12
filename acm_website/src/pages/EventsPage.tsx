@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, query, collection, where, Timestamp, orderBy, getDocs, updateDoc, doc, arrayUnion, getDoc } from 'firebase/firestore';
 import '../styles/Pages.css';
 import '../styles/EventsPage.css';
 import { useApp } from '../hooks/useApp';
 import { eventCategories } from "../components/admin/CreateEvent.tsx";
 import { Event, UserEventRecord } from '../types';
+import { getUpcomingEvents, getPastEvents, rsvpForEvent, getUserData } from '../api';
 
 const EventsPage: React.FC = () => {
   const { user, isLoggedIn, navigateTo, error } = useApp();
@@ -15,69 +15,28 @@ const EventsPage: React.FC = () => {
   const [selectedUpcomingCategory, setSelectedUpcomingCategory] = useState<string>('All');
   const [selectedPastCategory, setSelectedPastCategory] = useState<string>('All');
 
-  const db = getFirestore();
-  
   const fetchUpcomingEvents = async () => {
-    const upcomingEventsQuery = query(collection(db, "events"), where("start", ">=", Timestamp.now()), orderBy("start", "desc"));
-    const upcomingEventsSnapshot = await getDocs(upcomingEventsQuery);
-    const upcomingEvents: Event[] = upcomingEventsSnapshot.docs.map(doc => {
-      const data = doc.data();
-      const eventTitle = data.name || 'Untitled Event';
-      return {
-        id: doc.id,
-        category: data.category || 'Other',
-        name: eventTitle,
-        date: data.start.toDate(),
-        start_time: data.start ? data.start.toDate().toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }) : 'TBD',
-        end_time: data.end ? data.end.toDate().toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }) : 'TBD',
-        location: data.location || 'TBD',
-        description: data.description || '',
-      };
-    });
-    setUpcomingEvents(upcomingEvents);
-  }
+    try {
+      const events = await getUpcomingEvents();
+      setUpcomingEvents(events);
+    } catch (error) {
+      console.error('Error fetching upcoming events:', error);
+    }
+  };
 
   const fetchPastEvents = async () => {
-    const pastEventsQuery = query(collection(db, "events"), where("start", "<", Timestamp.now()), orderBy("start", "desc"));
-    const pastEventsSnapshot = await getDocs(pastEventsQuery);
-    const pastEvents: Event[] = pastEventsSnapshot.docs.map(doc => {
-      const data = doc.data();
-      const eventTitle = data.name || 'Untitled Event';
-      return {
-        id: doc.id,
-        category: data.category || 'Other',
-        name: eventTitle,
-        date: data.start.toDate(),
-        start_time: data.start ? data.start.toDate().toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }) : 'TBD',
-        end_time: data.end ? data.end.toDate().toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }) : 'TBD',
-        location: data.location || 'TBD',
-        description: data.description || '',
-      };
-    });
-    setPastEvents(pastEvents);
-  }
+    try {
+      const events = await getPastEvents();
+      setPastEvents(events);
+    } catch (error) {
+      console.error('Error fetching past events:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        await fetchUpcomingEvents();
-        await fetchPastEvents();
+        await Promise.all([fetchUpcomingEvents(), fetchPastEvents()]);
       } catch (error) {
         console.error('Error fetching events:', error);
       } finally {
@@ -86,25 +45,26 @@ const EventsPage: React.FC = () => {
     };
 
     fetchEvents();
-  }, [db]);
+  }, []);
 
   useEffect(() => {
     if (user) {
       const fetchUserRegistrations = async () => {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
+        try {
+          const userData = await getUserData(user.uid);
           const registered: Event[] = userData.eventsRegistered.map((event: UserEventRecord) => ({
             id: event.eventID,
           }));
           setRegisteredEvents(registered);
+        } catch (error) {
+          console.error('Error fetching user registrations:', error);
         }
       };
       fetchUserRegistrations();
     } else {
       setRegisteredEvents([]);
     }
-  }, [user, db]);
+  }, [user]);
 
   const handleRSVP = async (eventID: string) => {
     if (!isLoggedIn) {
@@ -112,14 +72,17 @@ const EventsPage: React.FC = () => {
       return;
     }
     try {
-      const event = upcomingEvents.find(e => e.id === eventID);
-      await updateDoc(doc(db, 'events', eventID), {
-        registered: arrayUnion({ uid: user?.uid, email: user?.email })
-      });
-      if (!user?.uid) throw new Error('User ID not found');
-      await updateDoc(doc(db, 'users', user.uid), {
-        eventsRegistered: arrayUnion({ date: event?.date, eventID: event?.id, name: event?.name })
-      });
+      if (!user?.uid || !user?.email) throw new Error('User ID or email not found');
+      
+      await rsvpForEvent(eventID, user.uid, user.email);
+      
+      // Refresh user registrations
+      const userData = await getUserData(user.uid);
+      const registered: Event[] = userData.eventsRegistered.map((event: UserEventRecord) => ({
+        id: event.eventID,
+      }));
+      setRegisteredEvents(registered);
+      
       alert('Successfully registered for the event!');
     } catch (error) {
       alert('Error registering for event.');

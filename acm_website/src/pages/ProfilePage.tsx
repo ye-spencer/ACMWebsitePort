@@ -3,13 +3,13 @@ import '../styles/Pages.css';
 import '../styles/ProfilePage.css';
 import { auth } from '../firebase/config';
 import { EmailAuthProvider, updatePassword, deleteUser, signOut, reauthenticateWithCredential } from "firebase/auth";
-import { collection, doc, getFirestore, getDoc, getDocs, query, where, deleteDoc, updateDoc } from "firebase/firestore";
 import { useApp } from '../hooks/useApp';
 import UserInfoContainer from '../components/profile/UserInfoContainer';
 import EventsContainer from '../components/profile/EventsContainer';
 import PasswordModal from '../components/profile/PasswordModal';
 import VerifyPasswordModal from '../components/profile/VerifyPasswordModal';
 import { Booking, EventSummary, UserEventRecord } from '../types';
+import { getUserData, updateUser, getUserBookings, deleteBooking } from '../api';
 
 type ProfileSection = 'profile' | 'bookings' | 'events';
 
@@ -41,49 +41,46 @@ const ProfilePage: React.FC = () => {
 
     if (user) {
       const loadUserData = async () => {
-        setEmail(user.email || '');
-        const db = getFirestore();
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
+        try {
+          setEmail(user.email || '');
+          
+          // Get user data from API
+          const userData = await getUserData(user.uid);
           setIsMember(userData.isMember || false);
           setIsOnMailingList(userData.isOnMailingList || false);
-        }
 
-        // get bookings
-        const bookingsQuery = query(
-          collection(db, "bookings"),
-          where("UID", "==", user.uid)
-        );
-        const bookingsSnapshot = await getDocs(bookingsQuery);
-        const now = new Date();
-        const bookings: Booking[] = bookingsSnapshot.docs.map(doc => ({
-          id: doc.id,
-          start: doc.data().start.toDate(),
-          end: doc.data().end.toDate()
-        }));
+          // Get bookings from API
+          const bookings = await getUserBookings(user.uid);
+          const now = new Date();
+          
+          // Convert booking dates from strings to Date objects
+          const processedBookings: Booking[] = bookings.map((booking: any) => ({
+            ...booking,
+            start: new Date(booking.start),
+            end: new Date(booking.end)
+          }));
+          
+          setUpcomingBookings(processedBookings.filter(booking => booking.start > now));
+          setPastBookings(processedBookings.filter(booking => booking.start <= now));
 
-        setUpcomingBookings(bookings.filter(booking => booking.start > now));
-        setPastBookings(bookings.filter(booking => booking.start <= now));
-
-        // get events attended and registered
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          const attended: EventSummary[] = userData.eventsAttended?.map((event: UserEventRecord) => ({
+          // Process events attended and registered
+          const attended: EventSummary[] = userData.eventsAttended?.map((event: any) => ({
             id: event.eventID,
             name: event.name,
-            date: event.date instanceof Date ? event.date : event.date.toDate(),
+            date: new Date(event.date),
           })) || [];
 
-          const registered: EventSummary[] = userData.eventsRegistered?.map((event: UserEventRecord) => ({
+          const registered: EventSummary[] = userData.eventsRegistered?.map((event: any) => ({
             id: event.eventID,
             name: event.name,
-            date: event.date instanceof Date ? event.date : event.date.toDate(),
+            date: new Date(event.date),
           })) || [];
 
           setUpcomingEvents(registered.filter(event => event.date > now));
           setPastEvents(attended.filter(event => event.date <= now));
           setEventsAttended(attended.length);
+        } catch (error) {
+          console.error('Error loading user data:', error);
         }
       };
       
@@ -145,13 +142,13 @@ const ProfilePage: React.FC = () => {
       try {
         const user = auth.currentUser;
         if (user) {
-          const db = getFirestore();
-          // update user in database
-          await updateDoc(doc(db, "users", user.uid), {
+          // Update user in database via API
+          await updateUser(user.uid, {
             deleted: true,
-            deletedAt: new Date()
+            deletedAt: new Date().toISOString()
           });
-          // delete user credentials
+          
+          // Delete user credentials
           await deleteUser(user);
           navigateTo('home');
         }
@@ -174,10 +171,7 @@ const ProfilePage: React.FC = () => {
     try {
       const user = auth.currentUser;
       if (user) {
-        const db = getFirestore();
-        await updateDoc(doc(db, "users", user.uid), {
-          isOnMailingList: true,
-        });
+        await updateUser(user.uid, { isOnMailingList: true });
         setIsOnMailingList(true);
       }
     } catch (error) {
@@ -189,10 +183,7 @@ const ProfilePage: React.FC = () => {
     try {
       const user = auth.currentUser;
       if (user) {
-        const db = getFirestore();
-        await updateDoc(doc(db, "users", user.uid), {
-          isOnMailingList: false,
-        });
+        await updateUser(user.uid, { isOnMailingList: false });
         setIsOnMailingList(false);
       }
     } catch (error) {
@@ -214,8 +205,7 @@ const ProfilePage: React.FC = () => {
     try {
       const user = auth.currentUser;
       if (user) {
-        const db = getFirestore();
-        await updateDoc(doc(db, 'users', user.uid), { isMember: true });
+        await updateUser(user.uid, { isMember: true });
         setIsMember(true);
         setMemberSuccess('You are now a member!');
       }
@@ -246,8 +236,7 @@ const ProfilePage: React.FC = () => {
   const handleDeleteBooking = async (bookingId: string) => {
     if (window.confirm('Are you sure you want to cancel this booking?')) {
       try {
-        const db = getFirestore();
-        await deleteDoc(doc(db, "bookings", bookingId));
+        await deleteBooking(bookingId);
         setUpcomingBookings(prev => prev.filter(booking => booking.id !== bookingId));
       } catch (error) {
         console.error('Error deleting booking:', error);

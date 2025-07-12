@@ -20,7 +20,7 @@ function EventsContainer<T>({
   renderPastItem,
 }: EventsContainerProps<T>) {
   return (
-    <div className="page-section">
+    <div className="page-section profile-section">
       <h2 className="section-title">{title}</h2>
       <div className="section-block">
         <h3 className="section-subtitle">{upcomingTitle}</h3>

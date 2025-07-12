@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../styles/Pages.css';
 import '../styles/ProfilePage.css';
 import { auth } from '../firebase/config';
 import { EmailAuthProvider, updatePassword, deleteUser, signOut, reauthenticateWithCredential } from "firebase/auth";
@@ -10,9 +11,11 @@ import PasswordModal from '../components/profile/PasswordModal';
 import VerifyPasswordModal from '../components/profile/VerifyPasswordModal';
 import { Booking, EventSummary, UserEventRecord } from '../types';
 
+type ProfileSection = 'profile' | 'bookings' | 'events';
 
 const ProfilePage: React.FC = () => {
   const { user, navigateTo, error, authLoading } = useApp();
+  const [activeSection, setActiveSection] = useState<ProfileSection>('profile');
   const [email, setEmail] = useState<string>('');
   const [isMember, setIsMember] = useState<boolean>(false);
   const [isOnMailingList, setIsOnMailingList] = useState<boolean>(false);
@@ -252,71 +255,129 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'profile':
+        return (
+          <UserInfoContainer
+            email={email}
+            isMember={isMember}
+            isOnMailingList={isOnMailingList}
+            memberError={memberError}
+            memberSuccess={memberSuccess}
+            onBecomeMember={handleBecomeMember}
+            onJoinMailingList={handleJoinMailingList}
+            onUnsubscribeMailingList={handleUnsubscribeMailingList}
+            onLogout={handleLogout}
+            onDeleteAccount={handleDeleteAccount}
+            onChangePassword={() => setShowVerifyModal(true)}
+          />
+        );
+      case 'bookings':
+        return (
+          <EventsContainer
+            title="Your Bookings"
+            upcomingTitle="Upcoming Bookings"
+            pastTitle="Past Bookings"
+            upcomingItems={upcomingBookings}
+            pastItems={pastBookings}
+            renderUpcomingItem={(booking) => (
+              <div className="profile-booking-item upcoming" key={booking.id}>
+                <span>
+                  {formatDate(booking.start)} • {formatTime(booking.start)} - {formatTime(booking.end)}
+                </span>
+                <button className="delete-icon" onClick={() => handleDeleteBooking(booking.id)}>
+                  ×
+                </button>
+              </div>
+            )}
+            renderPastItem={(booking) => (
+              <div className="profile-booking-item" key={booking.id}>
+                {formatDate(booking.start)} • {formatTime(booking.start)} - {formatTime(booking.end)}
+              </div>
+            )}
+          />
+        );
+      case 'events':
+        return (
+          <EventsContainer
+            title="Your Events"
+            upcomingTitle="Upcoming Events"
+            pastTitle="Past Events"
+            upcomingItems={upcomingEvents}
+            pastItems={pastEvents}
+            renderUpcomingItem={(event, index) => (
+              <div className="profile-event-item" key={`${event.id}-${index}`}>
+                <h4 className="profile-event-title">{event.name}</h4>
+                <p className="profile-event-date">
+                  {formatDate(event.date)} • {formatTime(event.date)}
+                </p>
+              </div>
+            )}
+            renderPastItem={(event, index) => (
+              <div className="profile-event-item" key={`${event.id}-${index}`}>
+                <h4 className="profile-event-title">{event.name}</h4>
+                <p className="profile-event-date">
+                  {formatDate(event.date)} • {formatTime(event.date)}
+                </p>
+              </div>
+            )}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="profile-page page-container">
+    <div className="page profile-page">
       <div className="profile-layout">
         {error && <div className="error-message">{error}</div>}
 
-        <UserInfoContainer
-          email={email}
-          isMember={isMember}
-          isOnMailingList={isOnMailingList}
-          memberError={memberError}
-          memberSuccess={memberSuccess}
-          onBecomeMember={handleBecomeMember}
-          onJoinMailingList={handleJoinMailingList}
-          onUnsubscribeMailingList={handleUnsubscribeMailingList}
-          onLogout={handleLogout}
-          onDeleteAccount={handleDeleteAccount}
-          onChangePassword={() => setShowVerifyModal(true)}
-        />
+        {/* Left Sidebar Navigation */}
+        <div className="profile-sidebar">
+          <div className="sidebar-header">
+            <h2 className="sidebar-title">Profile</h2>
+            <p className="sidebar-subtitle">Manage your account</p>
+          </div>
+          
+          <nav className="sidebar-nav">
+            <button
+              className={`sidebar-nav-item ${activeSection === 'profile' ? 'active' : ''}`}
+              onClick={() => setActiveSection('profile')}
+            >
+              <span className="nav-icon">👤</span>
+              <span className="nav-text">Account</span>
+            </button>
+            
+            <button
+              className={`sidebar-nav-item ${activeSection === 'bookings' ? 'active' : ''}`}
+              onClick={() => setActiveSection('bookings')}
+            >
+              <span className="nav-icon">📅</span>
+              <span className="nav-text">Bookings</span>
+              {upcomingBookings.length > 0 && (
+                <span className="nav-badge">{upcomingBookings.length}</span>
+              )}
+            </button>
+            
+            <button
+              className={`sidebar-nav-item ${activeSection === 'events' ? 'active' : ''}`}
+              onClick={() => setActiveSection('events')}
+            >
+              <span className="nav-icon">🎉</span>
+              <span className="nav-text">Events</span>
+              {upcomingEvents.length > 0 && (
+                <span className="nav-badge">{upcomingEvents.length}</span>
+              )}
+            </button>
+          </nav>
+        </div>
 
-        <EventsContainer
-          title="Your Bookings"
-          upcomingTitle="Upcoming Bookings"
-          pastTitle="Past Bookings"
-          upcomingItems={upcomingBookings}
-          pastItems={pastBookings}
-          renderUpcomingItem={(booking) => (
-            <div className="booking-item upcoming" key={booking.id}>
-              <span>
-                {formatDate(booking.start)} • {formatTime(booking.start)} - {formatTime(booking.end)}
-              </span>
-              <button className="delete-icon" onClick={() => handleDeleteBooking(booking.id)}>
-                ×
-              </button>
-            </div>
-          )}
-          renderPastItem={(booking) => (
-            <div className="booking-item" key={booking.id}>
-              {formatDate(booking.start)} • {formatTime(booking.start)} - {formatTime(booking.end)}
-            </div>
-          )}
-        />
-
-        <EventsContainer
-          title="Your Events"
-          upcomingTitle="Upcoming Events"
-          pastTitle="Past Events"
-          upcomingItems={upcomingEvents}
-          pastItems={pastEvents}
-          renderUpcomingItem={(event, index) => (
-            <div className="event-item" key={`${event.id}-${index}`}>
-              <h4 className="event-title">{event.name}</h4>
-              <p className="event-date">
-                {formatDate(event.date)} • {formatTime(event.date)}
-              </p>
-            </div>
-          )}
-          renderPastItem={(event, index) => (
-            <div className="event-item" key={`${event.id}-${index}`}>
-              <h4 className="event-title">{event.name}</h4>
-              <p className="event-date">
-                {formatDate(event.date)} • {formatTime(event.date)}
-              </p>
-            </div>
-          )}
-        />
+        {/* Right Content Area */}
+        <div className="profile-content">
+          {renderContent()}
+        </div>
       </div>
 
       <VerifyPasswordModal

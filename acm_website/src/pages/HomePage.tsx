@@ -1,4 +1,5 @@
 import React from 'react';
+import '../styles/Pages.css';
 import '../styles/HomePage.css';
 import { FaCalendarAlt, FaUsers } from 'react-icons/fa';
 import { useApp } from '../hooks/useApp';

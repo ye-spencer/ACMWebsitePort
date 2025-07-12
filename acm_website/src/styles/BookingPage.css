@@ -1,81 +1,4 @@
-/* BookingPage Professional Styles */
-
-.booking-page {
-  min-height: 100vh;
-  padding: 2rem;
-  position: relative;
-  background: linear-gradient(135deg, rgba(0, 51, 102, 0.05), rgba(0, 85, 165, 0.05));
-}
-
-.booking-layout {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  max-width: 1400px;
-  width: 100%;
-  margin: 0 auto;
-  animation: fadeInUp 0.6s ease-out;
-  box-sizing: border-box;
-}
-
-.page-header {
-  text-align: center;
-  margin-bottom: 1rem;
-  animation: slideInDown 0.8s ease-out;
-}
-
-.page-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: white;
-  margin-bottom: 0.5rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.page-subtitle {
-  font-size: 1.125rem;
-  color: #6b7280;
-  font-weight: 400;
-}
-
-.booking-section {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  animation: slideInScale 0.6s ease-out;
-}
-
-.booking-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #003366, #0055a5, #003366);
-  background-size: 200% 100%;
-  animation: gradientShift 3s ease-in-out infinite;
-}
-
-.booking-section:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-}
-
-.error-section {
-  border-left: 4px solid #dc3545;
-  background: rgba(248, 215, 218, 0.9);
-}
-
-.error-section::before {
-  background: #dc3545;
-}
+/* BookingPage Specific Styles */
 
 .booking-content {
   display: grid;
@@ -90,26 +13,6 @@
 
 .calendar-section {
   min-height: 500px;
-}
-
-.section-title {
-  margin-bottom: 1.5rem;
-  color: #1a1a1a;
-  font-size: 1.5rem;
-  font-weight: 600;
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid #e2e8f0;
-  position: relative;
-}
-
-.section-title::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 60px;
-  height: 2px;
-  background: linear-gradient(90deg, #003366, #0055a5);
 }
 
 /* Time Selection Styles */
@@ -410,66 +313,6 @@
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
-.error-message {
-  color: #dc3545;
-  background: rgba(248, 215, 218, 0.9);
-  border: 1px solid rgba(220, 53, 69, 0.2);
-  padding: 1rem;
-  border-radius: 12px;
-  font-weight: 500;
-  animation: slideInLeft 0.4s ease-out;
-}
-
-/* Animations */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInScale {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes gradientShift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
 @keyframes shimmer {
   0% { left: -100%; }
   100% { left: 100%; }
@@ -492,21 +335,9 @@
   .calendar-section {
     order: -1;
   }
-  
-  .page-title {
-    font-size: 2rem;
-  }
 }
 
 @media (max-width: 768px) {
-  .booking-page {
-    padding: 1rem;
-  }
-  
-  .booking-section {
-    padding: 1.5rem;
-  }
-  
   .time-selects {
     grid-template-columns: 1fr;
   }
@@ -533,10 +364,6 @@
     font-size: 0.625rem;
   }
   
-  .page-title {
-    font-size: 1.75rem;
-  }
-  
   .booking-btn {
     padding: 0.875rem 1.5rem;
     font-size: 1rem;
@@ -544,24 +371,8 @@
 }
 
 @media (max-width: 480px) {
-  .booking-layout {
-    gap: 1rem;
-  }
-  
-  .booking-section {
-    padding: 1rem;
-  }
-  
   .calendar-container {
     grid-template-columns: 50px repeat(3, 1fr);
-  }
-  
-  .page-title {
-    font-size: 1.5rem;
-  }
-  
-  .section-title {
-    font-size: 1.25rem;
   }
 }
 

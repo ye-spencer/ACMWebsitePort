@@ -1,5 +1,4 @@
 import React from 'react';
-import '../../styles/BookingPage.css';
 
 interface CalendarViewProps {
   dates: Date[];

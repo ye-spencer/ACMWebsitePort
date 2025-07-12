@@ -4,14 +4,15 @@ import { alumniData } from '../data/alumni';
 import { FaInstagram, FaEnvelope, FaCalendar } from 'react-icons/fa';
 import FlipCard from '../components/FlipCard';
 import { useApp } from '../hooks/useApp';
+import '../styles/Pages.css';
 import '../styles/AboutPage.css';
 
 const AboutPage: React.FC = () => {
   const { navigateTo, error } = useApp();
 
   return (
-    <div className="about-page">
-      <div className="about-layout">
+    <div className="page">
+      <div className="page-layout">
         {/* Page Header */}
         <div className="page-header">
           <h1 className="page-title">About Us</h1>
@@ -19,13 +20,13 @@ const AboutPage: React.FC = () => {
         </div>
 
         {error && (
-          <div className="about-section error-section">
+          <div className="page-section error-section">
             <div className="error-message">{error}</div>
           </div>
         )}
 
         {/* About Content Section */}
-        <div className="about-section">
+        <div className="page-section">
           <h2 className="section-title">Our Mission</h2>
           <div className="about-content">
             <p className="about-description">
@@ -78,13 +79,13 @@ const AboutPage: React.FC = () => {
         </div>
         
         {/* Officers Section */}
-        <div className="about-section">
+        <div className="page-section">
           <h2 className="section-title">Officers</h2>
           <FlipCard data={leadershipData} />
         </div>
         
         {/* Alumni Section */}
-        <div className="about-section">
+        <div className="page-section">
           <h2 className="section-title">Alumni</h2>
           <FlipCard data={alumniData} />
         </div>

@@ -1,4 +1,4 @@
-/* Login Page Styles */
+/* Login Page Specific Styles */
 
 .login-page {
   height: 80vh;
@@ -219,40 +219,6 @@
 .signup-button:disabled:hover {
   transform: none;
   box-shadow: none;
-}
-
-/* Animations */
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-
-
-@keyframes gradientShift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
 }
 
 /* Responsive Design */

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../styles/Pages.css';
 import '../styles/BookingPage.css';
 import TimeSelection from '../components/booking/TimeSelection';
 import CalendarView from '../components/booking/CalendarView';
@@ -247,21 +248,21 @@ const BookingPage: React.FC = () => {
   };
 
   return (
-    <div className="booking-page">
-      <div className="booking-layout">
+    <div className="page">
+      <div className="page-layout">
         <div className="page-header">
           <h1 className="page-title">Room Booking</h1>
           <p className="page-subtitle">Schedule a time to use the ACM Lounge in Malone Hall</p>
         </div>
 
         {error && (
-          <div className="booking-section error-section">
+          <div className="page-section error-section">
             <div className="error-message">{error}</div>
           </div>
         )}
 
         <div className="booking-content">
-          <div className="booking-section time-selection-section">
+          <div className="page-section time-selection-section">
             <TimeSelection
               dates={dates}
               startTime={startTime}
@@ -279,7 +280,7 @@ const BookingPage: React.FC = () => {
             />
           </div>
 
-          <div className="booking-section calendar-section">
+          <div className="page-section calendar-section">
             <CalendarView
               dates={dates}
               isTimeSlotBooked={isTimeSlotBooked}

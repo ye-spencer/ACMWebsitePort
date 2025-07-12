@@ -1,5 +1,15 @@
 import { Timestamp } from 'firebase/firestore';
 
+export interface BaseEvent {
+  name: string;
+  description: string;
+  location: string;
+  category: string;
+  link?: string;
+  attendees?: EventAttendeeRecord[];
+  registered?: EventAttendeeRecord[];
+}
+
 // =========================
 // DATABASE DOCUMENT TYPES
 // =========================
@@ -11,8 +21,8 @@ export interface UserDocument {
   email: string;
   isMember: boolean;
   isOnMailingList: boolean;
-  eventsAttended: EventAttendance[];
-  eventsRegistered: EventRegistration[];
+  eventsAttended: UserEventRecord[];
+  eventsRegistered: UserEventRecord[];
   deleted?: boolean;
   deletedAt?: Timestamp;
 }
@@ -20,15 +30,9 @@ export interface UserDocument {
 /**
  * Event document structure in Firestore
  */
-export interface EventDocument {
-  name: string;
-  description: string;
-  location: string;
-  link?: string;
+export interface EventDocument extends BaseEvent {
   start: Timestamp;
   end: Timestamp;
-  attendees?: EventAttendee[];
-  registered?: EventRegistration[];
 }
 
 /**
@@ -47,17 +51,11 @@ export interface BookingDocument {
 /**
  * Event data with converted dates for frontend use
  */
-export interface Event {
+export interface Event extends BaseEvent {
   id: string;
-  title: string;
-  name: string;
   date: Date;
   start_time: string;
   end_time: string;
-  location: string;
-  description: string;
-  link?: string;
-  attendees?: EventAttendee[];
 }
 
 /**
@@ -65,7 +63,7 @@ export interface Event {
  */
 export interface EventSummary {
   id: string;
-  title: string;
+  name: string;
   date: Date;
 }
 
@@ -107,40 +105,23 @@ export interface PersonData {
   imagePath?: string;
 }
 
-/**
- * Contributor data (extends PersonData for contributors page)
- */
-export interface ContributorData extends PersonData {
-  // Inherits all PersonData fields
-}
-
 // =========================
 // NESTED DOCUMENT TYPES
 // =========================
 
 /**
- * Event attendance record in user documents
+ * Event attendance or registration record in user documents
  */
-export interface EventAttendance {
+export interface UserEventRecord {
   eventID: string;
   name: string;
   date: Date | Timestamp;
 }
 
 /**
- * Event registration record in user documents
- */
-export interface EventRegistration {
-  eventID: string;
-  name?: string;
-  title?: string;
-  date: Date | Timestamp;
-}
-
-/**
  * Event attendee record in event documents
  */
-export interface EventAttendee {
+export interface EventAttendeeRecord {
   uid: string;
   email: string;
 }
@@ -152,25 +133,6 @@ export interface SpreadsheetRow {
   Email?: string;
   email?: string;
   [key: string]: unknown;
-}
-
-// =========================
-// COMPONENT PROP TYPES
-// =========================
-
-/**
- * Common navigation props for pages
- */
-export interface NavigationProps {
-  navigateTo: (page: string, errorMessage?: string) => void;
-  error?: string;
-}
-
-/**
- * Generic page props that includes navigation
- */
-export interface PageProps extends NavigationProps {
-  // Can be extended by specific page props
 }
 
 // =========================

@@ -2,18 +2,13 @@ import React, { useState, useEffect } from 'react';
 import '../styles/LoginPage.css'; // Import the CSS file for styling
 import { auth } from '../firebase/config';
 import { createUserWithEmailAndPassword,
-         onAuthStateChanged,
          sendPasswordResetEmail,
          signInWithEmailAndPassword } from "firebase/auth";
 import { collection, doc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
+import { useApp } from '../hooks/useApp';
 
-interface LoginPageProps {
-  navigateTo: (page: string, errorMessage?: string) => void;
-  error?: string;
-}
-
-const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
-
+const LoginPage: React.FC = () => {
+  const { user, navigateTo, error } = useApp();
   const [userCredentials, setUserCredentials] = useState({email: '', password: ''});
   const [localError, setLocalError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -22,18 +17,16 @@ const LoginPage: React.FC<LoginPageProps> = ({ navigateTo, error }) => {
     setUserCredentials({...userCredentials, [e.target.name]: e.target.value});
   };
 
+  // Handle auth state changes - redirect if user is logged in
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        if (error?.includes('booking')) {
-          navigateTo('booking');
-        } else {
-          navigateTo('home');
-        }
+    if (user) {
+      if (error?.includes('booking')) {
+        navigateTo('booking');
+      } else {
+        navigateTo('home');
       }
-    });
-    return unsubscribe;
-  }, [navigateTo, error]);
+    }
+  }, [user, error, navigateTo]);
 
   function handleSignup(e: React.FormEvent) {
     e.preventDefault();

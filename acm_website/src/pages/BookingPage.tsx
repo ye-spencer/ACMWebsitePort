@@ -2,18 +2,15 @@ import React, { useState, useEffect } from 'react';
 import '../styles/BookingPage.css';
 import TimeSelection from '../components/booking/TimeSelection';
 import CalendarView from '../components/booking/CalendarView';
-import { app, auth } from '../firebase/config';
-import { onAuthStateChanged } from "firebase/auth";
+import { app } from '../firebase/config';
 import { collection, doc, getFirestore, setDoc, Timestamp, query, where, getDocs, getDoc } from "firebase/firestore";
-import { PageProps, TimeSlot } from '../types';
+import { TimeSlot } from '../types';
+import { useApp } from '../hooks/useApp';
 
 const db = getFirestore(app);
 
-interface BookingPageProps extends PageProps {
-  // Extends the common page props
-}
-
-const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
+const BookingPage: React.FC = () => {
+  const { user, navigateTo, error, authLoading } = useApp();
   const [startTime, setStartTime] = useState<Date>(() => {
     const date = new Date();
     date.setHours(9, 0, 0, 0);
@@ -34,20 +31,25 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
 
   // Initial auth check
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
+    // Don't redirect while authentication is still loading
+    if (authLoading) {
+      return;
+    }
+
+    if (user) {
+      const fetchUserMembership = async () => {
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
           setIsMember(userDoc.data().isMember || false);
         } else {
           setIsMember(false);
         }
-      } else {
-        navigateTo('login', 'Please log in to access the booking page');
-      }
-    });
-    return unsubscribe;
-  }, [navigateTo]);
+      };
+      fetchUserMembership();
+    } else {
+      navigateTo('login', 'Please log in to access the booking page');
+    }
+  }, [user, navigateTo, authLoading]);
 
   // Generate time slots for dropdowns
   useEffect(() => {
@@ -149,7 +151,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
     }
 
     // Check if user already has a booking on this day
-    if (auth.currentUser) {
+    if (user) {
       const startOfDay = new Date(startTime);
       startOfDay.setHours(0, 0, 0, 0);
       const endOfDay = new Date(startTime);
@@ -157,7 +159,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
 
       const q = query(
         collection(db, "bookings"),
-        where("UID", "==", auth.currentUser.uid),
+        where("UID", "==", user.uid),
         where("start", ">=", Timestamp.fromDate(startOfDay)),
         where("start", "<=", Timestamp.fromDate(endOfDay))
       );
@@ -189,7 +191,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
 
   const handleBooking = async () => {
     try {
-      if (!auth.currentUser) {
+      if (!user) {
         throw new Error('User not authenticated');
       }
 
@@ -210,8 +212,8 @@ const BookingPage: React.FC<BookingPageProps> = ({ navigateTo, error }) => {
       }
 
       // add booking to database
-      await setDoc(doc(db, "bookings", auth.currentUser.uid + startTime.toDateString()), {
-        UID: auth.currentUser.uid,
+      await setDoc(doc(db, "bookings", user.uid + startTime.toDateString()), {
+        UID: user.uid,
         start: Timestamp.fromDate(startTime),
         end: Timestamp.fromDate(endTime)
       });

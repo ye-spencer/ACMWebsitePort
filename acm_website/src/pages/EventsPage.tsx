@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, query, collection, where, Timestamp, orderBy, getDocs, updateDoc, doc, arrayUnion, getDoc } from 'firebase/firestore';
 import '../styles/EventsPage.css';
-import { auth } from '../firebase/config';
-import { onAuthStateChanged } from "firebase/auth";
-import { PageProps, Event } from '../types';
+import { useApp } from '../hooks/useApp';
+import { eventCategories } from "../components/admin/CreateEvent.tsx";
+import { Event, UserEventRecord } from '../types';
 
-interface EventsPageProps extends PageProps {
-  // Extends the common page props
-}
-
-const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
+const EventsPage: React.FC = () => {
+  const { user, isLoggedIn, navigateTo, error } = useApp();
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [registeredEvents, setRegisteredEvents] = useState<Event[]>([]);
+  const [selectedUpcomingCategory, setSelectedUpcomingCategory] = useState<string>('All');
+  const [selectedPastCategory, setSelectedPastCategory] = useState<string>('All');
 
   const db = getFirestore();
   
@@ -26,7 +24,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
       const eventTitle = data.name || 'Untitled Event';
       return {
         id: doc.id,
-        title: eventTitle,
+        category: data.category || 'Other',
         name: eventTitle,
         date: data.start.toDate(),
         start_time: data.start ? data.start.toDate().toLocaleTimeString('en-US', {
@@ -54,7 +52,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
       const eventTitle = data.name || 'Untitled Event';
       return {
         id: doc.id,
-        title: eventTitle,
+        category: data.category || 'Other',
         name: eventTitle,
         date: data.start.toDate(),
         start_time: data.start ? data.start.toDate().toLocaleTimeString('en-US', {
@@ -90,21 +88,22 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
   }, [db]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setIsLoggedIn(!!user);
-      if (user) {
+    if (user) {
+      const fetchUserRegistrations = async () => {
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          const registered: Event[] = userData.eventsRegistered.map((event: any) => ({
+          const registered: Event[] = userData.eventsRegistered.map((event: UserEventRecord) => ({
             id: event.eventID,
           }));
           setRegisteredEvents(registered);
         }
-      } else setRegisteredEvents([]);
-    });
-    return unsubscribe;
-  }, [db]);
+      };
+      fetchUserRegistrations();
+    } else {
+      setRegisteredEvents([]);
+    }
+  }, [user, db]);
 
   const handleRSVP = async (eventID: string) => {
     if (!isLoggedIn) {
@@ -112,14 +111,13 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
       return;
     }
     try {
-      const user = auth.currentUser;
       const event = upcomingEvents.find(e => e.id === eventID);
       await updateDoc(doc(db, 'events', eventID), {
         registered: arrayUnion({ uid: user?.uid, email: user?.email })
       });
       if (!user?.uid) throw new Error('User ID not found');
       await updateDoc(doc(db, 'users', user.uid), {
-        eventsRegistered: arrayUnion({ date: event?.date, eventID: event?.id, title: event?.title })
+        eventsRegistered: arrayUnion({ date: event?.date, eventID: event?.id, name: event?.name })
       });
       alert('Successfully registered for the event!');
     } catch (error) {
@@ -127,6 +125,9 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
       console.error(error);
     }
   };
+
+  const filteredUpcoming = selectedUpcomingCategory == 'All' ? upcomingEvents : upcomingEvents.filter(event => event.category == selectedUpcomingCategory);
+  const filteredPast = selectedPastCategory == 'All' ? pastEvents : pastEvents.filter(event => event.category == selectedPastCategory);
 
   if (loading) {
     return (
@@ -146,44 +147,84 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
 
       {/*Upcoming Events */}
       <h1 className="events-title">Upcoming Events</h1>
+      <div className="filter-container">
+        <div className="filter">
+          <label className="filter-label">Category</label>
+          <select
+            value={selectedUpcomingCategory}
+            onChange={(e) => setSelectedUpcomingCategory(e.target.value)}
+            className="filter-select"
+          >
+            <option value="All">All</option>
+            {eventCategories.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
+      </div>
       <div className="events-list">
-        {upcomingEvents.length === 0 ? (
+        {upcomingEvents.length == 0 ? (
           <div className="no-events-message">
             <p>No upcoming events at the moment.</p>
             <p>Check back soon for new events!</p>
           </div>
-        ) : (
-          upcomingEvents.map(event => {
-            const isRegistered = registeredEvents.some(e => e.id == event.id);
-            return (
-              <div key={event.id} className="event-card">
-                <h2 className="event-title">{event.title}</h2>
-                <div className="event-details">
-                  <p><strong>Date:</strong> {event.date.toLocaleDateString()}</p>
-                  <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
-                  <p><strong>Location:</strong> {event.location}</p>
-                </div>
-                <p className="event-description">{event.description}</p>
-                <button
-                  className="event-button"
-                  onClick={() => handleRSVP(event.id)}
-                  disabled={isRegistered}
-                  style={isRegistered ? { background: '#aaa', color: '#fff', cursor: 'not-allowed' } : {}}
-                >
-                  {isRegistered ? 'Registered' : 'RSVP'}
-                </button>
+        ) : ( filteredUpcoming.length == 0 ? (
+          <div className="no-events-message">
+            <p>No events match the current filter.</p>
+            <p>Try modifying your search.</p>
+          </div>
+        ) : ( filteredUpcoming.map(event => {
+          const isRegistered = registeredEvents.some(e => e.id == event.id);
+          return (
+            <div key={event.id} className="event-card">
+              <span className="event-category-badge">{event.category}</span>
+              <h2 className="event-title">{event.name}</h2>
+              <div className="event-details">
+                <p><strong>Date:</strong> {event.date.toLocaleDateString()}</p>
+                <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
+                <p><strong>Location:</strong> {event.location}</p>
               </div>
-            )
-          })
-        )}
+              <p className="event-description">{event.description}</p>
+              <button
+                className="event-button"
+                onClick={() => handleRSVP(event.id)}
+                disabled={isRegistered}
+                style={isRegistered ? { background: '#aaa', color: '#fff', cursor: 'not-allowed' } : {}}
+              >
+                {isRegistered ? 'Registered' : 'RSVP'}
+              </button>
+            </div>
+          )})
+        ))}
       </div>
 
       {/* Past Events */}
       <h1 className="events-title">Past Events</h1>
+      <div className="filter-container">
+        <div className="filter">
+          <label className="filter-label">Category</label>
+          <select
+            value={selectedPastCategory}
+            onChange={(e) => setSelectedPastCategory(e.target.value)}
+            className="filter-select"
+          >
+            <option value="All">All</option>
+            {eventCategories.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
+      </div>
       <div className="events-list">
-        {pastEvents.map(event => (
+        {filteredPast.length == 0 ? (
+          <div className="no-events-message">
+            <p>No events match the current filter.</p>
+            <p>Try modifying your search.</p>
+          </div>
+        ) : ( filteredPast.map(event => (
           <div key={event.id} className="event-card" style={{ backgroundColor: 'rgba(220, 220, 220, 0.8)' }}>
-            <h2 className="event-title">{event.title}</h2>
+            <span className="event-category-badge">{event.category}</span>
+            <h2 className="event-title">{event.name}</h2>
             <div className="event-details">
               <p><strong>Date:</strong> {event.date.toLocaleDateString()}</p>
               <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
@@ -191,7 +232,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ navigateTo, error }) => {
             </div>
             <p className="event-description">{event.description}</p>
           </div>
-        ))}
+        )))}
       </div>
     </div>
   );

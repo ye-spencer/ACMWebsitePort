@@ -1,6 +1,6 @@
-import { ContributorData } from '../types';
+import { PersonData } from '../types';
 
-export const contributorsData: ContributorData[] = [
+export const contributorsData: PersonData[] = [
   {
     name: "Alan Li",
     role: "About Us",

@@ -5,22 +5,21 @@ import Members from '../components/admin/Members';
 import AttendanceUpload from '../components/admin/AttendanceUpload';
 import Account from '../components/admin/Account';
 import { auth } from '../firebase/config';
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { collection, doc, getFirestore, getDocs, query, where, updateDoc, addDoc, Timestamp, orderBy, arrayUnion } from "firebase/firestore";
+import { useApp } from '../hooks/useApp';
 import * as XLSX from 'xlsx';
 import { deleteUser } from '../api';
-import { PageProps, EventSummary, Member, SpreadsheetRow, EventAttendee } from '../types';
+import { EventSummary, Member, SpreadsheetRow, EventAttendeeRecord } from '../types';
 
-interface AdminPageProps extends PageProps {
-  // Extends the common page props
-}
-
-const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+const AdminPage: React.FC = () => {
+  const { user, isAdmin, navigateTo, error, authLoading, setError } = useApp();
   const [members, setMembers] = useState<Member[]>([]);
   const [pastEvents, setPastEvents] = useState<EventSummary[]>([]);
+  const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
   
   // Event form state
+  const [eventCategory, setEventCategory] = useState<string>('');
   const [eventTitle, setEventTitle] = useState<string>('');
   const [eventDescription, setEventDescription] = useState<string>('');
   const [eventLocation, setEventLocation] = useState<string>('');
@@ -35,45 +34,48 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
   const [attendanceFile, setAttendanceFile] = useState<File | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // check if user is admin
-        if (user.email !== "jhuacmweb@gmail.com") {
-          navigateTo('home', 'You do not have permission to access the admin page');
-          return;
-        }
-        setIsAdmin(true);
-        const db = getFirestore();
+    // Don't redirect while authentication is still loading or during logout
+    if (authLoading || isLoggingOut) {
+      return;
+    }
+    if (!isAdmin && user) {
+      navigateTo('profile', 'You do not have permission to access the admin page');
+      return;
+    } else if (!user) {
+      navigateTo('login', 'Please log in to access the admin page');
+      return;
+    }
 
-        // Fetch members
-        const membersQuery = query(collection(db, "users"), where("isMember", "==", true));
-        const membersSnapshot = await getDocs(membersQuery);
-        const membersData: Member[] = membersSnapshot.docs.map(doc => ({
-          uid: doc.id,
-          email: doc.data().email,
-          eventsAttended: doc.data().eventsAttended?.length || 0
-        }));
-        setMembers(membersData);
+    const fetchAdminData = async () => {
+      const db = getFirestore();
 
-        // Fetch past events
-        const eventsQuery = query(collection(db, "events"), where("end", "<", Timestamp.now()), orderBy("start", "desc"));
-        const eventsSnapshot = await getDocs(eventsQuery);
-        const events: EventSummary[] = eventsSnapshot.docs
-          .map(doc => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              title: data.name,
-              date: data.start.toDate(),
-            };
-          });
-        setPastEvents(events);
-      } else {
-        navigateTo('login', 'Please log in to access the admin page');
-      }
-    });
-    return unsubscribe;
-  }, [navigateTo]);
+      // Fetch members
+      const membersQuery = query(collection(db, "users"), where("isMember", "==", true));
+      const membersSnapshot = await getDocs(membersQuery);
+      const membersData: Member[] = membersSnapshot.docs.map(doc => ({
+        uid: doc.id,
+        email: doc.data().email,
+        eventsAttended: doc.data().eventsAttended?.length || 0
+      }));
+      setMembers(membersData);
+
+      // Fetch past events
+      const eventsQuery = query(collection(db, "events"), where("end", "<", Timestamp.now()), orderBy("start", "desc"));
+      const eventsSnapshot = await getDocs(eventsQuery);
+      const events: EventSummary[] = eventsSnapshot.docs
+        .map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            name: data.name,
+            date: data.start.toDate(),
+          };
+        });
+      setPastEvents(events);
+    };
+
+    fetchAdminData();
+  }, [user, isAdmin, navigateTo, authLoading, isLoggingOut]);
 
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,12 +87,13 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
 
       // validate start and end date and time
       if (endDateTime <= startDateTime) {
-        alert('End time must be after start time');
+        setError('End time must be after start time');
         return;
       }
 
       // send event to database
       await addDoc(collection(db, "events"), {
+        category: eventCategory,
         name: eventTitle,
         description: eventDescription,
         location: eventLocation,
@@ -100,6 +103,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
       });
 
       // Reset form
+      setEventCategory('');
       setEventTitle('');
       setEventDescription('');
       setEventLocation('');
@@ -112,7 +116,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
       alert('Event created successfully!');
     } catch (error) {
       console.error('Error creating event:', error);
-      alert('Failed to create event. Please try again.');
+      setError('Failed to create event. Please try again.');
     }
   };
 
@@ -135,7 +139,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
         setMembers(prev => prev.filter(member => member.uid !== uid));
       } catch (error) {
         console.error('Error removing member:', error);
-        alert('Failed to remove member. Please try again.');
+        setError('Failed to remove member. Please try again.');
       }
     }
   };
@@ -144,7 +148,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
     e.preventDefault();
     // validate event and file
     if (!selectedEvent || !attendanceFile) {
-      alert('Please select an event and upload a file');
+      setError('Please select an event and upload a file');
       return;
     }
 
@@ -185,7 +189,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
           }
 
           // get attendee list
-          const attendees: EventAttendee[] = [];
+          const attendees: EventAttendeeRecord[] = [];
           const updatePromises = usersSnapshot.docs.map(async (userDoc) => {
             const userData = userDoc.data();
             attendees.push({
@@ -197,7 +201,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
             return updateDoc(doc(db, "users", userDoc.id), {
               eventsAttended: arrayUnion({
                 eventID: event.id,
-                name: event.title,
+                name: event.name,
                 date: event.date
               })
             });
@@ -229,7 +233,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
           setAttendanceFile(null);
         } catch (error) {
           console.error('Error processing attendance:', error);
-          alert(`Error processing attendance: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          setError(`Error processing attendance: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
       };
 
@@ -240,17 +244,19 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
       reader.readAsArrayBuffer(attendanceFile);
     } catch (error) {
       console.error('Error uploading attendance:', error);
-      alert(`Error uploading attendance: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setError(`Error uploading attendance: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
   const handleLogout = async () => {
     try {
+      setIsLoggingOut(true);
       await signOut(auth);
       navigateTo('login', 'You have been logged out');
     } catch (error) {
       console.error('Error signing out:', error);
-      alert('Failed to log out. Please try again.');
+      setError('Failed to log out. Please try again.');
+      setIsLoggingOut(false); // Reset on error
     }
   };
 
@@ -277,6 +283,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ navigateTo, error }) => {
         {/* Create Event Section */}
         <div className="admin-section">
           <CreateEvent
+            eventCategory={eventCategory}
+            setEventCategory={setEventCategory}
             eventTitle={eventTitle}
             setEventTitle={setEventTitle}
             eventDescription={eventDescription}

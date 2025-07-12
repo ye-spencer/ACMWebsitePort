@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/ProfilePage.css';
 import { auth } from '../firebase/config';
-import { EmailAuthProvider, onAuthStateChanged, updatePassword, deleteUser, signOut, reauthenticateWithCredential } from "firebase/auth";
+import { EmailAuthProvider, updatePassword, deleteUser, signOut, reauthenticateWithCredential } from "firebase/auth";
 import { collection, doc, getFirestore, getDoc, getDocs, query, where, deleteDoc, updateDoc } from "firebase/firestore";
+import { useApp } from '../hooks/useApp';
 import UserInfoContainer from '../components/profile/UserInfoContainer';
 import EventsContainer from '../components/profile/EventsContainer';
 import PasswordModal from '../components/profile/PasswordModal';
 import VerifyPasswordModal from '../components/profile/VerifyPasswordModal';
-import { PageProps, Booking, EventSummary, EventAttendance, EventRegistration } from '../types';
+import { Booking, EventSummary, UserEventRecord } from '../types';
 
-interface ProfilePageProps extends PageProps {
-  // Extends the common page props
-}
 
-const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
+const ProfilePage: React.FC = () => {
+  const { user, navigateTo, error, authLoading } = useApp();
   const [email, setEmail] = useState<string>('');
   const [isMember, setIsMember] = useState<boolean>(false);
   const [isOnMailingList, setIsOnMailingList] = useState<boolean>(false);
@@ -32,8 +31,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
   const [currentPassword, setCurrentPassword] = useState<string>('');
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
+    // Don't redirect while authentication is still loading
+    if (authLoading) {
+      return;
+    }
+
+    if (user) {
+      const loadUserData = async () => {
         setEmail(user.email || '');
         const db = getFirestore();
         const userDoc = await getDoc(doc(db, "users", user.uid));
@@ -62,15 +66,15 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
         // get events attended and registered
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          const attended: EventSummary[] = userData.eventsAttended?.map((event: EventAttendance) => ({
+          const attended: EventSummary[] = userData.eventsAttended?.map((event: UserEventRecord) => ({
             id: event.eventID,
-            title: event.name,
+            name: event.name,
             date: event.date instanceof Date ? event.date : event.date.toDate(),
           })) || [];
 
-          const registered: EventSummary[] = userData.eventsRegistered?.map((event: EventRegistration) => ({
+          const registered: EventSummary[] = userData.eventsRegistered?.map((event: UserEventRecord) => ({
             id: event.eventID,
-            title: event.name || event.title || 'Untitled Event',
+            name: event.name,
             date: event.date instanceof Date ? event.date : event.date.toDate(),
           })) || [];
 
@@ -78,12 +82,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
           setPastEvents(attended.filter(event => event.date <= now));
           setEventsAttended(attended.length);
         }
-      } else {
-        navigateTo('login', 'Please log in to access your profile');
-      }
-    });
-    return unsubscribe;
-  }, [navigateTo]);
+      };
+      
+      loadUserData();
+    } else {
+      navigateTo('login', 'Please log in to access your profile');
+    }
+  }, [user, navigateTo, authLoading]);
 
   const handleVerifyPassword = async () => {
     try {
@@ -297,7 +302,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
           pastItems={pastEvents}
           renderUpcomingItem={(event, index) => (
             <div className="event-item" key={`${event.id}-${index}`}>
-              <h4 className="event-title">{event.title}</h4>
+              <h4 className="event-title">{event.name}</h4>
               <p className="event-date">
                 {formatDate(event.date)} • {formatTime(event.date)}
               </p>
@@ -305,7 +310,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ navigateTo, error }) => {
           )}
           renderPastItem={(event, index) => (
             <div className="event-item" key={`${event.id}-${index}`}>
-              <h4 className="event-title">{event.title}</h4>
+              <h4 className="event-title">{event.name}</h4>
               <p className="event-date">
                 {formatDate(event.date)} • {formatTime(event.date)}
               </p>

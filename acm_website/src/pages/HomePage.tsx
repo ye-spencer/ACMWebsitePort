@@ -1,14 +1,10 @@
 import React from 'react';
 import '../styles/HomePage.css';
-import { useNavigate } from 'react-router-dom';
 import { FaCalendarAlt, FaUsers } from 'react-icons/fa';
+import { useApp } from '../hooks/useApp';
 
-interface HomePageProps {
-  error?: string;
-}
-
-const HomePage: React.FC<HomePageProps> = ({ error }) => {
-  const navigate = useNavigate();
+const HomePage: React.FC = () => {
+  const { error, navigateTo } = useApp();
 
   return (
     <div className="home-page">
@@ -42,7 +38,7 @@ const HomePage: React.FC<HomePageProps> = ({ error }) => {
             <div className="hero-actions">
               <button 
                 className="secondary-cta"
-                onClick={() => navigate('/about')}
+                onClick={() => navigateTo('about')}
               >
                 Learn More
               </button>
@@ -69,14 +65,14 @@ const HomePage: React.FC<HomePageProps> = ({ error }) => {
             <div className="quick-actions">
               <button 
                 className="quick-action"
-                onClick={() => navigate('/events')}
+                onClick={() => navigateTo('events')}
               >
                 <FaCalendarAlt />
                 <span>View Events</span>
               </button>
               <button 
                 className="quick-action"
-                onClick={() => navigate('/booking')}
+                onClick={() => navigateTo('booking')}
               >
                 <FaUsers />
                 <span>Book Space</span>

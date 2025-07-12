@@ -63,13 +63,14 @@ A homepage with links to all other important aspects of the website
 **Existing Functionality:**
 
 - Navigation menu (Shreyasi)
+- Hero section with ACM mission statement (Ria)
+- Quick links to important sections (Ria)
 
 **Possible Components:**
 
-- Hero section with ACM mission statement
-- Quick links to important sections
 - News/announcements section
 - Footer with contact information
+
 
 ### Events Page
 
@@ -80,26 +81,29 @@ A page containing upcoming events with a register link, along with relevant info
 - Event listing with dates, times, and locations (Shreyasi)
 - Past events archive (Shreyasi)
 - Registration system integration (Shreyasi)
+- Event categories/tags (Shreyasi)
 
 **Possible Components:**
 
 - Event details page
-- Event categories/tags
 
 ### About Us
 
 Basic contact page with officer information
 
+**Existing Functionality:**
+
+- Current/Historical officer profiles (Alan)
+- ACM mission and vision  (Ria)
+- Contact information (Ria)
+- Social media links (Ria)
+
 **Possible Components:**
 
-- Current/Historical officer profiles
-- ACM mission and vision
-- Contact information
-- Social media links
 - Committee information
 - History of ACM at JHU
 
-### Accounts/Register/Signup
+### Accounts/Register/Signup [COMPLETE]
 
 Likely the most complex part of the website (but not that complex still). Students should be able to register to become a ACM member with an email/password, this allows them to join the new mailing list (just some database) and become part of our records (records includes events attended).
 
@@ -112,11 +116,8 @@ Likely the most complex part of the website (but not that complex still). Studen
 - Membership request (Ria)
 - Mailing list subscription management (Ria)
 
-**Possible Components:**
 
-- UI improvements
-
-### Admin Dashboard
+### Admin Dashboard [COMPLETE]
 
 **Existing Functionality:**
 
@@ -124,11 +125,8 @@ Likely the most complex part of the website (but not that complex still). Studen
 - Member management (Ria)
 - Attendance upload (Ria)
 
-**Possible Components:**
 
-- UI improvements
-
-### Booking ACM Lounge
+### Booking ACM Lounge [COMPLETE]
 
 A page that allows members to book the ACM lounge for a period of time, and also has a schedule of when it is already booked
 
@@ -137,9 +135,6 @@ A page that allows members to book the ACM lounge for a period of time, and also
 - Available and unavailable times with dates/times (Ria)
 - Limit of registration time/occurrences (Ria)
 
-**Possible Components:**
-
-- UI improvements
 
 ### Sponsor Page
 

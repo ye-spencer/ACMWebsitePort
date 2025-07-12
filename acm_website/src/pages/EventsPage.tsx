@@ -131,108 +131,131 @@ const EventsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="events-container">
-        <h1 className="events-title">Loading Events...</h1>
+      <div className="events-page">
+        <div className="events-layout">
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <div className="loading-text">Loading Events</div>
+            <div className="loading-subtext">Please wait while we fetch the latest events...</div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="events-container">
-      {error && (
-        <div className="error-message" style={{ position: 'relative', zIndex: 2 }}>
-          {error}
+    <div className="events-page">
+      <div className="events-layout">
+        {/* Page Header */}
+        <div className="page-header">
+          <h1 className="page-title">Events</h1>
+          <p className="page-subtitle">Discover and join exciting ACM events at Johns Hopkins</p>
         </div>
-      )}
 
-      {/*Upcoming Events */}
-      <h1 className="events-title">Upcoming Events</h1>
-      <div className="filter-container">
-        <div className="filter">
-          <label className="filter-label">Category</label>
-          <select
-            value={selectedUpcomingCategory}
-            onChange={(e) => setSelectedUpcomingCategory(e.target.value)}
-            className="filter-select"
-          >
-            <option value="All">All</option>
-            {eventCategories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-      <div className="events-list">
-        {upcomingEvents.length == 0 ? (
-          <div className="no-events-message">
-            <p>No upcoming events at the moment.</p>
-            <p>Check back soon for new events!</p>
+        {error && (
+          <div className="events-section error-section">
+            <div className="error-message">{error}</div>
           </div>
-        ) : ( filteredUpcoming.length == 0 ? (
-          <div className="no-events-message">
-            <p>No events match the current filter.</p>
-            <p>Try modifying your search.</p>
-          </div>
-        ) : ( filteredUpcoming.map(event => {
-          const isRegistered = registeredEvents.some(e => e.id == event.id);
-          return (
-            <div key={event.id} className="event-card">
-              <span className="event-category-badge">{event.category}</span>
-              <h2 className="event-title">{event.name}</h2>
-              <div className="event-details">
-                <p><strong>Date:</strong> {event.date.toLocaleDateString()}</p>
-                <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
-                <p><strong>Location:</strong> {event.location}</p>
-              </div>
-              <p className="event-description">{event.description}</p>
-              <button
-                className="event-button"
-                onClick={() => handleRSVP(event.id)}
-                disabled={isRegistered}
-                style={isRegistered ? { background: '#aaa', color: '#fff', cursor: 'not-allowed' } : {}}
+        )}
+
+        {/* Upcoming Events Section */}
+        <div className="events-section">
+          <h2 className="section-title">Upcoming Events</h2>
+          <div className="filter-container">
+            <div className="filter">
+              <label className="filter-label">Category</label>
+              <select
+                value={selectedUpcomingCategory}
+                onChange={(e) => setSelectedUpcomingCategory(e.target.value)}
+                className="filter-select"
               >
-                {isRegistered ? 'Registered' : 'RSVP'}
-              </button>
+                <option value="All">All</option>
+                {eventCategories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
             </div>
-          )})
-        ))}
-      </div>
-
-      {/* Past Events */}
-      <h1 className="events-title">Past Events</h1>
-      <div className="filter-container">
-        <div className="filter">
-          <label className="filter-label">Category</label>
-          <select
-            value={selectedPastCategory}
-            onChange={(e) => setSelectedPastCategory(e.target.value)}
-            className="filter-select"
-          >
-            <option value="All">All</option>
-            {eventCategories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
+          </div>
+          <div className="events-list">
+            {upcomingEvents.length == 0 ? (
+              <div className="no-events-message">
+                <p>No upcoming events at the moment.</p>
+                <p>Check back soon for new events!</p>
+              </div>
+            ) : ( filteredUpcoming.length == 0 ? (
+              <div className="no-events-message">
+                <p>No events match the current filter.</p>
+                <p>Try modifying your search.</p>
+              </div>
+            ) : ( filteredUpcoming.map(event => {
+              const isRegistered = registeredEvents.some(e => e.id == event.id);
+              return (
+                <div key={event.id} className="event-card">
+                  <div className="event-header">
+                    <h3 className="event-title">{event.name}</h3>
+                    <span className="event-category-badge">{event.category}</span>
+                    <div className="event-status"></div>
+                  </div>
+                  <div className="event-details">
+                    <p><strong>Date:</strong> {event.date.toLocaleDateString()}</p>
+                    <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
+                    <p><strong>Location:</strong> {event.location}</p>
+                  </div>
+                  <p className="event-description">{event.description}</p>
+                  <button
+                    className="event-button"
+                    onClick={() => handleRSVP(event.id)}
+                    disabled={isRegistered}
+                  >
+                    {isRegistered ? 'Registered' : 'RSVP'}
+                  </button>
+                </div>
+              )})
             ))}
-          </select>
+          </div>
         </div>
-      </div>
-      <div className="events-list">
-        {filteredPast.length == 0 ? (
-          <div className="no-events-message">
-            <p>No events match the current filter.</p>
-            <p>Try modifying your search.</p>
-          </div>
-        ) : ( filteredPast.map(event => (
-          <div key={event.id} className="event-card" style={{ backgroundColor: 'rgba(220, 220, 220, 0.8)' }}>
-            <span className="event-category-badge">{event.category}</span>
-            <h2 className="event-title">{event.name}</h2>
-            <div className="event-details">
-              <p><strong>Date:</strong> {event.date.toLocaleDateString()}</p>
-              <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
-              <p><strong>Location:</strong> {event.location}</p>
+
+        {/* Past Events Section */}
+        <div className="events-section">
+          <h2 className="section-title">Past Events</h2>
+          <div className="filter-container">
+            <div className="filter">
+              <label className="filter-label">Category</label>
+              <select
+                value={selectedPastCategory}
+                onChange={(e) => setSelectedPastCategory(e.target.value)}
+                className="filter-select"
+              >
+                <option value="All">All</option>
+                {eventCategories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
             </div>
-            <p className="event-description">{event.description}</p>
           </div>
-        )))}
+          <div className="events-list">
+            {filteredPast.length == 0 ? (
+              <div className="no-events-message">
+                <p>No events match the current filter.</p>
+                <p>Try modifying your search.</p>
+              </div>
+            ) : ( filteredPast.map(event => (
+              <div key={event.id} className="event-card past-event">
+                <div className="event-header">
+                  <h3 className="event-title">{event.name}</h3>
+                  <span className="event-category-badge">{event.category}</span>
+                  <div className="event-status"></div>
+                </div>
+                <div className="event-details">
+                  <p><strong>Date:</strong> {event.date.toLocaleDateString()}</p>
+                  <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
+                  <p><strong>Location:</strong> {event.location}</p>
+                </div>
+                <p className="event-description">{event.description}</p>
+              </div>
+            )))}
+          </div>
+        </div>
       </div>
     </div>
   );

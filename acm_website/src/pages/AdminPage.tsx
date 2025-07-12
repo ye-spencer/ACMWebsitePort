@@ -13,8 +13,11 @@ import * as XLSX from 'xlsx';
 import { deleteUser } from '../api';
 import { EventSummary, Member, SpreadsheetRow, EventAttendeeRecord } from '../types';
 
+type AdminSection = 'dashboard' | 'create-event' | 'members' | 'attendance';
+
 const AdminPage: React.FC = () => {
   const { user, isAdmin, navigateTo, error, authLoading, setError } = useApp();
+  const [activeSection, setActiveSection] = useState<AdminSection>('dashboard');
   const [members, setMembers] = useState<Member[]>([]);
   const [pastEvents, setPastEvents] = useState<EventSummary[]>([]);
   const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
@@ -261,73 +264,158 @@ const AdminPage: React.FC = () => {
     }
   };
 
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'dashboard':
+        return (
+          <div className="page-section admin-section">
+            <h2 className="section-title">Dashboard Overview</h2>
+            <div className="dashboard-stats">
+              <div className="admin-stat-card">
+                <div className="admin-stat-icon">👥</div>
+                <div className="admin-stat-content">
+                  <div className="admin-stat-number">{members.length}</div>
+                  <div className="admin-stat-label">Total Members</div>
+                </div>
+              </div>
+              <div className="admin-stat-card">
+                <div className="admin-stat-icon">📅</div>
+                <div className="admin-stat-content">
+                  <div className="admin-stat-number">{pastEvents.length}</div>
+                  <div className="admin-stat-label">Past Events</div>
+                </div>
+              </div>
+              <div className="admin-stat-card">
+                <div className="admin-stat-icon">🎯</div>
+                <div className="admin-stat-content">
+                  <div className="admin-stat-number">
+                    {members.length > 0 
+                      ? Math.round(members.reduce((sum, member) => sum + member.eventsAttended, 0) / members.length * 10) / 10
+                      : 0
+                    }
+                  </div>
+                  <div className="admin-stat-label">Avg Events/Member</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case 'create-event':
+        return (
+          <div className="page-section admin-section">
+            <CreateEvent
+              eventCategory={eventCategory}
+              setEventCategory={setEventCategory}
+              eventTitle={eventTitle}
+              setEventTitle={setEventTitle}
+              eventDescription={eventDescription}
+              setEventDescription={setEventDescription}
+              eventLocation={eventLocation}
+              setEventLocation={setEventLocation}
+              eventLink={eventLink}
+              setEventLink={setEventLink}
+              eventStartDate={eventStartDate}
+              setEventStartDate={setEventStartDate}
+              eventStartTime={eventStartTime}
+              setEventStartTime={setEventStartTime}
+              eventEndDate={eventEndDate}
+              setEventEndDate={setEventEndDate}
+              eventEndTime={eventEndTime}
+              setEventEndTime={setEventEndTime}
+              handleCreateEvent={handleCreateEvent}
+            />
+          </div>
+        );
+      case 'members':
+        return (
+          <div className="page-section admin-section">
+            <Members
+              members={members}
+              handleRemoveMember={handleRemoveMember}
+            />
+          </div>
+        );
+      case 'attendance':
+        return (
+          <div className="page-section admin-section">
+            <AttendanceUpload
+              pastEvents={pastEvents}
+              selectedEvent={selectedEvent}
+              setSelectedEvent={setSelectedEvent}
+              setAttendanceFile={setAttendanceFile}
+              handleAttendanceUpload={handleAttendanceUpload}
+            />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   if (!isAdmin) {
     return null;
   }
 
   return (
-    <div className="page">
-      <div className="page-layout">
-        <div className="page-header">
-          <h1 className="page-title">Admin Dashboard</h1>
-          <p className="page-subtitle">Manage events, members, and attendance</p>
-        </div>
+    <div className="page admin-page">
+      <div className="admin-layout">
+        {error && <div className="error-message">{error}</div>}
 
-        {error && (
-          <div className="page-section error-section">
-            <div className="error-message">
-              {error}
-            </div>
+        {/* Left Sidebar Navigation */}
+        <div className="admin-sidebar">
+          <div className="sidebar-header">
+            <h2 className="sidebar-title">Admin Panel</h2>
+            <p className="sidebar-subtitle">Manage your organization</p>
           </div>
-        )}
+          
+          <nav className="sidebar-nav">
+            <button
+              className={`sidebar-nav-item ${activeSection === 'dashboard' ? 'active' : ''}`}
+              onClick={() => setActiveSection('dashboard')}
+            >
+              <span className="nav-icon">📊</span>
+              <span className="nav-text">Dashboard</span>
+            </button>
+            
+            <button
+              className={`sidebar-nav-item ${activeSection === 'create-event' ? 'active' : ''}`}
+              onClick={() => setActiveSection('create-event')}
+            >
+              <span className="nav-icon">➕</span>
+              <span className="nav-text">Create Event</span>
+            </button>
+            
+            <button
+              className={`sidebar-nav-item ${activeSection === 'members' ? 'active' : ''}`}
+              onClick={() => setActiveSection('members')}
+            >
+              <span className="nav-icon">👥</span>
+              <span className="nav-text">Members</span>
+              <span className="nav-badge">{members.length}</span>
+            </button>
+            
+            <button
+              className={`sidebar-nav-item ${activeSection === 'attendance' ? 'active' : ''}`}
+              onClick={() => setActiveSection('attendance')}
+            >
+              <span className="nav-icon">📊</span>
+              <span className="nav-text">Attendance</span>
+              {pastEvents.length > 0 && (
+                <span className="nav-badge">{pastEvents.length}</span>
+              )}
+            </button>
+          </nav>
 
-        {/* Create Event Section */}
-        <div className="page-section">
-          <CreateEvent
-            eventCategory={eventCategory}
-            setEventCategory={setEventCategory}
-            eventTitle={eventTitle}
-            setEventTitle={setEventTitle}
-            eventDescription={eventDescription}
-            setEventDescription={setEventDescription}
-            eventLocation={eventLocation}
-            setEventLocation={setEventLocation}
-            eventLink={eventLink}
-            setEventLink={setEventLink}
-            eventStartDate={eventStartDate}
-            setEventStartDate={setEventStartDate}
-            eventStartTime={eventStartTime}
-            setEventStartTime={setEventStartTime}
-            eventEndDate={eventEndDate}
-            setEventEndDate={setEventEndDate}
-            eventEndTime={eventEndTime}
-            setEventEndTime={setEventEndTime}
-            handleCreateEvent={handleCreateEvent}
-          />
+          {/* Account Section at Bottom */}
+          <div className="sidebar-account">
+            <div className="account-divider"></div>
+            <Account handleLogout={handleLogout} />
+          </div>
         </div>
 
-        {/* Members Section */}
-        <div className="page-section">
-          <Members
-            members={members}
-            handleRemoveMember={handleRemoveMember}
-          />
-        </div>
-
-        {/* Attendance Upload Section */}
-        <div className="page-section">
-          <AttendanceUpload
-            pastEvents={pastEvents}
-            selectedEvent={selectedEvent}
-            setSelectedEvent={setSelectedEvent}
-            setAttendanceFile={setAttendanceFile}
-            handleAttendanceUpload={handleAttendanceUpload}
-          />
-        </div>
-
-        {/* Account Section */}
-        <div className="page-section">
-          <Account handleLogout={handleLogout} />
+        {/* Right Content Area */}
+        <div className="admin-content">
+          {renderContent()}
         </div>
       </div>
     </div>

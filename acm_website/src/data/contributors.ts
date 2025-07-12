@@ -1,12 +1,6 @@
-interface ContributorData {
-  name: string;
-  role: string;
-  bio: string;
-  linkedin: string;
-  imagePath?: string;
-}
+import { PersonData } from '../types';
 
-export const contributorsData: ContributorData[] = [
+export const contributorsData: PersonData[] = [
   {
     name: "Alan Li",
     role: "About Us",

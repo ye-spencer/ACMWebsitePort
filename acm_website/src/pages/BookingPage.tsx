@@ -4,15 +4,10 @@ import TimeSelection from '../components/booking/TimeSelection';
 import CalendarView from '../components/booking/CalendarView';
 import { app } from '../firebase/config';
 import { collection, doc, getFirestore, setDoc, Timestamp, query, where, getDocs, getDoc } from "firebase/firestore";
+import { TimeSlot } from '../types';
 import { useApp } from '../hooks/useApp';
 
 const db = getFirestore(app);
-
-interface TimeSlot {
-  hour: number;
-  minute: number;
-  label: string;
-}
 
 const BookingPage: React.FC = () => {
   const { user, navigateTo, error, authLoading } = useApp();

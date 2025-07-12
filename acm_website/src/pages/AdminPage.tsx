@@ -10,30 +10,12 @@ import { collection, doc, getFirestore, getDocs, query, where, updateDoc, addDoc
 import { useApp } from '../hooks/useApp';
 import * as XLSX from 'xlsx';
 import { deleteUser } from '../api';
-
-interface Event {
-  id: string;
-  name: string;
-  date: Date;
-  attendees?: { uid: string; email: string }[];
-}
-
-interface Member {
-  uid: string;
-  email: string;
-  eventsAttended: number;
-}
-
-interface SpreadsheetRow {
-  Email?: string;
-  email?: string;
-  [key: string]: unknown;
-}
+import { EventSummary, Member, SpreadsheetRow, EventAttendeeRecord } from '../types';
 
 const AdminPage: React.FC = () => {
   const { user, isAdmin, navigateTo, error, authLoading, setError } = useApp();
   const [members, setMembers] = useState<Member[]>([]);
-  const [pastEvents, setPastEvents] = useState<Event[]>([]);
+  const [pastEvents, setPastEvents] = useState<EventSummary[]>([]);
   const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
   
   // Event form state
@@ -80,7 +62,7 @@ const AdminPage: React.FC = () => {
       // Fetch past events
       const eventsQuery = query(collection(db, "events"), where("end", "<", Timestamp.now()), orderBy("start", "desc"));
       const eventsSnapshot = await getDocs(eventsQuery);
-      const events: Event[] = eventsSnapshot.docs
+      const events: EventSummary[] = eventsSnapshot.docs
         .map(doc => {
           const data = doc.data();
           return {
@@ -207,7 +189,7 @@ const AdminPage: React.FC = () => {
           }
 
           // get attendee list
-          const attendees: { uid: string; email: string }[] = [];
+          const attendees: EventAttendeeRecord[] = [];
           const updatePromises = usersSnapshot.docs.map(async (userDoc) => {
             const userData = userDoc.data();
             attendees.push({

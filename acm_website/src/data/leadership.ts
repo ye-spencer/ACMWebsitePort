@@ -1,10 +1,4 @@
-interface PersonData {
-  name: string;
-  role: string;
-  bio: string;
-  linkedin: string;
-  imagePath?: string;
-}
+import { PersonData } from '../types';
 
 export const leadershipData: PersonData[] = [
   {

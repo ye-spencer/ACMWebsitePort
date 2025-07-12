@@ -1,14 +1,9 @@
 import React from 'react';
 import '../../styles/AdminPage.css';
-
-interface EventItem {
-  id: string;
-  name: string;
-  date: Date;
-}
+import { EventSummary } from '../../types';
 
 interface AttendanceUploadProps {
-  pastEvents: EventItem[];
+  pastEvents: EventSummary[];
   selectedEvent: string;
   setSelectedEvent: (id: string) => void;
   setAttendanceFile: (f: File | null) => void;

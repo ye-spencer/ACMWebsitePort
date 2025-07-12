@@ -3,17 +3,7 @@ import { getFirestore, query, collection, where, Timestamp, orderBy, getDocs, up
 import '../styles/EventsPage.css';
 import { useApp } from '../hooks/useApp';
 import { eventCategories } from "../components/admin/CreateEvent.tsx";
-
-interface Event {
-  id: string;
-  category: string;
-  title: string;
-  date: Date;
-  start_time: string;
-  end_time: string;
-  location: string;
-  description: string;
-}
+import { Event, UserEventRecord } from '../types';
 
 const EventsPage: React.FC = () => {
   const { user, isLoggedIn, navigateTo, error } = useApp();
@@ -31,10 +21,11 @@ const EventsPage: React.FC = () => {
     const upcomingEventsSnapshot = await getDocs(upcomingEventsQuery);
     const upcomingEvents: Event[] = upcomingEventsSnapshot.docs.map(doc => {
       const data = doc.data();
+      const eventTitle = data.name || 'Untitled Event';
       return {
         id: doc.id,
         category: data.category || 'Other',
-        title: data.name || 'Untitled Event',
+        name: eventTitle,
         date: data.start.toDate(),
         start_time: data.start ? data.start.toDate().toLocaleTimeString('en-US', {
           hour: 'numeric',
@@ -58,10 +49,11 @@ const EventsPage: React.FC = () => {
     const pastEventsSnapshot = await getDocs(pastEventsQuery);
     const pastEvents: Event[] = pastEventsSnapshot.docs.map(doc => {
       const data = doc.data();
+      const eventTitle = data.name || 'Untitled Event';
       return {
         id: doc.id,
         category: data.category || 'Other',
-        title: data.name || 'Untitled Event',
+        name: eventTitle,
         date: data.start.toDate(),
         start_time: data.start ? data.start.toDate().toLocaleTimeString('en-US', {
           hour: 'numeric',
@@ -101,7 +93,7 @@ const EventsPage: React.FC = () => {
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          const registered: Event[] = userData.eventsRegistered.map((event: any) => ({
+          const registered: Event[] = userData.eventsRegistered.map((event: UserEventRecord) => ({
             id: event.eventID,
           }));
           setRegisteredEvents(registered);
@@ -125,7 +117,7 @@ const EventsPage: React.FC = () => {
       });
       if (!user?.uid) throw new Error('User ID not found');
       await updateDoc(doc(db, 'users', user.uid), {
-        eventsRegistered: arrayUnion({ date: event?.date, eventID: event?.id, title: event?.title })
+        eventsRegistered: arrayUnion({ date: event?.date, eventID: event?.id, name: event?.name })
       });
       alert('Successfully registered for the event!');
     } catch (error) {
@@ -186,7 +178,7 @@ const EventsPage: React.FC = () => {
           return (
             <div key={event.id} className="event-card">
               <span className="event-category-badge">{event.category}</span>
-              <h2 className="event-title">{event.title}</h2>
+              <h2 className="event-title">{event.name}</h2>
               <div className="event-details">
                 <p><strong>Date:</strong> {event.date.toLocaleDateString()}</p>
                 <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
@@ -232,7 +224,7 @@ const EventsPage: React.FC = () => {
         ) : ( filteredPast.map(event => (
           <div key={event.id} className="event-card" style={{ backgroundColor: 'rgba(220, 220, 220, 0.8)' }}>
             <span className="event-category-badge">{event.category}</span>
-            <h2 className="event-title">{event.title}</h2>
+            <h2 className="event-title">{event.name}</h2>
             <div className="event-details">
               <p><strong>Date:</strong> {event.date.toLocaleDateString()}</p>
               <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>

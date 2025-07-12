@@ -8,24 +8,8 @@ import UserInfoContainer from '../components/profile/UserInfoContainer';
 import EventsContainer from '../components/profile/EventsContainer';
 import PasswordModal from '../components/profile/PasswordModal';
 import VerifyPasswordModal from '../components/profile/VerifyPasswordModal';
+import { Booking, EventSummary, UserEventRecord } from '../types';
 
-interface Booking {
-  id: string;
-  start: Date;
-  end: Date;
-}
-
-interface Event {
-  id: string;
-  title: string;
-  date: Date;
-}
-
-interface FirestoreEvent {
-  eventID: string;
-  name: string;
-  date: { toDate: () => Date };
-}
 
 const ProfilePage: React.FC = () => {
   const { user, navigateTo, error, authLoading } = useApp();
@@ -38,8 +22,8 @@ const ProfilePage: React.FC = () => {
   const [passwordError, setPasswordError] = useState<string>('');
   const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
   const [pastBookings, setPastBookings] = useState<Booking[]>([]);
-  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
-  const [pastEvents, setPastEvents] = useState<Event[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<EventSummary[]>([]);
+  const [pastEvents, setPastEvents] = useState<EventSummary[]>([]);
   const [eventsAttended, setEventsAttended] = useState<number>(0);
   const [memberError, setMemberError] = useState<string>('');
   const [memberSuccess, setMemberSuccess] = useState<string>('');
@@ -82,17 +66,17 @@ const ProfilePage: React.FC = () => {
         // get events attended and registered
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          const attended: Event[] = userData.eventsAttended.map((event: FirestoreEvent) => ({
+          const attended: EventSummary[] = userData.eventsAttended?.map((event: UserEventRecord) => ({
             id: event.eventID,
-            title: event.name,
-            date: event.date.toDate(),
-          }));
+            name: event.name,
+            date: event.date instanceof Date ? event.date : event.date.toDate(),
+          })) || [];
 
-          const registered: Event[] = userData.eventsRegistered.map((event: FirestoreEvent) => ({
+          const registered: EventSummary[] = userData.eventsRegistered?.map((event: UserEventRecord) => ({
             id: event.eventID,
-            title: event.name,
-            date: event.date.toDate(),
-          }));
+            name: event.name,
+            date: event.date instanceof Date ? event.date : event.date.toDate(),
+          })) || [];
 
           setUpcomingEvents(registered.filter(event => event.date > now));
           setPastEvents(attended.filter(event => event.date <= now));
@@ -318,7 +302,7 @@ const ProfilePage: React.FC = () => {
           pastItems={pastEvents}
           renderUpcomingItem={(event, index) => (
             <div className="event-item" key={`${event.id}-${index}`}>
-              <h4 className="event-title">{event.title}</h4>
+              <h4 className="event-title">{event.name}</h4>
               <p className="event-date">
                 {formatDate(event.date)} • {formatTime(event.date)}
               </p>
@@ -326,7 +310,7 @@ const ProfilePage: React.FC = () => {
           )}
           renderPastItem={(event, index) => (
             <div className="event-item" key={`${event.id}-${index}`}>
-              <h4 className="event-title">{event.title}</h4>
+              <h4 className="event-title">{event.name}</h4>
               <p className="event-date">
                 {formatDate(event.date)} • {formatTime(event.date)}
               </p>

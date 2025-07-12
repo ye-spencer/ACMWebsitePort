@@ -1,11 +1,6 @@
 import React from 'react';
 import '../../styles/AdminPage.css';
-
-interface Member {
-  uid: string;
-  email: string;
-  eventsAttended: number;
-}
+import { Member } from '../../types';
 
 interface MembersProps {
   members: Member[];

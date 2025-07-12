@@ -2,14 +2,7 @@ import miseokImage from '../assets/alumni/miseok kim.jpg';
 import juliaImage from '../assets/alumni/julia bian.jpeg';
 import nishImage from '../assets/alumni/nish.jpeg';
 import chaseImage from '../assets/alumni/chase feng.jpeg';
-
-interface PersonData {
-  name: string;
-  role: string;
-  bio: string;
-  linkedin: string;
-  imagePath?: string | undefined;
-}
+import { PersonData } from '../types';
 
 export const alumniData: PersonData[] = [
   {

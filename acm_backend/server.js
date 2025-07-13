@@ -356,7 +356,7 @@ app.post('/api/bookings', async (req, res) => {
       end: toFirestoreTimestamp(end)
     };
 
-    const bookingId = `${uid}${start.toDateString()}`;
+    const bookingId = `${uid}${new Date(start).toDateString()}`;
     await db.collection("bookings").doc(bookingId).set(bookingData);
     
     res.status(201).json({ 

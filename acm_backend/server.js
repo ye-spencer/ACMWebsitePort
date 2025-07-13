@@ -32,8 +32,14 @@ const convertTimestamp = (timestamp) => {
 
 // Helper function to convert Date to Firestore timestamp
 const toFirestoreTimestamp = (date) => {
+  if (!date) {
+    return null;
+  }
   if (date instanceof Date) {
     return admin.firestore.Timestamp.fromDate(date);
+  }
+  if (typeof date === 'string') {
+    return admin.firestore.Timestamp.fromDate(new Date(date));
   }
   return date;
 };
@@ -540,33 +546,47 @@ app.delete('/api/admin/members/:uid', async (req, res) => {
 // Create new user
 app.post('/api/users', async (req, res) => {
   try {
-    const { email, isMember, isOnMailingList, eventsAttended, eventsRegistered, deleted, deletedAt } = req.body;
+    const { uid, email, isMember, isOnMailingList, eventsAttended, eventsRegistered } = req.body;
     
     if (!email) {
-      return res.status(400).json({ message: 'UID and email are required' });
+      return res.status(400).json({ message: 'Email is required' });
     }
 
-    await db.collection("users").doc(uid).set({
+    if (!uid) {
+      return res.status(400).json({ message: 'UID is required' });
+    }
+
+    // Process events arrays safely
+    const processEventsArray = (eventsArray) => {
+      if (!eventsArray || !Array.isArray(eventsArray)) {
+        return [];
+      }
+      return eventsArray.map(event => {
+        if (!event || !event.eventID || !event.name) {
+          console.warn('Invalid event record:', event);
+          return null;
+        }
+        return {
+          eventID: event.eventID,
+          name: event.name,
+          date: toFirestoreTimestamp(event.date)
+        };
+      }).filter(Boolean); // Remove null entries
+    };
+
+    const userData = {
       email,
-      isMember,
-      isOnMailingList,
-      eventsAttended: eventsAttended.map(event => ({
-        eventID: event.eventID,
-        name: event.name,
-        date: toFirestoreTimestamp(event.date)
-      })),
-      eventsRegistered: eventsRegistered.map(event => ({
-        eventID: event.eventID,
-        name: event.name,
-        date: toFirestoreTimestamp(event.date)
-      })),
-      deleted,
-      deletedAt: deletedAt ? toFirestoreTimestamp(deletedAt) : undefined
-    });
+      isMember: isMember || false,
+      isOnMailingList: isOnMailingList || false,
+      eventsAttended: processEventsArray(eventsAttended),
+      eventsRegistered: processEventsArray(eventsRegistered),
+    };
+
+    await db.collection("users").doc(uid).set(userData);
     
     res.status(201).json({ 
       message: 'User created successfully',
-      uid 
+      uid: uid
     });
   } catch (error) {
     console.error('Error creating user:', error);

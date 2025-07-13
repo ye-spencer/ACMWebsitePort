@@ -91,6 +91,7 @@ const LoginPage: React.FC = () => {
           // create user in database with events attended and registered
           await Promise.all([
             createUser({ 
+              uid: cred.user.uid,
               email: cred.user.email!, 
               isMember: false,
               isOnMailingList: false,

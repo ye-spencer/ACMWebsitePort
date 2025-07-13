@@ -1,3 +1,5 @@
+import { Booking, EventAttendeeRecord, Event, EventSummary, Member, Profile } from './types';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 
 // Helper function for API calls
@@ -20,69 +22,53 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
 
 // EVENTS API
 
-export async function getUpcomingEvents() {
-  return apiCall('/api/events/upcoming');
+export async function getAllEvents() {
+  return apiCall('/api/events/all') as Promise<Event[]>
 }
 
-export async function getPastEvents() {
-  return apiCall('/api/events/past');
-}
-
-export async function createEvent(eventData: {
-  category: string;
-  name: string;
-  description: string;
-  location: string;
-  link: string;
-  start: string;
-  end: string;
-}) {
+export async function createEvent(event: Event) {
   return apiCall('/api/events', {
     method: 'POST',
-    body: JSON.stringify(eventData),
+    body: JSON.stringify(event),
   });
 }
 
-export async function rsvpForEvent(eventId: string, uid: string, email: string) {
+export async function rsvpForEvent(eventId: string, eventAttendee: EventAttendeeRecord) {
   return apiCall(`/api/events/${eventId}/rsvp`, {
     method: 'POST',
-    body: JSON.stringify({ uid, email }),
+    body: JSON.stringify(eventAttendee),
   });
 }
 
-export async function getAllEvents() {
-  return apiCall('/api/events/all');
-}
-
-export async function updateEvent(eventId: string, updates: any) {
-  return apiCall(`/api/events/${eventId}`, {
+export async function updateEvent(event: Event) {
+  return apiCall(`/api/events/${event.id}`, {
     method: 'PATCH',
-    body: JSON.stringify(updates),
+    body: JSON.stringify(event),
   });
 }
 
 // USERS API
 
 export async function getUserData(uid: string) {
-  return apiCall(`/api/users/${uid}`);
+  return apiCall(`/api/users/${uid}`) as Promise<Profile>;
 }
 
-export async function updateUser(uid: string, updates: any) {
-  return apiCall(`/api/users/${uid}`, {
+export async function updateUser(updates: Profile) {
+  return apiCall(`/api/users/${updates.uid}`, {
     method: 'PATCH',
     body: JSON.stringify(updates),
   });
 }
 
-export async function createUser(uid: string, email: string, eventsAttended: any[], eventsRegistered: any[]) {
+export async function createUser(userData: Profile) {
   return apiCall('/api/users', {
     method: 'POST',
-    body: JSON.stringify({ uid, email, eventsAttended, eventsRegistered }),
+    body: JSON.stringify(userData),
   });
 }
 
 export async function deleteUser(uid: string): Promise<void> {
-  await apiCall('/deleteUser', {
+  await apiCall('/api/users/delete', {
     method: 'POST',
     body: JSON.stringify({ uid }),
   });
@@ -91,18 +77,18 @@ export async function deleteUser(uid: string): Promise<void> {
 // BOOKINGS API
 
 export async function getWeekBookings() {
-  return apiCall('/api/bookings/week');
+  return apiCall('/api/bookings/week') as Promise<Booking[]>;
 }
 
-export async function createBooking(uid: string, start: string, end: string) {
+export async function createBooking(booking: Booking) {
   return apiCall('/api/bookings', {
     method: 'POST',
-    body: JSON.stringify({ uid, start, end }),
+    body: JSON.stringify(booking),
   });
 }
 
 export async function getUserBookings(uid: string) {
-  return apiCall(`/api/users/${uid}/bookings`);
+  return apiCall(`/api/bookings/user/${uid}`) as Promise<Booking[]>;
 }
 
 export async function deleteBooking(bookingId: string) {
@@ -114,11 +100,11 @@ export async function deleteBooking(bookingId: string) {
 // ADMIN API
 
 export async function getMembers() {
-  return apiCall('/api/admin/members');
+  return apiCall('/api/admin/members') as Promise<Member[]>;
 }
 
 export async function getPastEventsForAdmin() {
-  return apiCall('/api/admin/events/past');
+  return apiCall('/api/admin/events/past') as Promise<EventSummary[]>;
 }
 
 export async function uploadAttendance(eventId: string, attendeeEmails: string[]) {

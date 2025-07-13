@@ -6,8 +6,24 @@ export interface BaseEvent {
   location: string;
   category: string;
   link?: string;
-  attendees?: EventAttendeeRecord[];
-  registered?: EventAttendeeRecord[];
+  attendees: EventAttendeeRecord[];
+  registered: EventAttendeeRecord[];
+}
+
+export interface BaseProfile {
+  email: string;
+  isMember: boolean;
+  isOnMailingList: boolean;
+  deleted?: boolean;
+}
+
+export interface BaseBooking {
+  uid: string;
+}
+
+export interface BaseUserEventRecord {
+  eventID: string;
+  name: string;
 }
 
 // =========================
@@ -17,13 +33,9 @@ export interface BaseEvent {
 /**
  * User document structure in Firestore
  */
-export interface UserDocument {
-  email: string;
-  isMember: boolean;
-  isOnMailingList: boolean;
-  eventsAttended: UserEventRecord[];
-  eventsRegistered: UserEventRecord[];
-  deleted?: boolean;
+export interface ProfileDocument extends BaseProfile {
+  eventsAttended: UserEventRecordDocument[];
+  eventsRegistered: UserEventRecordDocument[];
   deletedAt?: Timestamp;
 }
 
@@ -38,10 +50,16 @@ export interface EventDocument extends BaseEvent {
 /**
  * Booking document structure in Firestore
  */
-export interface BookingDocument {
-  UID: string;
+export interface BookingDocument extends BaseBooking {
   start: Timestamp;
   end: Timestamp;
+}
+
+/**
+ * User event record document structure in Firestore
+ */
+export interface UserEventRecordDocument extends BaseUserEventRecord {
+  date: Timestamp;
 }
 
 // =========================
@@ -49,13 +67,22 @@ export interface BookingDocument {
 // =========================
 
 /**
+ * User data with converted dates for frontend use
+ */
+export interface Profile extends BaseProfile {
+  uid: string;
+  eventsAttended: UserEventRecord[];
+  eventsRegistered: UserEventRecord[];
+  deletedAt?: Date;
+}
+
+/**
  * Event data with converted dates for frontend use
  */
 export interface Event extends BaseEvent {
   id: string;
-  date: Date;
-  start_time: string;
-  end_time: string;
+  start: Date;
+  end: Date;
 }
 
 /**
@@ -70,7 +97,7 @@ export interface EventSummary {
 /**
  * Booking data with converted dates for frontend use
  */
-export interface Booking {
+export interface Booking extends BaseBooking {
   id: string;
   start: Date;
   end: Date;
@@ -112,10 +139,8 @@ export interface PersonData {
 /**
  * Event attendance or registration record in user documents
  */
-export interface UserEventRecord {
-  eventID: string;
-  name: string;
-  date: Date | Timestamp;
+export interface UserEventRecord extends BaseUserEventRecord {
+  date: Date;
 }
 
 /**

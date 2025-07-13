@@ -40,111 +40,56 @@ const toFirestoreTimestamp = (date) => {
 
 // EVENTS API
 
-// Get upcoming events
-app.get('/api/events/upcoming', async (req, res) => {
+// Get all events
+app.get('/api/events/all', async (req, res) => {
   try {
-    const now = admin.firestore.Timestamp.now();
-    const eventsQuery = db.collection("events")
-      .where("start", ">=", now)
-      .orderBy("start", "desc");
-    
+    const eventsQuery = db.collection("events");
     const eventsSnapshot = await eventsQuery.get();
+    
     const events = eventsSnapshot.docs.map(doc => {
       const data = doc.data();
       return {
         id: doc.id,
-        category: data.category || 'Other',
-        name: data.name || 'Untitled Event',
-        date: convertTimestamp(data.start),
-        start_time: data.start ? convertTimestamp(data.start).toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }) : 'TBD',
-        end_time: data.end ? convertTimestamp(data.end).toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }) : 'TBD',
-        location: data.location || 'TBD',
-        description: data.description || '',
+        ...data,
+        start: convertTimestamp(data.start),
+        end: convertTimestamp(data.end)
       };
     });
-    
-    res.json(events);
-  } catch (error) {
-    console.error('Error fetching upcoming events:', error);
-    res.status(500).json({ message: 'Error fetching upcoming events' });
-  }
-});
 
-// Get past events
-app.get('/api/events/past', async (req, res) => {
-  try {
-    const now = admin.firestore.Timestamp.now();
-    const eventsQuery = db.collection("events")
-      .where("start", "<", now)
-      .orderBy("start", "desc");
-    
-    const eventsSnapshot = await eventsQuery.get();
-    const events = eventsSnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        category: data.category || 'Other',
-        name: data.name || 'Untitled Event',
-        date: convertTimestamp(data.start),
-        start_time: data.start ? convertTimestamp(data.start).toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }) : 'TBD',
-        end_time: data.end ? convertTimestamp(data.end).toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }) : 'TBD',
-        location: data.location || 'TBD',
-        description: data.description || '',
-      };
-    });
-    
     res.json(events);
   } catch (error) {
-    console.error('Error fetching past events:', error);
-    res.status(500).json({ message: 'Error fetching past events' });
+    console.error('Error fetching all events:', error);
+    res.status(500).json({ message: 'Error fetching all events' });
   }
 });
 
 // Create new event
 app.post('/api/events', async (req, res) => {
   try {
-    const { category, name, description, location, link, start, end } = req.body;
+    const {name, description, location, category, link, attendees, registered, start, end} = req.body;
     
     if (!name || !start || !end) {
-      return res.status(400).json({ message: 'Name, start, and end are required' });
+      return res.status(400).json({ message: 'Name, start, and end are required' }); 
     }
 
-    const startDateTime = new Date(start);
-    const endDateTime = new Date(end);
-
-    if (endDateTime <= startDateTime) {
+    // Check if start and end are valid
+    if (end <= start) {
       return res.status(400).json({ message: 'End time must be after start time' });
     }
 
-    const eventData = {
-      category: category || 'Other',
+    const eventDoc = {
       name,
-      description: description || '',
-      location: location || 'TBD',
-      link: link || '',
-      start: toFirestoreTimestamp(startDateTime),
-      end: toFirestoreTimestamp(endDateTime),
-      registered: [],
-      attendees: []
+      description,
+      location,
+      category,
+      link,
+      attendees,
+      registered,
+      start: toFirestoreTimestamp(start),
+      end: toFirestoreTimestamp(end),
     };
 
-    const docRef = await db.collection("events").add(eventData);
+    const docRef = await db.collection("events").add(eventDoc);
     
     res.status(201).json({ 
       message: 'Event created successfully',
@@ -153,6 +98,31 @@ app.post('/api/events', async (req, res) => {
   } catch (error) {
     console.error('Error creating event:', error);
     res.status(500).json({ message: 'Error creating event' });
+  }
+});
+
+// Update event
+app.patch('/api/events/:eventId', async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const { name, description, location, category, link, attendees, registered, start, end } = req.body;
+    const eventDoc = {
+      name,
+      description,
+      location,
+      category,
+      link,
+      attendees,
+      registered,
+      start: toFirestoreTimestamp(start),
+      end: toFirestoreTimestamp(end)
+    }
+    
+    await db.collection("events").doc(eventId).update(eventDoc);
+    res.json({ message: 'Event updated successfully' });
+  } catch (error) {
+    console.error('Error updating event:', error);
+    res.status(500).json({ message: 'Error updating event' });
   }
 });
 
@@ -214,8 +184,18 @@ app.get('/api/users/:uid', async (req, res) => {
       email: userData.email,
       isMember: userData.isMember || false,
       isOnMailingList: userData.isOnMailingList || false,
-      eventsRegistered: userData.eventsRegistered || [],
-      eventsAttended: userData.eventsAttended || []
+      eventsRegistered: userData.eventsRegistered.map(event => ({
+        eventID: event.eventID,
+        name: event.name,
+        date: convertTimestamp(event.date)
+      })) || [],
+      eventsAttended: userData.eventsAttended.map(event => ({
+        eventID: event.eventID,
+        name: event.name,
+        date: convertTimestamp(event.date)
+      })) || [],
+      deleted: userData.deleted || false,
+      deletedAt: userData.deletedAt ? convertTimestamp(userData.deletedAt) : undefined
     });
   } catch (error) {
     console.error('Error fetching user data:', error);
@@ -227,19 +207,26 @@ app.get('/api/users/:uid', async (req, res) => {
 app.patch('/api/users/:uid', async (req, res) => {
   try {
     const { uid } = req.params;
-    const updates = req.body;
-    
-    // Convert dates to Firestore timestamps if present
-    const processedUpdates = {};
-    Object.keys(updates).forEach(key => {
-      if (key === 'deletedAt' && updates[key]) {
-        processedUpdates[key] = toFirestoreTimestamp(new Date(updates[key]));
-      } else {
-        processedUpdates[key] = updates[key];
-      }
-    });
+    const { email, isMember, isOnMailingList, eventsAttended, eventsRegistered, deleted, deletedAt } = req.body;
+    const updatedUserDoc = {
+      email,
+      isMember,
+      isOnMailingList,
+      eventsAttended: eventsAttended.map(event => ({
+        eventID: event.eventID,
+        name: event.name,
+        date: toFirestoreTimestamp(event.date)
+      })),
+      eventsRegistered: eventsRegistered.map(event => ({
+        eventID: event.eventID,
+        name: event.name,
+        date: toFirestoreTimestamp(event.date)
+      })),
+      deleted,
+      deletedAt: deletedAt ? toFirestoreTimestamp(deletedAt) : undefined
+    };
 
-    await db.collection("users").doc(uid).update(processedUpdates);
+    await db.collection("users").doc(uid).update(updatedUserDoc);
     res.json({ message: 'User updated successfully' });
   } catch (error) {
     console.error('Error updating user:', error);
@@ -248,7 +235,7 @@ app.patch('/api/users/:uid', async (req, res) => {
 });
 
 // Delete a user by UID
-app.post('/deleteUser', async (req, res) => {
+app.post('/api/users/delete', async (req, res) => {
   const { uid } = req.body;
   if (!uid) {
     return res.status(400).json({ message: 'UID is required' });
@@ -266,17 +253,21 @@ app.post('/deleteUser', async (req, res) => {
 // BOOKINGS API
 
 // Get user bookings
-app.get('/api/users/:uid/bookings', async (req, res) => {
+app.get('/api/bookings/user/:uid', async (req, res) => {
   try {
     const { uid } = req.params;
-    const bookingsQuery = db.collection("bookings").where("UID", "==", uid);
+    const bookingsQuery = db.collection("bookings").where("uid", "==", uid);
     const bookingsSnapshot = await bookingsQuery.get();
     
-    const bookings = bookingsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      start: convertTimestamp(doc.data().start),
-      end: convertTimestamp(doc.data().end)
-    }));
+    const bookings = bookingsSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        uid: data.uid,
+        start: convertTimestamp(data.start),
+        end: convertTimestamp(data.end)
+      };
+    });
 
     res.json(bookings);
   } catch (error) {
@@ -297,11 +288,15 @@ app.get('/api/bookings/week', async (req, res) => {
       .where("start", "<=", toFirestoreTimestamp(weekEnd));
     
     const bookingsSnapshot = await bookingsQuery.get();
-    const bookings = bookingsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      start: convertTimestamp(doc.data().start),
-      end: convertTimestamp(doc.data().end)
-    }));
+    const bookings = bookingsSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        uid: data.uid,
+        start: convertTimestamp(data.start),
+        end: convertTimestamp(data.end)
+      };
+    });
 
     res.json(bookings);
   } catch (error) {
@@ -319,21 +314,18 @@ app.post('/api/bookings', async (req, res) => {
       return res.status(400).json({ message: 'UID, start, and end are required' });
     }
 
-    const startDateTime = new Date(start);
-    const endDateTime = new Date(end);
-
-    if (endDateTime <= startDateTime) {
+    if (end <= start) {
       return res.status(400).json({ message: 'End time must be after start time' });
     }
 
     // Check if user already has a booking on this day
-    const startOfDay = new Date(startDateTime);
+    const startOfDay = new Date(start);
     startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(startDateTime);
+    const endOfDay = new Date(start);
     endOfDay.setHours(23, 59, 59, 999);
 
     const existingBookingsQuery = db.collection("bookings")
-      .where("UID", "==", uid)
+      .where("uid", "==", uid)
       .where("start", ">=", toFirestoreTimestamp(startOfDay))
       .where("start", "<=", toFirestoreTimestamp(endOfDay));
 
@@ -344,8 +336,8 @@ app.post('/api/bookings', async (req, res) => {
 
     // Check for time slot conflicts
     const conflictQuery = db.collection("bookings")
-      .where("start", "<", toFirestoreTimestamp(endDateTime))
-      .where("end", ">", toFirestoreTimestamp(startDateTime));
+      .where("start", "<", toFirestoreTimestamp(end))
+      .where("end", ">", toFirestoreTimestamp(start));
 
     const conflictSnapshot = await conflictQuery.get();
     if (!conflictSnapshot.empty) {
@@ -353,12 +345,12 @@ app.post('/api/bookings', async (req, res) => {
     }
 
     const bookingData = {
-      UID: uid,
-      start: toFirestoreTimestamp(startDateTime),
-      end: toFirestoreTimestamp(endDateTime)
+      uid,
+      start: toFirestoreTimestamp(start),
+      end: toFirestoreTimestamp(end)
     };
 
-    const bookingId = `${uid}${startDateTime.toDateString()}`;
+    const bookingId = `${uid}${start.toDateString()}`;
     await db.collection("bookings").doc(bookingId).set(bookingData);
     
     res.status(201).json({ 
@@ -391,11 +383,14 @@ app.get('/api/admin/members', async (req, res) => {
     const membersQuery = db.collection("users").where("isMember", "==", true);
     const membersSnapshot = await membersQuery.get();
     
-    const members = membersSnapshot.docs.map(doc => ({
-      uid: doc.id,
-      email: doc.data().email,
-      eventsAttended: doc.data().eventsAttended?.length || 0
-    }));
+    const members = membersSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        uid: doc.id,
+        email: data.email,
+        eventsAttended: data.eventsAttended?.length || 0
+      };
+    });
 
     res.json(members);
   } catch (error) {
@@ -501,13 +496,8 @@ app.delete('/api/admin/members/:uid', async (req, res) => {
     
     // Update user in database
     await db.collection("users").doc(uid).update({
-      isMember: false,
-      deleted: true,
-      deletedAt: admin.firestore.Timestamp.now()
+      isMember: false
     });
-
-    // Delete user credentials
-    await admin.auth().deleteUser(uid);
 
     res.json({ message: 'Member removed successfully' });
   } catch (error) {
@@ -516,48 +506,32 @@ app.delete('/api/admin/members/:uid', async (req, res) => {
   }
 });
 
-// Get all events for user creation
-app.get('/api/events/all', async (req, res) => {
-  try {
-    const eventsQuery = db.collection("events");
-    const eventsSnapshot = await eventsQuery.get();
-    
-    const events = eventsSnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        name: data.name,
-        start: convertTimestamp(data.start),
-        attendees: data.attendees || [],
-        registered: data.registered || []
-      };
-    });
-
-    res.json(events);
-  } catch (error) {
-    console.error('Error fetching all events:', error);
-    res.status(500).json({ message: 'Error fetching all events' });
-  }
-});
-
 // Create new user
 app.post('/api/users', async (req, res) => {
   try {
-    const { uid, email, eventsAttended, eventsRegistered } = req.body;
+    const { email, isMember, isOnMailingList, eventsAttended, eventsRegistered, deleted, deletedAt } = req.body;
     
-    if (!uid || !email) {
+    if (!email) {
       return res.status(400).json({ message: 'UID and email are required' });
     }
 
-    const userData = {
-      email: email.toLowerCase(),
-      isMember: false,
-      isOnMailingList: false,
-      eventsAttended: eventsAttended || [],
-      eventsRegistered: eventsRegistered || []
-    };
-
-    await db.collection("users").doc(uid).set(userData);
+    await db.collection("users").doc(uid).set({
+      email,
+      isMember,
+      isOnMailingList,
+      eventsAttended: eventsAttended.map(event => ({
+        eventID: event.eventID,
+        name: event.name,
+        date: toFirestoreTimestamp(event.date)
+      })),
+      eventsRegistered: eventsRegistered.map(event => ({
+        eventID: event.eventID,
+        name: event.name,
+        date: toFirestoreTimestamp(event.date)
+      })),
+      deleted,
+      deletedAt: deletedAt ? toFirestoreTimestamp(deletedAt) : undefined
+    });
     
     res.status(201).json({ 
       message: 'User created successfully',
@@ -569,19 +543,6 @@ app.post('/api/users', async (req, res) => {
   }
 });
 
-// Update event attendees/registered
-app.patch('/api/events/:eventId', async (req, res) => {
-  try {
-    const { eventId } = req.params;
-    const updates = req.body;
-    
-    await db.collection("events").doc(eventId).update(updates);
-    res.json({ message: 'Event updated successfully' });
-  } catch (error) {
-    console.error('Error updating event:', error);
-    res.status(500).json({ message: 'Error updating event' });
-  }
-});
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

@@ -7,6 +7,7 @@ import { createUserWithEmailAndPassword,
          signInWithEmailAndPassword } from "firebase/auth";
 import { useApp } from '../hooks/useApp';
 import { getAllEvents, createUser, updateEvent } from '../api';
+import { Event, UserEventRecord, EventAttendeeRecord, Profile } from '../types';
 
 const LoginPage: React.FC = () => {
   const { user, navigateTo, error } = useApp();
@@ -51,22 +52,16 @@ const LoginPage: React.FC = () => {
           const events = await getAllEvents();
 
           // track events attended and registered
-          const attended: { eventID: string; name: string; date: any }[] = [];
-          const registered: { eventID: string; name: string; date: any }[] = [];
-          const updatePromises: Promise<any>[] = [];
+          const attended: UserEventRecord[] = [];
+          const registered: UserEventRecord[] = [];
+          const updatePromises: Promise<Event>[] = [];
 
           // get events and attendees
-          events.forEach((event: any) => {
-            const attendees = Array.isArray(event.attendees)
-              ? [...event.attendees]
-              : [];
-            const regs = Array.isArray(event.registered)
-              ? [...event.registered]
-              : [];
+          events.forEach((event: Event) => {
             let changed = false;
 
             // check if user is attendee
-            attendees.forEach((a: any) => {
+            event.attendees.forEach((a: EventAttendeeRecord) => {
               if (a.email && a.email.toLowerCase() === cred.user.email!.toLowerCase()) {
                 attended.push({ eventID: event.id, name: event.name, date: event.start });
                 if (a.uid !== cred.user.uid) {
@@ -77,7 +72,7 @@ const LoginPage: React.FC = () => {
             });
 
             // check if user is registered
-            regs.forEach((r: any) => {
+            event.registered.forEach((r: EventAttendeeRecord) => {
               if (r.email && r.email.toLowerCase() === cred.user.email!.toLowerCase()) {
                 registered.push({ eventID: event.id, name: event.name, date: event.start });
                 if (r.uid !== cred.user.uid) {
@@ -89,13 +84,19 @@ const LoginPage: React.FC = () => {
 
             // update event in database if user is attendee or registered
             if (changed) {
-              updatePromises.push(updateEvent(event.id, { attendees, registered: regs }));
+              updatePromises.push(updateEvent(event));
             }
           });
 
           // create user in database with events attended and registered
           await Promise.all([
-            createUser(cred.user.uid, cred.user.email!, attended, registered),
+            createUser({ 
+              email: cred.user.email!, 
+              isMember: false,
+              isOnMailingList: false,
+              eventsAttended: attended, 
+              eventsRegistered: registered 
+            } as Profile),
             ...updatePromises,
           ]);
         } catch (err) {

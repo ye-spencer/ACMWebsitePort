@@ -9,8 +9,8 @@ import { auth } from '../firebase/config';
 import { signOut } from "firebase/auth";
 import { useApp } from '../hooks/useApp';
 import * as XLSX from 'xlsx';
-import { deleteUser, getMembers, getPastEventsForAdmin, createEvent, updateUser, uploadAttendance, removeMember } from '../api';
-import { EventSummary, Member, SpreadsheetRow, EventAttendeeRecord } from '../types';
+import { getMembers, getPastEventsForAdmin, createEvent, uploadAttendance, removeMember } from '../api';
+import { Event, EventSummary, Member, SpreadsheetRow } from '../types';
 
 type AdminSection = 'dashboard' | 'create-event' | 'members' | 'attendance';
 
@@ -82,14 +82,17 @@ const AdminPage: React.FC = () => {
 
       // send event to database
       await createEvent({
+        id: '',
         category: eventCategory,
         name: eventTitle,
         description: eventDescription,
         location: eventLocation,
         link: eventLink,
-        start: startDateTime.toISOString(),
-        end: endDateTime.toISOString(),
-      });
+        attendees: [],
+        registered: [],
+        start: startDateTime,
+        end: endDateTime
+      } as Event);
 
       // Reset form
       setEventCategory('');

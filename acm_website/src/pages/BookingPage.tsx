@@ -3,7 +3,7 @@ import '../styles/Pages.css';
 import '../styles/BookingPage.css';
 import TimeSelection from '../components/booking/TimeSelection';
 import CalendarView from '../components/booking/CalendarView';
-import { TimeSlot } from '../types';
+import { Booking, TimeSlot } from '../types';
 import { useApp } from '../hooks/useApp';
 import { getUserData, getWeekBookings, createBooking } from '../api';
 
@@ -89,7 +89,7 @@ const BookingPage: React.FC = () => {
     const fetchWeekBookings = async () => {
       try {
         const bookings = await getWeekBookings();
-        const weekBookings = bookings.map((booking: any) => [
+        const weekBookings = bookings.map((booking: Booking) => [
           new Date(booking.start),
           new Date(booking.end)
         ]);
@@ -195,13 +195,13 @@ const BookingPage: React.FC = () => {
       }
 
       // Create booking via API
-      await createBooking(user.uid, startTime.toISOString(), endTime.toISOString());
+      await createBooking({id: user.uid, start: startTime, end: endTime} as Booking);
 
       setBookingSuccess('Room successfully booked!');
       
       // Refresh week bookings
       const bookings = await getWeekBookings();
-      const weekBookings = bookings.map((booking: any) => [
+      const weekBookings = bookings.map((booking: Booking) => [
         new Date(booking.start),
         new Date(booking.end)
       ]);

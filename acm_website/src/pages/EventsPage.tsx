@@ -3,40 +3,36 @@ import '../styles/Pages.css';
 import '../styles/EventsPage.css';
 import { useApp } from '../hooks/useApp';
 import { eventCategories } from "../components/admin/CreateEvent.tsx";
-import { Event, UserEventRecord } from '../types';
-import { getUpcomingEvents, getPastEvents, rsvpForEvent, getUserData } from '../api';
+import { Event, EventAttendeeRecord, EventSummary, UserEventRecord } from '../types';
+import { getAllEvents, rsvpForEvent, getUserData } from '../api';
 
 const EventsPage: React.FC = () => {
   const { user, isLoggedIn, navigateTo, error } = useApp();
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [registeredEvents, setRegisteredEvents] = useState<Event[]>([]);
+  const [registeredEvents, setRegisteredEvents] = useState<EventSummary[]>([]);
   const [selectedUpcomingCategory, setSelectedUpcomingCategory] = useState<string>('All');
   const [selectedPastCategory, setSelectedPastCategory] = useState<string>('All');
 
-  const fetchUpcomingEvents = async () => {
-    try {
-      const events = await getUpcomingEvents();
-      setUpcomingEvents(events);
-    } catch (error) {
-      console.error('Error fetching upcoming events:', error);
-    }
-  };
-
-  const fetchPastEvents = async () => {
-    try {
-      const events = await getPastEvents();
-      setPastEvents(events);
-    } catch (error) {
-      console.error('Error fetching past events:', error);
-    }
-  };
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        await Promise.all([fetchUpcomingEvents(), fetchPastEvents()]);
+        const events = await getAllEvents();
+        const now = new Date();
+        
+        const upcoming = events.filter(event => {
+          const eventStart = new Date(event.start);
+          return eventStart > now;
+        });
+        const past = events.filter(event => {
+          const eventStart = new Date(event.start);
+          return eventStart < now;
+        });
+        
+        setUpcomingEvents(upcoming);
+        setPastEvents(past);
       } catch (error) {
         console.error('Error fetching events:', error);
       } finally {
@@ -48,12 +44,19 @@ const EventsPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    console.log(upcomingEvents);
+    console.log(pastEvents);
+  }, [upcomingEvents, pastEvents]);
+
+  useEffect(() => {
     if (user) {
       const fetchUserRegistrations = async () => {
         try {
           const userData = await getUserData(user.uid);
-          const registered: Event[] = userData.eventsRegistered.map((event: UserEventRecord) => ({
+          const registered: EventSummary[] = userData.eventsRegistered.map((event: UserEventRecord) => ({
             id: event.eventID,
+            name: event.name, 
+            date: event.date
           }));
           setRegisteredEvents(registered);
         } catch (error) {
@@ -74,12 +77,14 @@ const EventsPage: React.FC = () => {
     try {
       if (!user?.uid || !user?.email) throw new Error('User ID or email not found');
       
-      await rsvpForEvent(eventID, user.uid, user.email);
+      await rsvpForEvent(eventID, { uid: user.uid, email: user.email } as EventAttendeeRecord);
       
       // Refresh user registrations
       const userData = await getUserData(user.uid);
-      const registered: Event[] = userData.eventsRegistered.map((event: UserEventRecord) => ({
+      const registered: EventSummary[] = userData.eventsRegistered.map((event: UserEventRecord) => ({
         id: event.eventID,
+        name: event.name,
+        date: event.date
       }));
       setRegisteredEvents(registered);
       
@@ -88,6 +93,21 @@ const EventsPage: React.FC = () => {
       alert('Error registering for event.');
       console.error(error);
     }
+  };
+
+  const formatDate = (date: Date) => {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const formatTime = (date: Date) => {
+    const hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    return `${displayHours}:${minutes} ${ampm}`;
   };
 
   const filteredUpcoming = selectedUpcomingCategory == 'All' ? upcomingEvents : upcomingEvents.filter(event => event.category == selectedUpcomingCategory);
@@ -161,8 +181,8 @@ const EventsPage: React.FC = () => {
                     <div className="event-status"></div>
                   </div>
                   <div className="event-details">
-                    <p><strong>Date:</strong> {event.date.toLocaleDateString()}</p>
-                    <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
+                    <p><strong>Date:</strong> {formatDate(new Date(event.start))}</p>
+                    <p><strong>Time:</strong> {formatTime(new Date(event.start))} - {formatTime(new Date(event.end))}</p>
                     <p><strong>Location:</strong> {event.location}</p>
                   </div>
                   <p className="event-description">{event.description}</p>
@@ -211,8 +231,8 @@ const EventsPage: React.FC = () => {
                   <div className="event-status"></div>
                 </div>
                 <div className="event-details">
-                  <p><strong>Date:</strong> {event.date.toLocaleDateString()}</p>
-                  <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
+                  <p><strong>Date:</strong> {formatDate(new Date(event.start))}</p>
+                  <p><strong>Time:</strong> {formatTime(new Date(event.start))} - {formatTime(new Date(event.end))}</p>
                   <p><strong>Location:</strong> {event.location}</p>
                 </div>
                 <p className="event-description">{event.description}</p>

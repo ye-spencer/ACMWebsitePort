@@ -8,7 +8,7 @@ import UserInfoContainer from '../components/profile/UserInfoContainer';
 import EventsContainer from '../components/profile/EventsContainer';
 import PasswordModal from '../components/profile/PasswordModal';
 import VerifyPasswordModal from '../components/profile/VerifyPasswordModal';
-import { Booking, EventSummary, UserEventRecord } from '../types';
+import { Booking, Profile, UserEventRecord } from '../types';
 import { getUserData, updateUser, getUserBookings, deleteBooking } from '../api';
 
 type ProfileSection = 'profile' | 'bookings' | 'events';
@@ -16,18 +16,15 @@ type ProfileSection = 'profile' | 'bookings' | 'events';
 const ProfilePage: React.FC = () => {
   const { user, navigateTo, error, authLoading } = useApp();
   const [activeSection, setActiveSection] = useState<ProfileSection>('profile');
-  const [email, setEmail] = useState<string>('');
-  const [isMember, setIsMember] = useState<boolean>(false);
-  const [isOnMailingList, setIsOnMailingList] = useState<boolean>(false);
+  const [userData, setUserData] = useState<Profile | null>(null);
+  const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
+  const [pastBookings, setPastBookings] = useState<Booking[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<UserEventRecord[]>([]);
+  const [pastEvents, setPastEvents] = useState<UserEventRecord[]>([]);
   const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
   const [newPassword, setNewPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
-  const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
-  const [pastBookings, setPastBookings] = useState<Booking[]>([]);
-  const [upcomingEvents, setUpcomingEvents] = useState<EventSummary[]>([]);
-  const [pastEvents, setPastEvents] = useState<EventSummary[]>([]);
-  const [eventsAttended, setEventsAttended] = useState<number>(0);
   const [memberError, setMemberError] = useState<string>('');
   const [memberSuccess, setMemberSuccess] = useState<string>('');
   const [showVerifyModal, setShowVerifyModal] = useState<boolean>(false);
@@ -42,43 +39,21 @@ const ProfilePage: React.FC = () => {
     if (user) {
       const loadUserData = async () => {
         try {
-          setEmail(user.email || '');
-          
           // Get user data from API
           const userData = await getUserData(user.uid);
-          setIsMember(userData.isMember || false);
-          setIsOnMailingList(userData.isOnMailingList || false);
+          if (!userData) {
+            navigateTo('login', 'Error loading user data');
+            return;
+          }
+          setUserData(userData);
 
           // Get bookings from API
           const bookings = await getUserBookings(user.uid);
-          const now = new Date();
-          
-          // Convert booking dates from strings to Date objects
-          const processedBookings: Booking[] = bookings.map((booking: any) => ({
-            ...booking,
-            start: new Date(booking.start),
-            end: new Date(booking.end)
-          }));
-          
-          setUpcomingBookings(processedBookings.filter(booking => booking.start > now));
-          setPastBookings(processedBookings.filter(booking => booking.start <= now));
+          setUpcomingBookings(bookings.filter(booking => new Date(booking.start) > new Date()));
+          setPastBookings(bookings.filter(booking => new Date(booking.start) <= new Date()));
 
-          // Process events attended and registered
-          const attended: EventSummary[] = userData.eventsAttended?.map((event: any) => ({
-            id: event.eventID,
-            name: event.name,
-            date: new Date(event.date),
-          })) || [];
-
-          const registered: EventSummary[] = userData.eventsRegistered?.map((event: any) => ({
-            id: event.eventID,
-            name: event.name,
-            date: new Date(event.date),
-          })) || [];
-
-          setUpcomingEvents(registered.filter(event => event.date > now));
-          setPastEvents(attended.filter(event => event.date <= now));
-          setEventsAttended(attended.length);
+          setUpcomingEvents(userData.eventsRegistered.filter(event => new Date(event.date) > new Date()));
+          setPastEvents(userData.eventsAttended.filter(event => new Date(event.date) <= new Date()));
         } catch (error) {
           console.error('Error loading user data:', error);
         }
@@ -143,9 +118,15 @@ const ProfilePage: React.FC = () => {
         const user = auth.currentUser;
         if (user) {
           // Update user in database via API
-          await updateUser(user.uid, {
+          await updateUser({
+            uid: user.uid,
+            email: user.email!,
+            isMember: false,
+            isOnMailingList: false,
+            eventsAttended: [],
+            eventsRegistered: [],
             deleted: true,
-            deletedAt: new Date().toISOString()
+            deletedAt: new Date(),
           });
           
           // Delete user credentials
@@ -167,27 +148,14 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  const handleJoinMailingList = async () => {
+  const handleToggleMailingList = async () => {
     try {
       const user = auth.currentUser;
-      if (user) {
-        await updateUser(user.uid, { isOnMailingList: true });
-        setIsOnMailingList(true);
+      if (user && userData) {
+        await updateUser({ ...userData, isOnMailingList: !userData.isOnMailingList });
       }
     } catch (error) {
       console.error('Error joining mailing list:', error);
-    }
-  };
-
-  const handleUnsubscribeMailingList = async () => {
-    try {
-      const user = auth.currentUser;
-      if (user) {
-        await updateUser(user.uid, { isOnMailingList: false });
-        setIsOnMailingList(false);
-      }
-    } catch (error) {
-      console.error('Error unsubscribing from mailing list:', error);
     }
   };
 
@@ -196,17 +164,15 @@ const ProfilePage: React.FC = () => {
     setMemberSuccess('');
 
     // check if user satisfies requirements
-    if (eventsAttended < 3) {
+    if (userData?.eventsAttended.length ?? 0 < 3) {
       setMemberError('You must have attended at least 3 events to become a member.');
       return;
     }
 
     // update user in database
     try {
-      const user = auth.currentUser;
-      if (user) {
-        await updateUser(user.uid, { isMember: true });
-        setIsMember(true);
+      if (userData) {
+        await updateUser({ ...userData, isMember: true });
         setMemberSuccess('You are now a member!');
       }
     } catch (error) {
@@ -216,7 +182,7 @@ const ProfilePage: React.FC = () => {
   };
 
   const formatDate = (date: Date): string => {
-    return date.toLocaleDateString('en-US', {
+    return new Date(date).toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
@@ -226,7 +192,7 @@ const ProfilePage: React.FC = () => {
   };
 
   const formatTime = (date: Date): string => {
-    return date.toLocaleTimeString('en-US', {
+    return new Date(date).toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true
@@ -245,18 +211,19 @@ const ProfilePage: React.FC = () => {
   };
 
   const renderContent = () => {
+    if (!userData) {
+      return null;
+    }
+
     switch (activeSection) {
       case 'profile':
         return (
           <UserInfoContainer
-            email={email}
-            isMember={isMember}
-            isOnMailingList={isOnMailingList}
+            userData={userData}
             memberError={memberError}
             memberSuccess={memberSuccess}
             onBecomeMember={handleBecomeMember}
-            onJoinMailingList={handleJoinMailingList}
-            onUnsubscribeMailingList={handleUnsubscribeMailingList}
+            onToggleMailingList={handleToggleMailingList}
             onLogout={handleLogout}
             onDeleteAccount={handleDeleteAccount}
             onChangePassword={() => setShowVerifyModal(true)}
@@ -296,7 +263,7 @@ const ProfilePage: React.FC = () => {
             upcomingItems={upcomingEvents}
             pastItems={pastEvents}
             renderUpcomingItem={(event, index) => (
-              <div className="profile-event-item" key={`${event.id}-${index}`}>
+              <div className="profile-event-item" key={`${event.eventID}-${index}`}>
                 <h4 className="profile-event-title">{event.name}</h4>
                 <p className="profile-event-date">
                   {formatDate(event.date)} • {formatTime(event.date)}
@@ -304,7 +271,7 @@ const ProfilePage: React.FC = () => {
               </div>
             )}
             renderPastItem={(event, index) => (
-              <div className="profile-event-item" key={`${event.id}-${index}`}>
+              <div className="profile-event-item" key={`${event.eventID}-${index}`}>
                 <h4 className="profile-event-title">{event.name}</h4>
                 <p className="profile-event-date">
                   {formatDate(event.date)} • {formatTime(event.date)}

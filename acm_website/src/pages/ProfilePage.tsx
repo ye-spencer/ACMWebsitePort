@@ -153,7 +153,7 @@ const ProfilePage: React.FC = () => {
       const user = auth.currentUser;
       if (user && userData) {
         await updateUser({ ...userData, isOnMailingList: !userData.isOnMailingList });
-        userData.isOnMailingList = !userData.isOnMailingList;
+        setUserData({ ...userData, isOnMailingList: !userData.isOnMailingList });
       }
     } catch (error) {
       console.error('Error joining mailing list:', error);
@@ -174,7 +174,7 @@ const ProfilePage: React.FC = () => {
     try {
       if (userData) {
         await updateUser({ ...userData, isMember: true });
-        userData.isMember = true;
+        setUserData({ ...userData, isMember: true });
         setMemberSuccess('You are now a member!');
       }
     } catch (error) {

@@ -195,7 +195,7 @@ const BookingPage: React.FC = () => {
       }
 
       // Create booking via API
-      await createBooking({id: user.uid, start: startTime, end: endTime} as Booking);
+      await createBooking({uid: user.uid, start: startTime, end: endTime} as Booking);
 
       setBookingSuccess('Room successfully booked!');
       

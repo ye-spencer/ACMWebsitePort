@@ -1,6 +1,6 @@
 import React from 'react';
 import '../styles/HomePage.css';
-import { FaCalendarAlt, FaUsers } from 'react-icons/fa';
+import { FaCalendarAlt, FaUsers, FaHandshake } from 'react-icons/fa';
 import { useApp } from '../hooks/useApp';
 
 const HomePage: React.FC = () => {
@@ -76,6 +76,13 @@ const HomePage: React.FC = () => {
               >
                 <FaUsers />
                 <span>Book Space</span>
+              </button>
+              <button 
+                className="quick-action"
+                onClick={() => navigateTo('sponsors')}
+              >
+                <FaHandshake />
+                <span>Our Sponsors</span>
               </button>
             </div>
           </div>

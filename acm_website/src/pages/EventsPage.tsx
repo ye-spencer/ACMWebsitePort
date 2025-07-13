@@ -44,11 +44,6 @@ const EventsPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    console.log(upcomingEvents);
-    console.log(pastEvents);
-  }, [upcomingEvents, pastEvents]);
-
-  useEffect(() => {
     if (user) {
       const fetchUserRegistrations = async () => {
         try {

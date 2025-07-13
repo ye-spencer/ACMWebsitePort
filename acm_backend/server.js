@@ -434,10 +434,6 @@ app.post('/api/admin/events/:eventId/attendance', async (req, res) => {
       return res.status(400).json({ message: 'Attendee emails array is required' });
     }
 
-    // Get all users whose emails match the attendees
-    const usersQuery = db.collection("users").where("email", "in", attendeeEmails);
-    const usersSnapshot = await usersQuery.get();
-
     // Get the event details
     const eventDoc = await db.collection("events").doc(eventId).get();
     if (!eventDoc.exists) {
@@ -447,41 +443,76 @@ app.post('/api/admin/events/:eventId/attendance', async (req, res) => {
     const eventData = eventDoc.data();
     const eventDate = convertTimestamp(eventData.start);
 
-    // Prepare attendee records and user updates
-    const attendees = [];
-    const userUpdatePromises = [];
+    // Get all users whose emails match the attendees
+    const usersQuery = db.collection("users").where("email", "in", attendeeEmails);
+    const usersSnapshot = await usersQuery.get();
 
+    // Create a map of existing users by email for quick lookup
+    const existingUsersMap = new Map();
     usersSnapshot.docs.forEach(userDoc => {
       const userData = userDoc.data();
-      attendees.push({
+      existingUsersMap.set(userData.email, {
         uid: userDoc.id,
         email: userData.email,
         name: userData.name || userData.email
       });
+    });
 
-      // Update user's events attended
-      userUpdatePromises.push(
-        db.collection("users").doc(userDoc.id).update({
-          eventsAttended: admin.firestore.FieldValue.arrayUnion({
-            date: eventDate,
-            eventID: eventId,
-            name: eventData.name
+    // Prepare attendee records and user updates
+    const attendees = [];
+    const userUpdatePromises = [];
+    const unknownAttendees = [];
+
+    // Process each attendee email
+    attendeeEmails.forEach(email => {
+      const existingUser = existingUsersMap.get(email);
+      
+      if (existingUser) {
+        // Known user - add to attendees and update their profile
+        attendees.push(existingUser);
+        userUpdatePromises.push(
+          db.collection("users").doc(existingUser.uid).update({
+            eventsAttended: admin.firestore.FieldValue.arrayUnion({
+              date: eventDate,
+              eventID: eventId,
+              name: eventData.name
+            })
           })
-        })
-      );
+        );
+      } else {
+        // Unknown user - create attendee record with "unknown" uid
+        const unknownAttendee = {
+          uid: "unknown",
+          email: email,
+          name: email
+        };
+        attendees.push(unknownAttendee);
+        unknownAttendees.push(email);
+      }
     });
 
     // Update event with attendees
-    await db.collection("events").doc(eventId).update({
-      attendees: admin.firestore.FieldValue.arrayUnion(...attendees)
-    });
+    if (attendees.length > 0) {
+      const currentEventData = eventDoc.data();
+      const currentAttendees = currentEventData.attendees || [];
+      const updatedAttendees = [...currentAttendees, ...attendees];
+      
+      await db.collection("events").doc(eventId).update({
+        attendees: updatedAttendees
+      });
+    }
 
-    // Update all users
-    await Promise.all(userUpdatePromises);
+    // Update all known users
+    if (userUpdatePromises.length > 0) {
+      await Promise.all(userUpdatePromises);
+    }
 
     res.json({ 
       message: 'Attendance uploaded successfully',
-      attendeesCount: attendees.length
+      attendeesCount: attendees.length,
+      knownAttendeesCount: attendees.length - unknownAttendees.length,
+      unknownAttendeesCount: unknownAttendees.length,
+      unknownAttendees: unknownAttendees
     });
   } catch (error) {
     console.error('Error uploading attendance:', error);

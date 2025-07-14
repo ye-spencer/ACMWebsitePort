@@ -335,7 +335,7 @@ app.get('/api/bookings/week', async (req: Request, res: Response) => {
 });
 
 // Create new booking - accepts Booking, returns success message
-app.post('/api/bookings', async (req: Request<{}, {}, Booking>, res: Response) => {
+app.post('/api/bookings', async (req: Request<{}, {}, Partial<Booking>>, res: Response) => {
   try {
     const { uid, start, end } = req.body;
     

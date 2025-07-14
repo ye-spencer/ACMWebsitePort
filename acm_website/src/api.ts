@@ -80,7 +80,7 @@ export async function getWeekBookings() {
   return apiCall('/api/bookings/week') as Promise<Booking[]>;
 }
 
-export async function createBooking(booking: Booking) {
+export async function createBooking(booking: Partial<Booking>) {
   return apiCall('/api/bookings', {
     method: 'POST',
     body: JSON.stringify(booking),

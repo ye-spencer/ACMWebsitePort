@@ -42,9 +42,9 @@ const convertTimestamp = (timestamp: FirebaseFirestore.Timestamp): Date => {
 };
 
 // Helper function to convert Date to Firestore timestamp
-const toFirestoreTimestamp = (date: Date | string | null): FirebaseFirestore.Timestamp | null => {
+const toFirestoreTimestamp = (date: Date | string | null): FirebaseFirestore.Timestamp | undefined => {
   if (!date) {
-    return null;
+    return undefined;
   }
   if (date instanceof Date) {
     return admin.firestore.Timestamp.fromDate(date);
@@ -57,7 +57,7 @@ const toFirestoreTimestamp = (date: Date | string | null): FirebaseFirestore.Tim
 
 // EVENTS API
 
-// Get all events
+// Get all events - returns Event[]
 app.get('/api/events/all', async (req: Request, res: Response) => {
   try {
     const eventsQuery = db.collection("events");
@@ -72,8 +72,8 @@ app.get('/api/events/all', async (req: Request, res: Response) => {
         location: data.location,
         category: data.category,
         link: data.link,
-        attendees: data.attendees,
-        registered: data.registered,
+        attendees: data.attendees as EventAttendeeRecord[],
+        registered: data.registered as EventAttendeeRecord[],
         start: convertTimestamp(data.start),
         end: convertTimestamp(data.end)
       };
@@ -86,7 +86,7 @@ app.get('/api/events/all', async (req: Request, res: Response) => {
   }
 });
 
-// Create new event
+// Create new event - accepts Event, returns success message
 app.post('/api/events', async (req: Request<{}, {}, Event>, res: Response) => {
   try {
     const {name, description, location, category, link, attendees, registered, start, end} = req.body;
@@ -124,7 +124,7 @@ app.post('/api/events', async (req: Request<{}, {}, Event>, res: Response) => {
   }
 });
 
-// Update event
+// Update event - accepts Event, returns success message
 app.patch('/api/events/:eventId', async (req: Request<{eventId: string}, {}, Event>, res: Response) => {
   try {
     const { eventId } = req.params;
@@ -149,14 +149,14 @@ app.patch('/api/events/:eventId', async (req: Request<{eventId: string}, {}, Eve
   }
 });
 
-// RSVP for an event
+// RSVP for an event - accepts EventAttendeeRecord, returns success message
 app.post('/api/events/:eventId/rsvp', async (req: Request<{eventId: string}, {}, EventAttendeeRecord>, res: Response) => {
   try {
     const { eventId } = req.params;
     const { uid, email } = req.body;
     
     if (!uid || !email) {
-      return res.status(400).json({ message: 'UID and email are required' });
+      return res.status(400).json({ message: 'uid and email are required' });
     }
 
     // Get event details
@@ -179,7 +179,7 @@ app.post('/api/events/:eventId/rsvp', async (req: Request<{eventId: string}, {},
         date: toFirestoreTimestamp(eventDate)!, 
         eventID: eventId, 
         name: eventData.name 
-      } as UserEventRecordDocument)
+      })
     });
 
     res.json({ message: 'Successfully registered for the event!' });
@@ -191,7 +191,7 @@ app.post('/api/events/:eventId/rsvp', async (req: Request<{eventId: string}, {},
 
 // USERS API
 
-// Get user data
+// Get user data - returns Profile
 app.get('/api/users/:uid', async (req: Request<{uid: string}>, res: Response) => {
   try {
     const { uid } = req.params;
@@ -217,8 +217,8 @@ app.get('/api/users/:uid', async (req: Request<{uid: string}>, res: Response) =>
         name: event.name,
         date: convertTimestamp(event.date)
       })),
-      ...(userData.deleted && { deleted: userData.deleted }),
-      ...(userData.deletedAt && { deletedAt: convertTimestamp(userData.deletedAt) })
+      deleted: userData.deleted || false,
+      deletedAt: userData.deletedAt ? convertTimestamp(userData.deletedAt) : undefined
     };
 
     res.json(profile);
@@ -228,25 +228,32 @@ app.get('/api/users/:uid', async (req: Request<{uid: string}>, res: Response) =>
   }
 });
 
-// Update user preferences
+// Update user preferences - accepts Profile, returns success message
 app.patch('/api/users/:uid', async (req: Request<{uid: string}, {}, Profile>, res: Response) => {
   try {
     const { uid } = req.params;
-    const updates: Partial<Profile> = req.body;
+    const { email, isMember, isOnMailingList, deleted, deletedAt, eventsAttended, eventsRegistered } = req.body;
     const updatedUserDoc: Partial<ProfileDocument> = {
-      ...updates,
-      ...(updates.eventsAttended && { eventsAttended: updates.eventsAttended?.map((event: UserEventRecord) => ({
-        eventID: event.eventID,
-        name: event.name,
-        date: toFirestoreTimestamp(event.date)!
-      })) as UserEventRecordDocument[] }),
-      ...(updates.eventsRegistered && { eventsRegistered: updates.eventsRegistered?.map((event: UserEventRecord) => ({
-        eventID: event.eventID,
-        name: event.name,
-        date: toFirestoreTimestamp(event.date)!
-      })) as UserEventRecordDocument[] }),
-      ...(updates.deletedAt && { deletedAt: toFirestoreTimestamp(updates.deletedAt) }),
-    } as Partial<ProfileDocument>;
+      email,
+      isMember,
+      isOnMailingList,
+      ...(deleted && { deleted }),
+      ...(deletedAt && { deletedAt: toFirestoreTimestamp(deletedAt) }),
+      ...(eventsAttended && {
+        eventsAttended: eventsAttended.map((event: UserEventRecord) => ({
+          eventID: event.eventID,
+          name: event.name,
+          date: toFirestoreTimestamp(event.date)!
+        }))
+      }),
+      ...(eventsRegistered && {
+        eventsRegistered: eventsRegistered.map((event: UserEventRecord) => ({
+          eventID: event.eventID,
+          name: event.name,
+          date: toFirestoreTimestamp(event.date)!
+        }))
+      })
+    };
 
     await db.collection("users").doc(uid).update(updatedUserDoc);
     res.json({ message: 'User updated successfully' });
@@ -256,11 +263,11 @@ app.patch('/api/users/:uid', async (req: Request<{uid: string}, {}, Profile>, re
   }
 });
 
-// Delete a user by UID
+// Delete a user by uid - accepts {uid: string}, returns success message
 app.post('/api/users/delete', async (req: Request<{}, {}, {uid: string}>, res: Response) => {
   const { uid } = req.body;
   if (!uid) {
-    return res.status(400).json({ message: 'UID is required' });
+    return res.status(400).json({ message: 'uid is required' });
   }
 
   try {
@@ -274,7 +281,7 @@ app.post('/api/users/delete', async (req: Request<{}, {}, {uid: string}>, res: R
 
 // BOOKINGS API
 
-// Get user bookings
+// Get user bookings - returns Booking[]
 app.get('/api/bookings/user/:uid', async (req: Request<{uid: string}>, res: Response) => {
   try {
     const { uid } = req.params;
@@ -288,7 +295,7 @@ app.get('/api/bookings/user/:uid', async (req: Request<{uid: string}>, res: Resp
         uid: data.uid,
         start: convertTimestamp(data.start),
         end: convertTimestamp(data.end)
-      } as Booking;
+      };
     });
 
     res.json(bookings);
@@ -298,7 +305,7 @@ app.get('/api/bookings/user/:uid', async (req: Request<{uid: string}>, res: Resp
   }
 });
 
-// Get all bookings for a week
+// Get all bookings for a week - returns Booking[]
 app.get('/api/bookings/week', async (req: Request, res: Response) => {
   try {
     const today = new Date();
@@ -317,7 +324,7 @@ app.get('/api/bookings/week', async (req: Request, res: Response) => {
         uid: data.uid,
         start: convertTimestamp(data.start),
         end: convertTimestamp(data.end)
-      } as Booking;
+      };
     });
 
     res.json(bookings);
@@ -327,13 +334,13 @@ app.get('/api/bookings/week', async (req: Request, res: Response) => {
   }
 });
 
-// Create new booking
+// Create new booking - accepts Booking, returns success message
 app.post('/api/bookings', async (req: Request<{}, {}, Booking>, res: Response) => {
   try {
     const { uid, start, end } = req.body;
     
     if (!uid || !start || !end) {
-      return res.status(400).json({ message: 'UID, start, and end are required' });
+      return res.status(400).json({ message: 'uid, start, and end are required' });
     }
 
     if (end <= start) {
@@ -385,7 +392,7 @@ app.post('/api/bookings', async (req: Request<{}, {}, Booking>, res: Response) =
   }
 });
 
-// Delete booking
+// Delete booking - returns success message
 app.delete('/api/bookings/:bookingId', async (req: Request<{bookingId: string}>, res: Response) => {
   try {
     const { bookingId } = req.params;
@@ -399,7 +406,7 @@ app.delete('/api/bookings/:bookingId', async (req: Request<{bookingId: string}>,
 
 // ADMIN API
 
-// Get all members
+// Get all members - returns Member[]
 app.get('/api/admin/members', async (req: Request, res: Response) => {
   try {
     const membersQuery = db.collection("users").where("isMember", "==", true);
@@ -411,7 +418,7 @@ app.get('/api/admin/members', async (req: Request, res: Response) => {
         uid: doc.id,
         email: data.email,
         eventsAttended: data.eventsAttended?.length || 0
-      } as Member;
+      };
     });
 
     res.json(members);
@@ -421,7 +428,7 @@ app.get('/api/admin/members', async (req: Request, res: Response) => {
   }
 });
 
-// Get past events for admin
+// Get past events for admin - returns EventSummary[]
 app.get('/api/admin/events/past', async (req: Request, res: Response) => {
   try {
     const now = admin.firestore.Timestamp.now();
@@ -446,7 +453,7 @@ app.get('/api/admin/events/past', async (req: Request, res: Response) => {
   }
 });
 
-// Upload attendance for an event
+// Upload attendance for an event - accepts {attendeeEmails: string[]}, returns success message
 app.post('/api/admin/events/:eventId/attendance', async (req: Request<{eventId: string}, {}, {attendeeEmails: string[]}>, res: Response) => {
   try {
     const { eventId } = req.params;
@@ -540,7 +547,7 @@ app.post('/api/admin/events/:eventId/attendance', async (req: Request<{eventId: 
   }
 });
 
-// Remove member
+// Remove member - returns success message
 app.delete('/api/admin/members/:uid', async (req: Request<{uid: string}>, res: Response) => {
   try {
     const { uid } = req.params;
@@ -557,7 +564,7 @@ app.delete('/api/admin/members/:uid', async (req: Request<{uid: string}>, res: R
   }
 });
 
-// Create new user
+// Create new user - accepts Profile, returns success message
 app.post('/api/users', async (req: Request<{}, {}, Profile>, res: Response) => {
   try {
     const { uid, email, isMember, isOnMailingList, eventsAttended, eventsRegistered } = req.body;
@@ -567,7 +574,7 @@ app.post('/api/users', async (req: Request<{}, {}, Profile>, res: Response) => {
     }
 
     if (!uid) {
-      return res.status(400).json({ message: 'UID is required' });
+      return res.status(400).json({ message: 'uid is required' });
     }
 
     // Process events arrays safely
@@ -585,7 +592,7 @@ app.post('/api/users', async (req: Request<{}, {}, Profile>, res: Response) => {
           name: event.name,
           date: toFirestoreTimestamp(event.date)!
         };
-      }).filter(Boolean) as UserEventRecordDocument[]; // Remove null entries
+      }).filter(Boolean) as UserEventRecordDocument[];
     };
 
     const userData: ProfileDocument = {

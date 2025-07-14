@@ -1,83 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, query, collection, where, Timestamp, orderBy, getDocs, updateDoc, doc, arrayUnion, getDoc } from 'firebase/firestore';
 import '../styles/Pages.css';
 import '../styles/EventsPage.css';
 import { useApp } from '../hooks/useApp';
 import { eventCategories } from "../components/admin/CreateEvent.tsx";
-import { Event, UserEventRecord } from '../types';
+import { Event, EventAttendeeRecord, EventSummary, UserEventRecord } from '../types';
+import { getAllEvents, rsvpForEvent, getUserData } from '../api';
 
 const EventsPage: React.FC = () => {
   const { user, isLoggedIn, navigateTo, error } = useApp();
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [registeredEvents, setRegisteredEvents] = useState<Event[]>([]);
+  const [registeredEvents, setRegisteredEvents] = useState<EventSummary[]>([]);
   const [selectedUpcomingCategory, setSelectedUpcomingCategory] = useState<string>('All');
   const [selectedPastCategory, setSelectedPastCategory] = useState<string>('All');
 
-  const db = getFirestore();
-  
-  const fetchUpcomingEvents = async () => {
-    const upcomingEventsQuery = query(collection(db, "events"), where("start", ">=", Timestamp.now()), orderBy("start", "desc"));
-    const upcomingEventsSnapshot = await getDocs(upcomingEventsQuery);
-    const upcomingEvents: Event[] = upcomingEventsSnapshot.docs.map(doc => {
-      const data = doc.data();
-      const eventTitle = data.name || 'Untitled Event';
-      return {
-        id: doc.id,
-        category: data.category || 'Other',
-        name: eventTitle,
-        date: data.start.toDate(),
-        start_time: data.start ? data.start.toDate().toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }) : 'TBD',
-        end_time: data.end ? data.end.toDate().toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }) : 'TBD',
-        location: data.location || 'TBD',
-        description: data.description || '',
-      };
-    });
-    setUpcomingEvents(upcomingEvents);
-  }
-
-  const fetchPastEvents = async () => {
-    const pastEventsQuery = query(collection(db, "events"), where("start", "<", Timestamp.now()), orderBy("start", "desc"));
-    const pastEventsSnapshot = await getDocs(pastEventsQuery);
-    const pastEvents: Event[] = pastEventsSnapshot.docs.map(doc => {
-      const data = doc.data();
-      const eventTitle = data.name || 'Untitled Event';
-      return {
-        id: doc.id,
-        category: data.category || 'Other',
-        name: eventTitle,
-        date: data.start.toDate(),
-        start_time: data.start ? data.start.toDate().toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }) : 'TBD',
-        end_time: data.end ? data.end.toDate().toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }) : 'TBD',
-        location: data.location || 'TBD',
-        description: data.description || '',
-      };
-    });
-    setPastEvents(pastEvents);
-  }
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        await fetchUpcomingEvents();
-        await fetchPastEvents();
+        const events = await getAllEvents();
+        const now = new Date();
+        
+        const upcoming = events.filter(event => {
+          const eventStart = new Date(event.start);
+          return eventStart > now;
+        });
+        const past = events.filter(event => {
+          const eventStart = new Date(event.start);
+          return eventStart < now;
+        });
+        
+        setUpcomingEvents(upcoming);
+        setPastEvents(past);
       } catch (error) {
         console.error('Error fetching events:', error);
       } finally {
@@ -86,25 +41,28 @@ const EventsPage: React.FC = () => {
     };
 
     fetchEvents();
-  }, [db]);
+  }, []);
 
   useEffect(() => {
     if (user) {
       const fetchUserRegistrations = async () => {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          const registered: Event[] = userData.eventsRegistered.map((event: UserEventRecord) => ({
+        try {
+          const userData = await getUserData(user.uid);
+          const registered: EventSummary[] = userData.eventsRegistered.map((event: UserEventRecord) => ({
             id: event.eventID,
+            name: event.name, 
+            date: event.date
           }));
           setRegisteredEvents(registered);
+        } catch (error) {
+          console.error('Error fetching user registrations:', error);
         }
       };
       fetchUserRegistrations();
     } else {
       setRegisteredEvents([]);
     }
-  }, [user, db]);
+  }, [user]);
 
   const handleRSVP = async (eventID: string) => {
     if (!isLoggedIn) {
@@ -112,19 +70,39 @@ const EventsPage: React.FC = () => {
       return;
     }
     try {
-      const event = upcomingEvents.find(e => e.id === eventID);
-      await updateDoc(doc(db, 'events', eventID), {
-        registered: arrayUnion({ uid: user?.uid, email: user?.email })
-      });
-      if (!user?.uid) throw new Error('User ID not found');
-      await updateDoc(doc(db, 'users', user.uid), {
-        eventsRegistered: arrayUnion({ date: event?.date, eventID: event?.id, name: event?.name })
-      });
+      if (!user?.uid || !user?.email) throw new Error('User ID or email not found');
+      
+      await rsvpForEvent(eventID, { uid: user.uid, email: user.email } as EventAttendeeRecord);
+      
+      // Refresh user registrations
+      const userData = await getUserData(user.uid);
+      const registered: EventSummary[] = userData.eventsRegistered.map((event: UserEventRecord) => ({
+        id: event.eventID,
+        name: event.name,
+        date: event.date
+      }));
+      setRegisteredEvents(registered);
+      
       alert('Successfully registered for the event!');
     } catch (error) {
       alert('Error registering for event.');
       console.error(error);
     }
+  };
+
+  const formatDate = (date: Date) => {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const formatTime = (date: Date) => {
+    const hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    return `${displayHours}:${minutes} ${ampm}`;
   };
 
   const filteredUpcoming = selectedUpcomingCategory == 'All' ? upcomingEvents : upcomingEvents.filter(event => event.category == selectedUpcomingCategory);
@@ -198,8 +176,8 @@ const EventsPage: React.FC = () => {
                     <div className="event-status"></div>
                   </div>
                   <div className="event-details">
-                    <p><strong>Date:</strong> {event.date.toLocaleDateString()}</p>
-                    <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
+                    <p><strong>Date:</strong> {formatDate(new Date(event.start))}</p>
+                    <p><strong>Time:</strong> {formatTime(new Date(event.start))} - {formatTime(new Date(event.end))}</p>
                     <p><strong>Location:</strong> {event.location}</p>
                   </div>
                   <p className="event-description">{event.description}</p>
@@ -248,8 +226,8 @@ const EventsPage: React.FC = () => {
                   <div className="event-status"></div>
                 </div>
                 <div className="event-details">
-                  <p><strong>Date:</strong> {event.date.toLocaleDateString()}</p>
-                  <p><strong>Time:</strong> {event.start_time} - {event.end_time}</p>
+                  <p><strong>Date:</strong> {formatDate(new Date(event.start))}</p>
+                  <p><strong>Time:</strong> {formatTime(new Date(event.start))} - {formatTime(new Date(event.end))}</p>
                   <p><strong>Location:</strong> {event.location}</p>
                 </div>
                 <p className="event-description">{event.description}</p>

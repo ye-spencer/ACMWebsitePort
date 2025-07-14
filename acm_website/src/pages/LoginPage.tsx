@@ -5,8 +5,9 @@ import { auth } from '../firebase/config';
 import { createUserWithEmailAndPassword,
          sendPasswordResetEmail,
          signInWithEmailAndPassword } from "firebase/auth";
-import { collection, doc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
 import { useApp } from '../hooks/useApp';
+import { getAllEvents, createUser, updateEvent } from '../api';
+import { Event, UserEventRecord, EventAttendeeRecord, Profile } from '../types';
 
 const LoginPage: React.FC = () => {
   const { user, navigateTo, error } = useApp();
@@ -47,29 +48,22 @@ const LoginPage: React.FC = () => {
     createUserWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
       .then(async (cred) => {
         try {
-          const db = getFirestore();
-          const eventsSnapshot = await getDocs(collection(db, 'events'));
+          // Get all events from API
+          const events = await getAllEvents();
 
           // track events attended and registered
-          const attended: { eventID: string; name: string; date: unknown }[] = [];
-          const registered: { eventID: string; name: string; date: unknown }[] = [];
-          const updatePromises: Promise<unknown>[] = [];
+          const attended: UserEventRecord[] = [];
+          const registered: UserEventRecord[] = [];
+          const updatePromises: Promise<Event>[] = [];
 
           // get events and attendees
-          eventsSnapshot.forEach((eventDoc) => {
-            const data = eventDoc.data();
-            const attendees = Array.isArray(data.attendees)
-              ? [...(data.attendees as { uid?: string; email?: string }[])]
-              : [];
-            const regs = Array.isArray(data.registered)
-              ? [...(data.registered as { uid?: string; email?: string }[])]
-              : [];
+          events.forEach((event: Event) => {
             let changed = false;
 
             // check if user is attendee
-            attendees.forEach((a) => {
+            event.attendees.forEach((a: EventAttendeeRecord) => {
               if (a.email && a.email.toLowerCase() === cred.user.email!.toLowerCase()) {
-                attended.push({ eventID: eventDoc.id, name: data.name, date: data.start });
+                attended.push({ eventID: event.id, name: event.name, date: event.start });
                 if (a.uid !== cred.user.uid) {
                   a.uid = cred.user.uid;
                   changed = true;
@@ -78,9 +72,9 @@ const LoginPage: React.FC = () => {
             });
 
             // check if user is registered
-            regs.forEach((r) => {
+            event.registered.forEach((r: EventAttendeeRecord) => {
               if (r.email && r.email.toLowerCase() === cred.user.email!.toLowerCase()) {
-                registered.push({ eventID: eventDoc.id, name: data.name, date: data.start });
+                registered.push({ eventID: event.id, name: event.name, date: event.start });
                 if (r.uid !== cred.user.uid) {
                   r.uid = cred.user.uid;
                   changed = true;
@@ -90,19 +84,20 @@ const LoginPage: React.FC = () => {
 
             // update event in database if user is attendee or registered
             if (changed) {
-              updatePromises.push(updateDoc(doc(db, 'events', eventDoc.id), { attendees, registered: regs }));
+              updatePromises.push(updateEvent(event));
             }
           });
 
-          // update user in database with events attended and registered
+          // create user in database with events attended and registered
           await Promise.all([
-            setDoc(doc(db, 'users', cred.user.uid), {
-              email: cred.user.email,
+            createUser({ 
+              uid: cred.user.uid,
+              email: cred.user.email!, 
               isMember: false,
               isOnMailingList: false,
-              eventsAttended: attended,
-              eventsRegistered: registered,
-            }),
+              eventsAttended: attended, 
+              eventsRegistered: registered 
+            } as Profile),
             ...updatePromises,
           ]);
         } catch (err) {

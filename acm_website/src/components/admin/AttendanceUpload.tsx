@@ -31,7 +31,7 @@ const AttendanceUpload: React.FC<AttendanceUploadProps> = ({
           <option value="">Select an event...</option>
           {pastEvents.map(event => (
             <option key={event.id} value={event.id}>
-              {event.name} ({event.date.toLocaleDateString()})
+              {event.name} ({new Date(event.date).toLocaleDateString()})
             </option>
           ))}
         </select>

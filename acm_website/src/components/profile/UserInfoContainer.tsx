@@ -1,28 +1,23 @@
 import React from 'react';
+import { Profile } from '../../types';
 
 interface UserInfoProps {
-  email: string;
-  isMember: boolean;
-  isOnMailingList: boolean;
+  userData: Profile;
   memberError: string;
   memberSuccess: string;
   onBecomeMember: () => void;
-  onJoinMailingList: () => void;
-  onUnsubscribeMailingList: () => void;
+  onToggleMailingList: () => void;
   onLogout: () => void;
   onDeleteAccount: () => void;
   onChangePassword: () => void;
 }
 
 const UserInfoContainer: React.FC<UserInfoProps> = ({
-  email,
-  isMember,
-  isOnMailingList,
+  userData,
   memberError,
   memberSuccess,
   onBecomeMember,
-  onJoinMailingList,
-  onUnsubscribeMailingList,
+  onToggleMailingList,
   onLogout,
   onDeleteAccount,
   onChangePassword,
@@ -34,17 +29,17 @@ const UserInfoContainer: React.FC<UserInfoProps> = ({
       <div className="profile-info-sections">
         <div className="info-card">
           <div className="info-label">Account Email</div>
-          <div className="info-value">{email}</div>
+          <div className="info-value">{userData.email}</div>
         </div>
 
         <div className="info-card">
           <div className="info-label">ACM Membership</div>
           <div className="info-content">
             <div className="info-actions">
-              <div className={`info-value ${isMember ? 'status-active' : ''}`}>
-                {isMember ? 'Active Member' : 'Not a member'}
+              <div className={`info-value ${userData.isMember ? 'status-active' : ''}`}>
+                {userData.isMember ? 'Active Member' : 'Not a member'}
               </div>
-              {!isMember && (
+              {!userData.isMember && (
                 <button className="profile-btn primary" onClick={onBecomeMember}>
                   Become a Member
                 </button>
@@ -62,17 +57,11 @@ const UserInfoContainer: React.FC<UserInfoProps> = ({
           <div className="info-label">Mailing List</div>
           <div className="info-actions">
             <div className="info-value">
-              {isOnMailingList ? 'Subscribed' : 'Not subscribed'}
+              {userData.isOnMailingList ? 'Subscribed' : 'Not subscribed'}
             </div>
-            {isOnMailingList ? (
-              <button className="profile-btn secondary" onClick={onUnsubscribeMailingList}>
-                Unsubscribe
-              </button>
-            ) : (
-              <button className="profile-btn primary" onClick={onJoinMailingList}>
-                Subscribe
-              </button>
-            )}
+            <button className="profile-btn secondary" onClick={onToggleMailingList}>
+              {userData.isOnMailingList ? 'Unsubscribe' : 'Subscribe'}
+            </button>
           </div>
         </div>
       </div>

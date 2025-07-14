@@ -1,7 +1,7 @@
 import React from 'react';
 import { leadershipData } from '../data/leadership';
 import { alumniData } from '../data/alumni';
-import { FaInstagram, FaEnvelope, FaCalendar, FaHandshake } from 'react-icons/fa';
+import { FaInstagram, FaEnvelope, FaCalendar } from 'react-icons/fa';
 import FlipCard from '../components/FlipCard';
 import { useApp } from '../hooks/useApp';
 import '../styles/AboutPage.css';
@@ -71,14 +71,6 @@ const AboutPage: React.FC = () => {
                 >
                   <FaCalendar size={20} />
                   <span>Events</span>
-                </a>
-                <a 
-                  href="#"
-                  onClick={(e) => { e.preventDefault(); navigateTo('sponsors'); }}
-                  className="contact-item"
-                >
-                  <FaHandshake size={20} />
-                  <span>Sponsors</span>
                 </a>
               </div>
             </div>

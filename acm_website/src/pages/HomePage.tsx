@@ -65,17 +65,17 @@ const HomePage: React.FC = () => {
             <div className="quick-actions">
               <button 
                 className="quick-action"
-                onClick={() => navigateTo('events')}
-              >
-                <FaCalendarAlt />
-                <span>View Events</span>
-              </button>
-              <button 
-                className="quick-action"
                 onClick={() => navigateTo('booking')}
               >
                 <FaUsers />
                 <span>Book Space</span>
+              </button>
+              <button 
+                className="quick-action"
+                onClick={() => navigateTo('events')}
+              >
+                <FaCalendarAlt />
+                <span>View Events</span>
               </button>
               <button 
                 className="quick-action"

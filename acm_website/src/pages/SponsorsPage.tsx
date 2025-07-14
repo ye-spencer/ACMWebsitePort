@@ -1,8 +1,9 @@
 import React from 'react';
 import { sponsorsData } from '../data/sponsors';
+import placeholderLogo from '../assets/placeholder logo.png';
 import '../styles/SponsorsPage.css';
+import { FaUsers, FaLightbulb, FaHandshake, FaExternalLinkAlt, FaEnvelope } from 'react-icons/fa';
 import { useApp } from '../hooks/useApp';
-import { FaUsers, FaExternalLinkAlt } from 'react-icons/fa';
 
 const SponsorsPage: React.FC = () => {
     const { error } = useApp();
@@ -40,7 +41,7 @@ const SponsorsPage: React.FC = () => {
                         </div>
                         <div className="benefit-card">
                             <div className="benefit-icon">
-                                <FaUsers size={24} />
+                                <FaLightbulb size={24} />
                             </div>
                             <h3 className="benefit-title">Innovation Hub</h3>
                             <p className="benefit-description">
@@ -49,7 +50,7 @@ const SponsorsPage: React.FC = () => {
                         </div>
                         <div className="benefit-card">
                             <div className="benefit-icon">
-                                <FaUsers size={24} />
+                                <FaHandshake size={24} />
                             </div>
                             <h3 className="benefit-title">Brand Visibility</h3>
                             <p className="benefit-description">
@@ -69,11 +70,11 @@ const SponsorsPage: React.FC = () => {
                             {partners.map((sponsor) => (
                                 <div key={sponsor.name} className="sponsor-card partner">
                                     <div className="sponsor-logo">
-                                        {sponsor.logoPath ? (
-                                            <img src={sponsor.logoPath} alt={`${sponsor.name} logo`} />
-                                        ) : (
-                                            <div className="sponsor-placeholder">{sponsor.name.charAt(0)}</div>
-                                        )}
+                                        <img
+                                            src={sponsor.logoPath || placeholderLogo}
+                                            alt={`${sponsor.name} logo`}
+                                            onError={(e) => { e.currentTarget.src = placeholderLogo; }}
+                                        />
                                     </div>
                                     <div className="sponsor-info">
                                         <h4 className="sponsor-name">{sponsor.name}</h4>
@@ -97,14 +98,14 @@ const SponsorsPage: React.FC = () => {
                             {standard.map((sponsor) => (
                                 <div key={sponsor.name} className="sponsor-card standard">
                                     <div className="sponsor-logo">
-                                        {sponsor.logoPath ? (
-                                            <img src={sponsor.logoPath} alt={`${sponsor.name} logo`} />
-                                        ) : (
-                                            <div className="sponsor-placeholder">{sponsor.name.charAt(0)}</div>
-                                        )}
+                                        <img
+                                            src={sponsor.logoPath || placeholderLogo}
+                                            alt={`${sponsor.name} logo`}
+                                            onError={(e) => { e.currentTarget.src = placeholderLogo; }}
+                                        />
                                     </div>
                                     <div className="sponsor-info">
-                                        <h4 className="sponsor-name">{sponsor.name}</h4>
+                                        <h4 className="sponsor-name" style={{ color: '#003366' }}>{sponsor.name}</h4>
                                         <p className="sponsor-description" style={{ color: '#003366' }}>{sponsor.description}</p>
                                         <div className="sponsor-meta">
                                             <span className="sponsor-year" style={{ color: '#003366' }}>{sponsor.year}</span>
@@ -131,7 +132,7 @@ const SponsorsPage: React.FC = () => {
                         </p>
                         <div className="contact-links">
                             <a href="mailto:jhuacmofficers@gmail.com" className="contact-item">
-                                <FaExternalLinkAlt size={28} />
+                                <FaEnvelope size={28} />
                                 <span>jhuacmofficers@gmail.com</span>
                             </a>
                         </div>

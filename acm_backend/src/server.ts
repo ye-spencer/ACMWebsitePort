@@ -87,7 +87,7 @@ app.get('/api/events/all', async (req: Request, res: Response) => {
 });
 
 // Create new event - accepts Event, returns success message
-app.post('/api/events', async (req: Request<{}, {}, Event>, res: Response) => {
+app.post('/api/events', async (req: Request<{}, {}, Partial<Event>>, res: Response) => {
   try {
     const {name, description, location, category, link, attendees, registered, start, end} = req.body;
     
@@ -101,13 +101,13 @@ app.post('/api/events', async (req: Request<{}, {}, Event>, res: Response) => {
     }
 
     const eventDoc: EventDocument = {
-      name,
-      description,
-      location,
-      category,
-      link,
-      attendees: attendees as EventAttendeeRecord[],
-      registered: registered as EventAttendeeRecord[],
+      name: name || '',
+      description: description || '',
+      location: location || '',
+      category: category || '',
+      link: link,
+      attendees: attendees as EventAttendeeRecord[] || [],
+      registered: registered as EventAttendeeRecord[] || [],
       start: toFirestoreTimestamp(start)!,
       end: toFirestoreTimestamp(end)!
     };

@@ -82,7 +82,6 @@ const AdminPage: React.FC = () => {
 
       // send event to database
       await createEvent({
-        id: '',
         category: eventCategory,
         name: eventTitle,
         description: eventDescription,
@@ -92,7 +91,7 @@ const AdminPage: React.FC = () => {
         registered: [],
         start: startDateTime,
         end: endDateTime
-      } as Event);
+      } as Partial<Event>);
 
       // Reset form
       setEventCategory('');

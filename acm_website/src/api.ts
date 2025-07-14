@@ -26,7 +26,7 @@ export async function getAllEvents() {
   return apiCall('/api/events/all') as Promise<Event[]>
 }
 
-export async function createEvent(event: Event) {
+export async function createEvent(event: Partial<Event>) {
   return apiCall('/api/events', {
     method: 'POST',
     body: JSON.stringify(event),

@@ -54,7 +54,7 @@
     margin-right: auto;
 }
 
-.sponsor-section::before {
+.sponsors-section::before {
     content: '';
     position: absolute;
     top: 0;

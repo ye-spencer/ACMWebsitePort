@@ -10,7 +10,7 @@ interface SponsorData {
 export const sponsorsData: SponsorData[] = [
     {
         name: "Google",
-        logoPath: "../assets/sponsors/google.png",
+        logoPath: "src/assets/sponsors/google.png",
         description: "Leading technology company providing innovative solutions and supporting student organizations.",
         tier: "Partner",
         website: "https://www.google.com",
@@ -18,7 +18,7 @@ export const sponsorsData: SponsorData[] = [
     },
     {
         name: "Microsoft",
-        logoPath: "../assets/sponsors/microsoft.png",
+        logoPath: "src/assets/sponsors/microsoft.png",
         description: "Global technology leader empowering students and organizations through cutting-edge software.",
         tier: "Partner",
         website: "https://www.microsoft.com",
@@ -26,7 +26,7 @@ export const sponsorsData: SponsorData[] = [
     },
     {
         name: "Amazon",
-        logoPath: "../assets/sponsors/amazon.png",
+        logoPath: "src/assets/sponsors/amazon.png",
         description: "E-commerce and cloud computing giant supporting innovation and technology education initiatives.",
         tier: "Partner",
         website: "https://www.amazon.com",
@@ -34,7 +34,7 @@ export const sponsorsData: SponsorData[] = [
     },
     {
         name: "Meta",
-        logoPath: "../assets/sponsors/meta.png",
+        logoPath: "src/assets/sponsors/meta.png",
         description: "Social media and technology company focused on connecting people.",
         tier: "Partner",
         website: "https://www.meta.com",
@@ -42,7 +42,7 @@ export const sponsorsData: SponsorData[] = [
     },
     {
         name: "Apple",
-        logoPath: "../assets/sponsors/apple.png",
+        logoPath: "src/assets/sponsors/apple.png",
         description: "Innovative technology company creating products that inspire creativity and empower individuals.",
         tier: "Standard",
         website: "https://www.apple.com",
@@ -50,7 +50,7 @@ export const sponsorsData: SponsorData[] = [
     },
     {
         name: "Netflix",
-        logoPath: "../assets/sponsors/netflix.png",
+        logoPath: "src/assets/sponsors/netflix.png",
         description: "Entertainment streaming service supporting technology education and student development.",
         tier: "Standard",
         website: "https://www.netflix.com",
@@ -58,7 +58,7 @@ export const sponsorsData: SponsorData[] = [
     },
     {
         name: "Spotify",
-        logoPath: "../assets/sponsors/spotify.png",
+        logoPath: "src/assets/sponsors/spotify.png",
         description: "Digital music streaming platform fostering innovation in audio technology and user experience.",
         tier: "Standard",
         website: "https://www.spotify.com",
@@ -66,7 +66,7 @@ export const sponsorsData: SponsorData[] = [
     },
     {
         name: "Uber",
-        logoPath: "../assets/sponsors/uber.png",
+        logoPath: "src/assets/sponsors/uber.png",
         description: "Mobility and delivery platform revolutionizing transportation through technology and innovation.",
         tier: "Standard",
         website: "https://www.uber.com",
@@ -74,7 +74,7 @@ export const sponsorsData: SponsorData[] = [
     },
     {
         name: "GitHub",
-        logoPath: "../assets/sponsors/github.png",
+        logoPath: "src/assets/sponsors/github.png",
         description: "Leading software development platform enabling collaboration and open source innovation.",
         tier: "Standard",
         website: "https://www.github.com",
@@ -82,7 +82,7 @@ export const sponsorsData: SponsorData[] = [
     },
     {
         name: "Intel",
-        logoPath: "../assets/sponsors/intel.png",
+        logoPath: "src/assets/sponsors/intel.png",
         description: "Semiconductor technology company driving innovation in computing and artificial intelligence.",
         tier: "Standard",
         website: "https://www.intel.com",

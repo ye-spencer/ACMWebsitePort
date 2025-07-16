@@ -81,7 +81,7 @@ const SponsorsPage: React.FC = () => {
                                         <p className="sponsor-description">{sponsor.description}</p>
                                         <div className="sponsor-meta">
                                             <span className="sponsor-year">{sponsor.year}</span>
-                                            <a href={sponsor.website} className="sponsor-link">
+                                            <a href={sponsor.website} className="sponsor-link" target="_blank" rel="noopener noreferrer">
                                                 <FaExternalLinkAlt size={14} />
                                                 <span>Visit Website</span>
                                             </a>
@@ -109,7 +109,7 @@ const SponsorsPage: React.FC = () => {
                                         <p className="sponsor-description" style={{ color: '#003366' }}>{sponsor.description}</p>
                                         <div className="sponsor-meta">
                                             <span className="sponsor-year" style={{ color: '#003366' }}>{sponsor.year}</span>
-                                            <a href={sponsor.website} className="sponsor-link" style={{ color: '#003366' }}>
+                                            <a href={sponsor.website} className="sponsor-link" style={{ color: '#003366' }} target="_blank" rel="noopener noreferrer">
                                                 <FaExternalLinkAlt size={14} />
                                                 <span>Visit Website</span>
                                             </a>

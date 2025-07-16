@@ -1,8 +1,9 @@
 import React from 'react';
-import { sponsorsData } from '../data/sponsors';
-import placeholderLogo from '../assets/placeholder logo.png';
 import '../styles/SponsorsPage.css';
-import { FaUsers, FaLightbulb, FaHandshake, FaExternalLinkAlt, FaEnvelope } from 'react-icons/fa';
+import { sponsorsData } from '../data/sponsors';
+import { FaUsers, FaLightbulb, FaHandshake, FaEnvelope } from 'react-icons/fa';
+import placeholderLogo from '../assets/placeholder logo.png';
+import SponsorCard from '../components/SponsorCard';
 import { useApp } from '../hooks/useApp';
 
 const SponsorsPage: React.FC = () => {
@@ -68,26 +69,12 @@ const SponsorsPage: React.FC = () => {
                         <h3 className="tier-group-title">Partners</h3>
                         <div className="sponsors-grid">
                             {partners.map((sponsor) => (
-                                <div key={sponsor.name} className="sponsor-card partner">
-                                    <div className="sponsor-logo">
-                                        <img
-                                            src={sponsor.logoPath || placeholderLogo}
-                                            alt={`${sponsor.name} logo`}
-                                            onError={(e) => { e.currentTarget.src = placeholderLogo; }}
-                                        />
-                                    </div>
-                                    <div className="sponsor-info">
-                                        <h4 className="sponsor-name">{sponsor.name}</h4>
-                                        <p className="sponsor-description">{sponsor.description}</p>
-                                        <div className="sponsor-meta">
-                                            <span className="sponsor-year">{sponsor.year}</span>
-                                            <a href={sponsor.website} className="sponsor-link" target="_blank" rel="noopener noreferrer">
-                                                <FaExternalLinkAlt size={14} />
-                                                <span>Visit Website</span>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
+                                <SponsorCard
+                                    key={sponsor.name}
+                                    sponsor={sponsor}
+                                    className="partner"
+                                    placeholderLogo={placeholderLogo}
+                                />
                             ))}
                         </div>
                     </div>
@@ -96,26 +83,13 @@ const SponsorsPage: React.FC = () => {
                         <h3 className="tier-group-title">Standard Sponsors</h3>
                         <div className="sponsors-grid">
                             {standard.map((sponsor) => (
-                                <div key={sponsor.name} className="sponsor-card standard">
-                                    <div className="sponsor-logo">
-                                        <img
-                                            src={sponsor.logoPath || placeholderLogo}
-                                            alt={`${sponsor.name} logo`}
-                                            onError={(e) => { e.currentTarget.src = placeholderLogo; }}
-                                        />
-                                    </div>
-                                    <div className="sponsor-info">
-                                        <h4 className="sponsor-name" style={{ color: '#003366' }}>{sponsor.name}</h4>
-                                        <p className="sponsor-description" style={{ color: '#003366' }}>{sponsor.description}</p>
-                                        <div className="sponsor-meta">
-                                            <span className="sponsor-year" style={{ color: '#003366' }}>{sponsor.year}</span>
-                                            <a href={sponsor.website} className="sponsor-link" style={{ color: '#003366' }} target="_blank" rel="noopener noreferrer">
-                                                <FaExternalLinkAlt size={14} />
-                                                <span>Visit Website</span>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
+                                <SponsorCard
+                                    key={sponsor.name}
+                                    sponsor={sponsor}
+                                    className="standard"
+                                    placeholderLogo={placeholderLogo}
+                                    textColor="#003366"
+                                />
                             ))}
                         </div>
                     </div>

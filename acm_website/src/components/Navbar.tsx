@@ -16,6 +16,7 @@ const Navbar: React.FC = () => {
           <Link to="#" onClick={(e) => { e.preventDefault(); navigateTo('home', '') }} className="nav-links">Home</Link>
           <Link to="#" onClick={(e) => { e.preventDefault(); navigateTo('about', '') }} className="nav-links">About Us</Link>
           <Link to="#" onClick={(e) => { e.preventDefault(); navigateTo('events', '') }} className="nav-links">Events</Link>
+          <Link to="#" onClick={(e) => { e.preventDefault(); navigateTo('sponsors', '') }} className="nav-links">Sponsors</Link>
           <Link to="#" onClick={(e) => { e.preventDefault(); navigateTo('booking', '') }} className="nav-links">Book Lounge</Link>
           <Link 
             to="#"

@@ -1,5 +1,3 @@
-import { Timestamp } from 'firebase/firestore';
-
 export interface BaseEvent {
   name: string;
   description: string;
@@ -103,7 +101,7 @@ export interface EventAttendeeRecord {
  * Converts Firestore document with Timestamp to frontend-friendly format
  */
 export type FirestoreToFrontend<T> = {
-  [K in keyof T]: T[K] extends Timestamp ? Date : T[K];
+  [K in keyof T]: T[K] extends any ? Date : T[K];
 };
 
 /**

@@ -5,7 +5,7 @@
       "src": "acm_website/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "dist"
+        "distDir": "acm_website/dist"
       }
     },
     {

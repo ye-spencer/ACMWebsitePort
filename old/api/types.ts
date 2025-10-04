@@ -37,6 +37,8 @@ export type UserEventRecordDocument = {
   date: Timestamp;
 };
 
+// =========================
+
 export type EventAttendeeRecord = {
   uid: string;
   email: string;

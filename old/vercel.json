@@ -2,12 +2,12 @@
   "version": 2,
   "builds": [
     {
-      "src": "acm_website/dist/**",
-      "use": "@vercel/static"
-    },
-    {
       "src": "src/server.ts",
       "use": "@vercel/node"
+    },
+    {
+      "src": "acm_website/dist/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [

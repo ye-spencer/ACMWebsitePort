@@ -616,7 +616,7 @@ app.post('/api/users', async (req: Request<{}, {}, Profile>, res: Response) => {
 });
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
+
+export default app;
 

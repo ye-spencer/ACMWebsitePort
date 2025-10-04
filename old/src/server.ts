@@ -615,8 +615,14 @@ app.post('/api/users', async (req: Request<{}, {}, Profile>, res: Response) => {
   }
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Export the Express app for Vercel serverless functions
+export default app;
+
+// Only start the server if running locally (not in Vercel)
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 

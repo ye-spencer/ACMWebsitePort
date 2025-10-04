@@ -13,7 +13,7 @@ import {
   EventSummary,
   Member,
   UserEventRecord
-} from '../../shared/types';
+} from "../shared/types";
 dotenv.config();
 
 const app = express();

@@ -1,28 +1,43 @@
 import { Timestamp } from 'firebase-admin/firestore';
-import { BaseProfile, BaseEvent, BaseBooking, BaseUserEventRecord } from '../../shared/types';
+import { BaseProfile, BaseEvent, BaseBooking, BaseUserEventRecord } from '../shared/types';
 
 // Backend-specific document types using Admin SDK Timestamp
-export interface ProfileDocument extends BaseProfile {
+
+export type ProfileDocument = {
+  email: string;
+  isMember: boolean;
+  isOnMailingList: boolean;
   eventsAttended: UserEventRecordDocument[];
   eventsRegistered: UserEventRecordDocument[];
+  deleted?: boolean;
   deletedAt?: Timestamp;
-}
+};
 
-export interface EventDocument extends BaseEvent {
+export type EventDocument = {
+  name: string;
+  description: string;
+  location: string;
+  category: string;
+  link?: string;
+  attendees: EventAttendeeRecord[];
+  registered: EventAttendeeRecord[];
   start: Timestamp;
   end: Timestamp;
-}
+};
 
-export interface BookingDocument extends BaseBooking {
+export type BookingDocument = {
+  uid: string;
   start: Timestamp;
   end: Timestamp;
-}
+};
 
-export interface UserEventRecordDocument extends BaseUserEventRecord {
+export type UserEventRecordDocument = {
+  eventID: string;
+  name: string;
   date: Timestamp;
-}
+};
 
-export interface EventAttendeeRecord {
+export type EventAttendeeRecord = {
   uid: string;
   email: string;
-}
+};

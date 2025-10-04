@@ -615,8 +615,9 @@ app.post('/api/users', async (req: Request<{}, {}, Profile>, res: Response) => {
   }
 });
 
-const PORT = process.env.PORT || 3001;
 
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-export default app;
-
+export default (req: VercelRequest, res: VercelResponse) => {
+  app(req, res);
+};
